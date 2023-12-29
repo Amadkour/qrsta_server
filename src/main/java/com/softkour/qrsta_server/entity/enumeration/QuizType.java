@@ -1,4 +1,4 @@
-package com.softkour.qrsta.domain.enumeration;
+package com.softkour.qrsta_server.entity.enumeration;
 
 /**
  * The QuizType enumeration.

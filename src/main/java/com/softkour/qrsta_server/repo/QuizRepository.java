@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.repository;
+package com.softkour.qrsta_server.repo;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.softkour.qrsta.service;
+package com.softkour.qrsta_server.service;
 
 import java.util.*;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.softkour.qrsta.repo.UserRepository;
+import com.softkour.qrsta_server.repo.UserRepository;
 
 /**
  * Authenticate a user from the database.

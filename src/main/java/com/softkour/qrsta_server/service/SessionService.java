@@ -1,7 +1,7 @@
-package com.softkour.qrsta.service;
+package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta.entity.Session;
-import com.softkour.qrsta.repo.SessionRepository;
+import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.repo.SessionRepository;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service Implementation for managing
- * {@link com.softkour.qrsta.domain.Session}.
+ * {@link com.softkour.qrsta_server.domain.Session}.
  */
 @Service
 @Transactional

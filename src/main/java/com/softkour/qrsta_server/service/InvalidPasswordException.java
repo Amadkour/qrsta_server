@@ -1,4 +1,4 @@
-package com.softkour.qrsta.service;
+package com.softkour.qrsta_server.service;
 
 public class InvalidPasswordException extends RuntimeException {
 

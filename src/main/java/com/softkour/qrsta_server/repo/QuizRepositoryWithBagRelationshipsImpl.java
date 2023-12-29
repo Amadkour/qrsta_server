@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.repository;
+package com.softkour.qrsta_server.repo;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

@@ -1,20 +1,11 @@
-package com.softkour.qrsta.entity;
+package com.softkour.qrsta_server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta.domain.enumeration.CourseType;
+import com.softkour.qrsta_server.entity.enumeration.CourseType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,17 +14,16 @@ import java.util.Set;
  * A Course.
  */
 @Entity
+@Data
 @Table(name = "course")
 // @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Course extends AbstractAuditingEntity<Long> {
 
-    private static final long serialVersionUID = 1L;
-
     @Id
-    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-    // "sequenceGenerator")
-    // @SequenceGenerator(name = "sequenceGenerator")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
+     "sequenceGenerator")
+     @SequenceGenerator(name = "sequenceGenerator")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "id")
     private Long id;
@@ -60,49 +50,6 @@ public class Course extends AbstractAuditingEntity<Long> {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public Long getId() {
-        return this.id;
-    }
-
-    public Course id(Long id) {
-        this.setId(id);
-        return this;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public Course name(String name) {
-        this.setName(name);
-        return this;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CourseType getType() {
-        return this.type;
-    }
-
-    public Course type(CourseType type) {
-        this.setType(type);
-        return this;
-    }
-
-    public void setType(CourseType type) {
-        this.type = type;
-    }
-
-    public Set<Session> getSessions() {
-        return this.sessions;
-    }
-
     public void setSessions(Set<Session> sessions) {
         if (this.sessions != null) {
             this.sessions.forEach(i -> i.setCourse(null));
@@ -111,11 +58,6 @@ public class Course extends AbstractAuditingEntity<Long> {
             sessions.forEach(i -> i.setCourse(this));
         }
         this.sessions = sessions;
-    }
-
-    public Course sessions(Set<Session> sessions) {
-        this.setSessions(sessions);
-        return this;
     }
 
     public Course addSession(Session session) {
@@ -130,9 +72,6 @@ public class Course extends AbstractAuditingEntity<Long> {
         return this;
     }
 
-    public Set<User> getStudents() {
-        return this.students;
-    }
 
 //    public void setStudents(Set<User> employees) {
 //        if (this.students != null) {
@@ -144,10 +83,10 @@ public class Course extends AbstractAuditingEntity<Long> {
 //        this.students = employees;
 //    }
 
-//    public Course students(Set<User> employees) {
-//        this.setStudents(employees);
-//        return this;
-//    }
+    public Course students(Set<User> employees) {
+        this.setStudents(employees);
+        return this;
+    }
 
     public Course addStudent(User employee) {
         this.students.add(employee);
@@ -159,10 +98,6 @@ public class Course extends AbstractAuditingEntity<Long> {
         this.students.remove(employee);
         employee.getCourses().remove(this);
         return this;
-    }
-
-    public Set<Schedule> getSchedules() {
-        return this.schedules;
     }
 
     public void setSchedules(Set<Schedule> schedules) {

@@ -5,7 +5,7 @@ package com.softkour.qrsta_server.security;
  */
 public final class AuthoritiesConstants {
 
-    public static final String ADMIN = "ROLE_ADMIN";
+    public static final String ADMI = "ROLE_ADMIN";
 
     public static final String USER = "ROLE_USER";
 

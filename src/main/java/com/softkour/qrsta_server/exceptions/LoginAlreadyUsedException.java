@@ -1,4 +1,4 @@
-package com.softkour.qrsta.exceptions;
+package com.softkour.qrsta_server.exceptions;
 
 import org.springframework.web.ErrorResponseException;
 

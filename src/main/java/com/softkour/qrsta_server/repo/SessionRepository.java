@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.repository;
+package com.softkour.qrsta_server.repo;
 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;

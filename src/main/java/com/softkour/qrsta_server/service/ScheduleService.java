@@ -1,7 +1,7 @@
-package com.softkour.qrsta.service;
+package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta.entity.Schedule;
-import com.softkour.qrsta.repo.ScheduleRepository;
+import com.softkour.qrsta_server.entity.Schedule;
+import com.softkour.qrsta_server.repo.ScheduleRepository;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service Implementation for managing
- * {@link com.softkour.qrsta.domain.Schedule}.
+ * {@link com.softkour.qrsta_server.domain.Schedule}.
  */
 @Service
 @Transactional

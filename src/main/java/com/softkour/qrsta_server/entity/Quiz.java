@@ -1,7 +1,7 @@
-package com.softkour.qrsta.entity;
+package com.softkour.qrsta_server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta.domain.enumeration.QuizType;
+import com.softkour.qrsta_server.entity.enumeration.QuizType;
 
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;

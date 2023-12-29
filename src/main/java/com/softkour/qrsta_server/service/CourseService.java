@@ -1,20 +1,16 @@
-package com.softkour.qrsta.service;
+package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta.entity.Course;
-import com.softkour.qrsta.repo.CourseRepository;
+import com.softkour.qrsta_server.entity.Course;
+import com.softkour.qrsta_server.repo.CourseRepository;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link com.softkour.qrsta.domain.Course}.
- */
 @Service
 @Transactional
 public class CourseService {
@@ -57,8 +53,8 @@ public class CourseService {
         return courseRepository
                 .findById(course.getId())
                 .map(existingCourse -> {
-                    if (course.getCourseId() != null) {
-                        existingCourse.setCourseId(course.getCourseId());
+                    if (course.getId() != null) {
+                        existingCourse.setId(course.getId());
                     }
                     if (course.getName() != null) {
                         existingCourse.setName(course.getName());

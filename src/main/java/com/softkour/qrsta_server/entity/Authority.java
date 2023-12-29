@@ -1,4 +1,4 @@
-package com.softkour.qrsta.entity;
+package com.softkour.qrsta_server.entity;
 
 import java.io.Serializable;
 import java.util.Objects;

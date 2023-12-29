@@ -1,6 +1,6 @@
-package com.softkour.qrsta.service.dto;
+package com.softkour.qrsta_server.service.dto;
 
-import com.softkour.qrsta.entity.User;
+import com.softkour.qrsta_server.entity.User;
 import java.io.Serializable;
 
 /**
