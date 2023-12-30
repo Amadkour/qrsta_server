@@ -26,7 +26,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-   public String username;
+   public static String username;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {

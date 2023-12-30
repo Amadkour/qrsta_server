@@ -49,8 +49,7 @@ public class User extends AbstractAuditingEntity<Long> {
 
     private String otp;
 
-    @NotNull
-    @Column( nullable = false)
+    @Column()
     private LocalDate dob;
 
     @Column()

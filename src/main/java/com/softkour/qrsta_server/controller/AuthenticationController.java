@@ -112,13 +112,32 @@ public class AuthenticationController {
         responseMap.put("otp", u.getOtp());
         return GenericResponse.success(responseMap);
     }
+    @PostMapping("/parent_register")
+    public ResponseEntity<GenericResponse<Map<String, Object>>> createParent(
+            @RequestBody RegisterationRequest registerationRequest) {
+        User user = new User();
+        Supplier<String> otp = otpService.createRandomOneTimeOTP();
+        user.setName(registerationRequest.getName());
+        user.setMacAddress(registerationRequest.getMacAddress());
+        user.setPhoneNumber(registerationRequest.getPhone());
+        user.setPassword(new BCryptPasswordEncoder().encode(registerationRequest.getPassword()));
+        user.setOtp(otp.get());
+        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
+        user.setType(registerationRequest.getUserType());
+        user.setOrganization(registerationRequest.getOrganizationName());
+        user.setDob(LocalDate.parse(registerationRequest.getBirthDate()));
+//        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(2));
+        User u = userRepository.save(user);
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("otp", u.getOtp());
+        return GenericResponse.success(responseMap);
+    }
 
     @PostMapping("verfy_otp")
     public ResponseEntity<GenericResponse<Object>> verifyOtp(@RequestHeader String otp,
                                                              @RequestHeader String phone) {
         User user = userRepository.findUserByPhoneNumber(phone);
         Map<String, Object> responseMap = new HashMap<>();
-
         if (user.getOtp().equalsIgnoreCase(otp)) {
             // user.setOtp(null);
             user.setActive(true);

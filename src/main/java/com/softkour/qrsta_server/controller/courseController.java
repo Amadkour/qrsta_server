@@ -48,14 +48,8 @@ public class courseController {
             course.setName(request.getName());
             course.setType(request.getCourseType());
             course.setCost(request.getCost());
-            logger.warn("in progress:2");
-
             course.setSchedules(savedSchedules);
-            logger.warn("in progress:3");
-
             courseService.save(course);
-            logger.warn("save schedule success");
-
             return GenericResponse.successWithMessageOnly("success add course");
         } catch (Exception e) {
             return GenericResponse.error(e.toString());
