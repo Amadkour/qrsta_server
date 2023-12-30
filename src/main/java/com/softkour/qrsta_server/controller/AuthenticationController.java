@@ -1,5 +1,7 @@
 package com.softkour.qrsta_server.controller;
 
+import com.softkour.qrsta_server.config.Constants;
+import com.softkour.qrsta_server.config.GenericResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
-import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.request.LoginRequest;
 import com.softkour.qrsta_server.request.RegisterationRequest;
@@ -26,13 +23,11 @@ import com.softkour.qrsta_server.security.JwtTokenUtil;
 import com.softkour.qrsta_server.service.JwtUserDetailsService;
 import com.softkour.qrsta_server.service.OTPService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @RestController
@@ -53,45 +48,48 @@ public class AuthenticationController {
     OTPService otpService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
+    public ResponseEntity<GenericResponse<Map<String, Object>>> loginUser(@RequestBody LoginRequest request) {
         Map<String, Object> responseMap = new HashMap<>();
         try {
+            logger.warn(request.toString());
             Authentication auth = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getPhone(), request.getPassword()));
-            if (auth.isAuthenticated()) {
+            User user = userRepository.findUserByPhoneNumber(request.getPhone());
+            if (user == null) {
+                responseMap.put("message", "user not found");
+                return GenericResponse.errorWithCoder(responseMap, Constants.ERROR_USER_NOT_FOUND);
+            } else if (!user.isActive()) {
+                responseMap.put("message", "user not activate");
+                return GenericResponse.errorWithCoder(responseMap, Constants.ERROR_USER_NOT_ACTIVATE);
+            } else if (auth.isAuthenticated()) {
                 logger.info("Logged In");
+                userRepository.save(user);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPhone());
                 String token = jwtTokenUtil.generateToken(userDetails);
-                responseMap.put("error", false);
-                responseMap.put("message", "Logged In");
+
+                responseMap.put("user", user);
                 responseMap.put("token", token);
-                return ResponseEntity.ok(responseMap);
+                return GenericResponse.success(responseMap);
             } else {
-                responseMap.put("error", true);
                 responseMap.put("message", "Invalid Credentials");
-                return ResponseEntity.status(401).body(responseMap);
+                return GenericResponse.error(responseMap);
             }
         } catch (DisabledException e) {
-            e.printStackTrace();
-            responseMap.put("error", true);
             responseMap.put("message", "User is disabled");
-            return ResponseEntity.status(500).body(responseMap);
+            return GenericResponse.error(responseMap);
         } catch (BadCredentialsException e) {
-            responseMap.put("error", true);
             responseMap.put("message", "Invalid Credentials");
-            return ResponseEntity.status(401).body(responseMap);
+            return GenericResponse.error(responseMap);
         } catch (Exception e) {
-            e.printStackTrace();
-            responseMap.put("error", true);
             responseMap.put("message", "Something went wrong");
-            return ResponseEntity.status(500).body(responseMap);
+            return GenericResponse.error(responseMap);
         }
     }
 
     @PostMapping("/register")
-    public String saveUser(@RequestBody RegisterationRequest registerationRequest) {
+    public ResponseEntity<GenericResponse<Map<String, Object>>> saveUser(
+            @RequestBody RegisterationRequest registerationRequest) {
         User user = new User();
-        logger.debug(registerationRequest.toString());
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setName(registerationRequest.getName());
@@ -102,20 +100,32 @@ public class AuthenticationController {
         user.setType(registerationRequest.getUserType());
         user.setOrganization(registerationRequest.getOrganizationName());
         user.setDob(LocalDate.parse(registerationRequest.getBirthDate()));
-        // user.setLoggen(false);
-        // user.setActive(false);
-        user.setExpireOTPDateTime(LocalDateTime.now().plus(30, ChronoUnit.DAYS));
-        user.setExpireOTPDateTime(LocalDateTime.now().plus(2, ChronoUnit.MINUTES));
-
+        user.setExpireOTPDateTime(LocalDateTime.now().plusDays(30));
+        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(2));
         User u = userRepository.save(user);
-        return u.getOtp();
-        // Map<String, Object> responseMap = new HashMap<>();
-        // UserDetails userDetails = userDetailsService.loadUserByUsername(phone);
-        // String token = jwtTokenUtil.generateToken(userDetails);
-        // responseMap.put("error", false);
-        // responseMap.put("username", userName);
-        // responseMap.put("message", "Account created successfully");
-        // responseMap.put("token", token);
-        // return ResponseEntity.ok(responseMap);
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("otp", u.getOtp());
+        return GenericResponse.success(responseMap);
+    }
+
+    @PostMapping("verfy_otp")
+    public ResponseEntity<GenericResponse<Map<String, Object>>> verifyOtp(@RequestHeader String otp, @RequestHeader String phone) {
+        User user = userRepository.findUserByPhoneNumber(phone);
+        Map<String, Object> responseMap = new HashMap<>();
+
+        logger.warn(user.toString());
+        if (Objects.equals(user.getOtp(), otp)) {
+            user.setOtp(null);
+            user.setLoggen(true);
+            user.setActive(true);
+            userRepository.save(user);
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setPassword(user.getPassword());
+            loginRequest.setPhone(user.getPhoneNumber());
+            return loginUser(loginRequest);
+        } else {
+            responseMap.put("message", "Invalid Credentials");
+            return GenericResponse.error(responseMap);
+        }
     }
 }

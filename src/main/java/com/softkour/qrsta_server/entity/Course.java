@@ -5,6 +5,7 @@ import com.softkour.qrsta_server.entity.enumeration.CourseType;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -31,6 +32,10 @@ public class Course extends AbstractAuditingEntity<Long> {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
+    @NotNull
+    @Column(name = "cost", nullable = false)
+    @Size(max = 4)
+    private double cost;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")

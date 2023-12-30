@@ -1,40 +1,29 @@
 package com.softkour.qrsta_server.request;
 
+import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Setter
 @Getter
 @ToString
-public class RegisterationRequest {
+public class CourseCreationRequest {
     @NotBlank
     @Size(min = 3, max = 20)
     private String name;
-    @NotNull
-    private UserType userType;
-    @NotNull
-    private OrganizationType organizationName;
 
     @NotBlank
-    @Size(min = 6, max = 40)
-    private String password;
-
+    private double cost;
     @NotBlank
-    @Size(min = 10, max = 10)
-    private String birthDate;
+    private CourseType courseType;
     @NotBlank
-    @Size(min = 11, max = 11)
-    private String phone;
-
-    @NotBlank
-    @Size(min = 6)
-    private String macAddress;
+    List<ScheduleRequest> schedules;
 }

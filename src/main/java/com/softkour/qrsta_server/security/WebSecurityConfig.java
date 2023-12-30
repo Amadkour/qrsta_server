@@ -24,55 +24,55 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
-  @Autowired
-  UserDetailsService userDetailsService;
+    @Autowired
+    UserDetailsService userDetailsService;
 
-  @Autowired
-  private JwtRequestFilter jwtRequestFilter;
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
 
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-    authProvider.setUserDetailsService(userDetailsService);
-    authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
 
-    return authProvider;
-  }
+        return authProvider;
+    }
 
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-    return authConfig.getAuthenticationManager();
-  }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable())
-        .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
-          Map<String, Object> responseMap = new HashMap<>();
-          ObjectMapper mapper = new ObjectMapper();
-          response.setStatus(401);
-          responseMap.put("error", true);
-          responseMap.put("message", "Unauthorized");
-          response.setHeader("content-type", "application/json");
-          String responseMsg = mapper.writeValueAsString(responseMap);
-          response.getWriter().write(responseMsg);
-        }))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "api/auth/**").permitAll()
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                    Map<String, Object> responseMap = new HashMap<>();
+                    ObjectMapper mapper = new ObjectMapper();
+                    response.setStatus(401);
+                    responseMap.put("error", true);
+                    responseMap.put("message", "Unauthorized");
+                    response.setHeader("content-type", "application/json");
+                    String responseMsg = mapper.writeValueAsString(responseMap);
+                    response.getWriter().write(responseMsg);
+                }))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "api/auth/**").permitAll()
 
-                .anyRequest().authenticated());
+                                .anyRequest().authenticated());
 
-    http.authenticationProvider(authenticationProvider());
+        http.authenticationProvider(authenticationProvider());
 
-    http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-    return http.build();
-  }
+        return http.build();
+    }
 }

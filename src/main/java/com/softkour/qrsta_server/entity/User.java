@@ -48,8 +48,6 @@ public class User extends AbstractAuditingEntity<Long> {
     @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
-    @NotNull
-    @Column(name = "otp", nullable = false, unique = false)
     private String otp;
 
     @NotNull
