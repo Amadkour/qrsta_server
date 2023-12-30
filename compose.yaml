@@ -15,7 +15,7 @@
 #       - 'POSTGRES_PASSWORD=secret'
 #     ports:
 #       - '5432:5432'
-version: '1'
+version: '2'
 services:
   postgres-db:
     container_name: postgres-db

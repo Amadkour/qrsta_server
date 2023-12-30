@@ -1,5 +1,7 @@
 package com.softkour.qrsta_server.security;
 
+import com.softkour.qrsta_server.config.MyUtils;
+import jdk.jshell.execution.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,8 +11,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.softkour.qrsta_server.service.JwtUserDetailsService;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -25,20 +26,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-
+   public String username;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         final String requestTokenHeader = request.getHeader("Authorization");
-        logger.warn(requestTokenHeader);
         if (StringUtils.startsWith(requestTokenHeader, "Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
             try {
-                String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                 if (StringUtils.isNotEmpty(username)
                         && null == SecurityContextHolder.getContext().getAuthentication()) {
-                    UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+                    UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(MyUtils.getUserPhone(username));
                     if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());

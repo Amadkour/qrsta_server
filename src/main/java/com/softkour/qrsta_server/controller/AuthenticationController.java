@@ -1,11 +1,13 @@
 package com.softkour.qrsta_server.controller;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.softkour.qrsta_server.service.dto.UserLoginResponse;
+import com.softkour.qrsta_server.service.mapper.UserLoginMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.request.LoginRequest;
 import com.softkour.qrsta_server.request.RegisterationRequest;
 import com.softkour.qrsta_server.security.JwtTokenUtil;
-import com.softkour.qrsta_server.service.JwtUserDetailsService;
+import com.softkour.qrsta_server.security.JwtUserDetailsService;
 import com.softkour.qrsta_server.service.OTPService;
 
 @RestController
@@ -52,7 +54,7 @@ public class AuthenticationController {
     OTPService otpService;
 
     @PostMapping("/login")
-    public ResponseEntity<GenericResponse<Map<String, Object>>> loginUser(@RequestBody LoginRequest request) {
+    public ResponseEntity<GenericResponse<Object>> loginUser(@RequestBody LoginRequest request) {
         Map<String, Object> responseMap = new HashMap<>();
         try {
             logger.warn(request.toString());
@@ -70,9 +72,9 @@ public class AuthenticationController {
                 userRepository.save(user);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPhone());
                 String token = jwtTokenUtil.generateToken(userDetails);
-
-                responseMap.put("user", user);
-                responseMap.put("token", token);
+                UserLoginResponse userLoginResponse=UserLoginMapper.INSTANCE.toDto(user);
+                userLoginResponse.setToken(token);
+                responseMap.put("user",userLoginResponse );
                 return GenericResponse.success(responseMap);
             } else {
                 responseMap.put("message", "Invalid Credentials");
@@ -100,12 +102,11 @@ public class AuthenticationController {
         user.setPhoneNumber(registerationRequest.getPhone());
         user.setPassword(new BCryptPasswordEncoder().encode(registerationRequest.getPassword()));
         user.setOtp(otp.get());
-        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(1));
+        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
         user.setType(registerationRequest.getUserType());
         user.setOrganization(registerationRequest.getOrganizationName());
         user.setDob(LocalDate.parse(registerationRequest.getBirthDate()));
-        user.setExpireOTPDateTime(LocalDateTime.now().plusDays(30));
-        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(2));
+//        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(2));
         User u = userRepository.save(user);
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("otp", u.getOtp());
@@ -113,8 +114,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("verfy_otp")
-    public ResponseEntity<GenericResponse<Map<String, Object>>> verifyOtp(@RequestHeader String otp,
-            @RequestHeader String phone) {
+    public ResponseEntity<GenericResponse<Object>> verifyOtp(@RequestHeader String otp,
+                                                             @RequestHeader String phone) {
         User user = userRepository.findUserByPhoneNumber(phone);
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -123,8 +124,8 @@ public class AuthenticationController {
             user.setActive(true);
             userRepository.save(user);
 
-            responseMap.put("otp", otp);
-            return GenericResponse.success(responseMap);
+            return GenericResponse.successWithMessageOnly("success verification");
+
 
         } else {
             responseMap.put("message", "Invalid Credentials");
@@ -132,17 +133,13 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping("logot")
-    public ResponseEntity<GenericResponse<String>> logot() {
-        return GenericResponse.successWithMessageOnly("sucess logout");
-    }
 
     @GetMapping("forget_password")
     public ResponseEntity<GenericResponse<Map<String, Object>>> forgetPassword(@RequestHeader String phone) {
         User user = userRepository.findUserByPhoneNumber(phone);
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setOtp(otp.get());
-        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(1));
+        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("otp", user.getOtp());
         return GenericResponse.success(responseMap);
@@ -150,13 +147,13 @@ public class AuthenticationController {
 
     @GetMapping("change_password")
     public ResponseEntity<GenericResponse<String>> changePassword(@RequestHeader String phone,
-            @RequestHeader String password, @RequestHeader String otp) {
+                                                                  @RequestHeader String password, @RequestHeader String otp) {
         User user = userRepository.findUserByPhoneNumber(phone);
         try {
-            if (otp.equalsIgnoreCase(otp) && user.getExpireOTPDateTime().isBefore(LocalDateTime.now())) {
+            if (user.getOtp().equalsIgnoreCase(otp) && user.getExpireOTPDateTime().isBefore(Instant.now())) {
                 user.setPassword(new BCryptPasswordEncoder().encode(password));
             }
-            return GenericResponse.successWithMessageOnly("sucess changed");
+            return GenericResponse.successWithMessageOnly("success changed");
         } catch (Exception e) {
             return GenericResponse.successWithMessageOnly(e.getMessage());
 

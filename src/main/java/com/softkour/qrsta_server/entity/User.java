@@ -7,7 +7,10 @@ import com.softkour.qrsta_server.entity.enumeration.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -18,7 +21,8 @@ import java.util.Set;
  */
 @Entity
 // @SuppressWarnings("common-java:DuplicatedBlocks")
-@Data
+@Setter
+@Getter
 @Table(name = "qrsta_user")
 public class User extends AbstractAuditingEntity<Long> {
 
@@ -26,43 +30,41 @@ public class User extends AbstractAuditingEntity<Long> {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-    // "sequenceGenerator")
-    // @SequenceGenerator(name = "sequence_generator", sequenceName =
-    // "sequence_generator", allocationSize = 1, schema = "public")
-    @Column(name = "id")
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Column( nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column()
     private UserType type;
 
-    @Column(name = "organization")
+    @Column()
     private OrganizationType organization;
 
     @NotNull
-    @Column(name = "phone_number", nullable = false, unique = true)
+    @Column( nullable = false, unique = true)
     private String phoneNumber;
 
     private String otp;
 
     @NotNull
-    @Column(name = "dob", nullable = false)
+    @Column( nullable = false)
     private LocalDate dob;
 
-    @Column(name = "mac_address")
+    @Column()
     private String macAddress;
 
-    @Column(name = "is_active", columnDefinition = "boolean default false")
+    @Column( columnDefinition = "boolean default false")
     private boolean isActive;
-    @Column(name = "is_loggen", columnDefinition = "boolean default false")
-    private boolean isLoggen;
+    @Column( columnDefinition = "boolean default false")
+    private boolean isLogged;
 
-    @Column(name = "password")
+    @Column(columnDefinition = "integer default 0")
+    private int logoutTimes;
+
+    @Column()
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -80,7 +82,7 @@ public class User extends AbstractAuditingEntity<Long> {
     private Set<Course> courses = new HashSet<>();
     /// ==========================
     @Column
-    private LocalDateTime ExpireOTPDateTime;
+    private Instant ExpireOTPDateTime;
     @Column
-    private LocalDateTime ExpirePasswordDate;
+    private Instant ExpirePasswordDate;
 }

@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.service;
+package com.softkour.qrsta_server.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +23,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         com.softkour.qrsta_server.entity.User user = userRepository.findUserByPhoneNumber(phone);
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority(user.getType().name()));
-        return new org.springframework.security.core.userdetails.User(user.getPhoneNumber(), user.getPassword(),
+        return new org.springframework.security.core.userdetails.User(String.valueOf(user.getLogoutTimes()).concat("+").concat(user.getPhoneNumber()), user.getPassword(),
                 authorityList);
     }
 }

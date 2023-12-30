@@ -31,7 +31,7 @@ public class courseController {
     ScheduleService scheduleService;
 
     @PostMapping("add_course")
-    public ResponseEntity<GenericResponse<String>> addCourse(@RequestBody CourseCreationRequest request) {
+    public ResponseEntity<GenericResponse<Object>> addCourse(@RequestBody CourseCreationRequest request) {
         try {
             // ===========[ schedule ]===============//
             Set<Schedule> savedSchedules = new HashSet<>();
