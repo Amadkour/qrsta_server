@@ -1,15 +1,24 @@
 package com.softkour.qrsta_server.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A Course.
@@ -20,21 +29,19 @@ import java.util.Set;
 // @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Course extends AbstractAuditingEntity<Long> {
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-     "sequenceGenerator")
-     @SequenceGenerator(name = "sequenceGenerator")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
+    // "sequenceGenerator")
+    // @SequenceGenerator(name = "sequence_generator", sequenceName =
+    // "sequence_generator", allocationSize = 1, schema = "public")
     @Column(name = "id")
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
     private String name;
     @NotNull
-    @Column(name = "cost", nullable = false)
-    @Size(max = 4)
+    // @Size(max = 4)
     private double cost;
 
     @Enumerated(EnumType.STRING)
@@ -77,16 +84,15 @@ public class Course extends AbstractAuditingEntity<Long> {
         return this;
     }
 
-
-//    public void setStudents(Set<User> employees) {
-//        if (this.students != null) {
-//            this.students.forEach(i -> i.removeCourse(this));
-//        }
-//        if (employees != null) {
-//            employees.forEach(i -> i.addCourse(this));
-//        }
-//        this.students = employees;
-//    }
+    // public void setStudents(Set<User> employees) {
+    // if (this.students != null) {
+    // this.students.forEach(i -> i.removeCourse(this));
+    // }
+    // if (employees != null) {
+    // employees.forEach(i -> i.addCourse(this));
+    // }
+    // this.students = employees;
+    // }
 
     public Course students(Set<User> employees) {
         this.setStudents(employees);

@@ -1,8 +1,7 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.entity.Course;
-import com.softkour.qrsta_server.repo.CourseRepository;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.softkour.qrsta_server.entity.Course;
+import com.softkour.qrsta_server.repo.CourseRepository;
+
 @Service
-@Transactional
 public class CourseService {
 
     private final Logger log = LoggerFactory.getLogger(CourseService.class);
