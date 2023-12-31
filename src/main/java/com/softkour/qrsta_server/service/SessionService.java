@@ -9,10 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing
- * {@link com.softkour.qrsta_server.domain.Session}.
- */
 @Service
 @Transactional
 public class SessionService {
@@ -25,80 +21,22 @@ public class SessionService {
         this.sessionRepository = sessionRepository;
     }
 
-    /**
-     * Save a session.
-     *
-     * @param session the entity to save.
-     * @return the persisted entity.
-     */
     public Session save(Session session) {
-        log.debug("Request to save Session : {}", session);
         return sessionRepository.save(session);
     }
 
-    /**
-     * Update a session.
-     *
-     * @param session the entity to save.
-     * @return the persisted entity.
-     */
-    public Session update(Session session) {
-        log.debug("Request to update Session : {}", session);
-        return sessionRepository.save(session);
-    }
-
-    /**
-     * Partially update a session.
-     *
-     * @param session the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Optional<Session> partialUpdate(Session session) {
-        log.debug("Request to partially update Session : {}", session);
-
-        return sessionRepository
-                .findById(session.getId())
-                .map(existingSession -> {
-                    if (session.getCreatedDate() != null) {
-                        existingSession.setCreatedDate(session.getCreatedDate());
-                    }
-                    if (session.getHaveQuiz() != null) {
-                        existingSession.setHaveQuiz(session.getHaveQuiz());
-                    }
-
-                    return existingSession;
-                })
-                .map(sessionRepository::save);
-    }
-
-    /**
-     * Get all the sessions.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public List<Session> findAll() {
+    public List<Session> findSessionsOfCourse(Long courseId) {
         log.debug("Request to get all Sessions");
-        return sessionRepository.findAll();
+        return sessionRepository.findAllByCourse_Id(courseId);
     }
 
-    /**
-     * Get one session by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
     public Optional<Session> findOne(Long id) {
         log.debug("Request to get Session : {}", id);
         return sessionRepository.findById(id);
     }
 
-    /**
-     * Delete the session by id.
-     *
-     * @param id the id of the entity.
-     */
     public void delete(Long id) {
         log.debug("Request to delete Session : {}", id);
         sessionRepository.deleteById(id);

@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import com.softkour.qrsta_server.service.dto.UserLoginResponse;
 import com.softkour.qrsta_server.service.mapper.UserLoginMapper;
+import jakarta.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +40,7 @@ import com.softkour.qrsta_server.service.OTPService;
 
 @RestController
 @RequestMapping("api/auth/")
+@Validated
 public class AuthenticationController {
 
     protected final Log logger = LogFactory.getLog(getClass());
@@ -94,25 +97,32 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<GenericResponse<Map<String, Object>>> saveUser(
-            @RequestBody RegisterationRequest registerationRequest) {
-        User user = new User();
-        Supplier<String> otp = otpService.createRandomOneTimeOTP();
-        user.setName(registerationRequest.getName());
-        user.setMacAddress(registerationRequest.getMacAddress());
-        user.setPhoneNumber(registerationRequest.getPhone());
-        user.setNationalId(registerationRequest.getNationalId());
-        user.setPassword(new BCryptPasswordEncoder().encode(registerationRequest.getPassword()));
-        user.setOtp(otp.get());
-        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
-        user.setType(registerationRequest.getUserType());
-        user.setOrganization(registerationRequest.getOrganizationName());
-        user.setDob(LocalDate.parse(registerationRequest.getBirthDate()));
+    public ResponseEntity<GenericResponse<Object>> saveUser(
+            @RequestBody @Valid RegisterationRequest registerationRequest) {
+        try{
+            User user = new User();
+            Supplier<String> otp = otpService.createRandomOneTimeOTP();
+            user.setName(registerationRequest.getName());
+            user.setMacAddress(registerationRequest.getMacAddress());
+            user.setPhoneNumber(registerationRequest.getPhone());
+            user.setNationalId(registerationRequest.getNationalId());
+            user.setPassword(new BCryptPasswordEncoder().encode(registerationRequest.getPassword()));
+            user.setOtp(otp.get());
+            user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
+            user.setType(registerationRequest.getUserType());
+            user.setOrganization(registerationRequest.getOrganizationName());
+            user.setDob(LocalDate.parse(registerationRequest.getBirthDate()));
 //        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(2));
-        User u = userRepository.save(user);
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("otp", u.getOtp());
-        return GenericResponse.success(responseMap);
+            logger.warn("=============================1111======================");
+            User u = userRepository.save(user);
+            logger.warn("=============================22222======================");
+
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("otp", u.getOtp());
+            return GenericResponse.success(responseMap);
+        }catch (Exception e){
+            return  GenericResponse.error(e.getMessage());
+        }
     }
 
     @PostMapping("verfy_otp")

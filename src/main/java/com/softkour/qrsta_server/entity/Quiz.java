@@ -31,13 +31,18 @@ public class Quiz extends AbstractAuditingEntity {
     private QuizType type;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "rel_quiz__session", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
+    @JoinTable(name = "quiz__session", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
     @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes")
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
-    private Set<Question> quizzes = new HashSet<>();
+    private Set<Question> questions = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "quiz__student", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
+    @JsonIgnoreProperties(value = { "quiz" }, allowSetters = true)
+    private Set<StudentQuiz> students = new HashSet<>();
 
     public void addSession(Session session) {
         this.sessions.add(session);
@@ -47,26 +52,36 @@ public class Quiz extends AbstractAuditingEntity {
         this.sessions.remove(session);
     }
 
-    public void setQuizzes(Set<Question> questions) {
-        if (this.quizzes != null) {
-            this.quizzes.forEach(i -> i.removeQuiz(this));
+    public void setQuestions(Set<Question> questions) {
+        if (this.questions != null) {
+            this.questions.forEach(i -> i.removeQuiz(this));
         }
         if (questions != null) {
             questions.forEach(i -> i.addQuiz(this));
         }
-        this.quizzes = questions;
+        this.questions = questions;
     }
 
 
-    public Quiz addQuiz(Question question) {
-        this.quizzes.add(question);
+    public Quiz addQuestion(Question question) {
+        this.questions.add(question);
         question.getQuizzes().add(this);
         return this;
     }
 
-    public Quiz removeQuiz(Question question) {
-        this.quizzes.remove(question);
+    public Quiz removeQuestion(Question question) {
+        this.questions.remove(question);
         question.getQuizzes().remove(this);
+        return this;
+    }
+
+    public Quiz addStudent(StudentQuiz studentQuiz) {
+        this.students.add(studentQuiz);
+        return this;
+    }
+
+    public Quiz removeStudent(StudentQuiz studentQuiz) {
+        this.students.remove(studentQuiz);
         return this;
     }
 }

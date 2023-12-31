@@ -53,21 +53,22 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
-                    Map<String, Object> responseMap = new HashMap<>();
-                    ObjectMapper mapper = new ObjectMapper();
-                    response.setStatus(401);
-                    responseMap.put("error", true);
-                    responseMap.put("message", "Unauthorized");
-                    response.setHeader("content-type", "application/json");
-                    String responseMsg = mapper.writeValueAsString(responseMap);
-                    response.getWriter().write(responseMsg);
-                }))
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "api/auth/**").permitAll()
 
-                                .anyRequest().authenticated());
+                                .anyRequest().authenticated()).exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                    Map<String, Object> responseMap = new HashMap<>();
+                    ObjectMapper mapper = new ObjectMapper();
+                    response.setStatus(401);
+                    responseMap.put("error", true);
+                    responseMap.put("exception_type", authException.getMessage());
+                    responseMap.put("message", "Unauthorized");
+                    response.setHeader("content-type", "application/json");
+                    String responseMsg = mapper.writeValueAsString(responseMap);
+                    response.getWriter().write(responseMsg);
+                }));
 
         http.authenticationProvider(authenticationProvider());
 

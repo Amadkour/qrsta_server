@@ -50,7 +50,7 @@ public class GenericResponse<T> {
                         .messages(error)
                         .success(false)
                         .code(Constants.ERROR_CODE)
-                        .data(error)
+                        .data(null)
                         .build(), HttpStatusCode.valueOf(Constants.ERROR_CODE));
     }
 

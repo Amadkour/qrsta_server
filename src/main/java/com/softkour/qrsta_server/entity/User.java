@@ -1,6 +1,7 @@
 package com.softkour.qrsta_server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.config.Constants;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 
@@ -41,6 +42,7 @@ public class User extends AbstractAuditingEntity {
     @NotNull
     @Column( nullable = false, unique = true)
     @Size(max = 11,min = 9)
+    @Pattern(regexp = Constants.PHONE_REGEX)
     private String phoneNumber;
 
     @NotNull
@@ -78,6 +80,11 @@ public class User extends AbstractAuditingEntity {
     @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
     @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user__quiz", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id"))
+    @JsonIgnoreProperties(value = { "students", "sessions" }, allowSetters = true)
+    private Set<Quiz> quizzes = new HashSet<>();
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user__course", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))

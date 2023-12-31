@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,9 +22,6 @@ import java.util.Set;
 public class Session extends AbstractAuditingEntity {
 
 
-    @Column()
-    private Boolean haveQuiz;
-
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "sessions")
     @JsonIgnoreProperties(value = { "parent", "sessions", "courses" }, allowSetters = true)
     private Set<User> students = new HashSet<>();
@@ -30,6 +29,12 @@ public class Session extends AbstractAuditingEntity {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "sessions")
     @JsonIgnoreProperties(value = { "sessions", "quizzes" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
+
+    @Column()
+    private Instant startDate ;
+
+    @Column()
+    private Instant endDate ;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "sessions", "students", "schedules" }, allowSetters = true)
