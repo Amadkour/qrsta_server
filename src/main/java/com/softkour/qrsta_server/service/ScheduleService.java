@@ -13,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.softkour.qrsta_server.entity.Schedule;
 import com.softkour.qrsta_server.repo.ScheduleRepository;
 
-/**
- * Service Implementation for managing
- * {@link com.softkour.qrsta_server.domain.Schedule}.
- */
 @Service
 public class ScheduleService {
 
@@ -62,11 +58,11 @@ public class ScheduleService {
         return scheduleRepository
                 .findById(schedule.getId())
                 .map(existingSchedule -> {
-                    if (schedule.getScheduleId() != null) {
-                        existingSchedule.setScheduleId(schedule.getScheduleId());
+                    if (schedule.getId() != null) {
+                        existingSchedule.setId(schedule.getId());
                     }
-                    if (schedule.getDat() != null) {
-                        existingSchedule.setDat(schedule.getDat());
+                    if (schedule.getDay() != null) {
+                        existingSchedule.setDay(schedule.getDay());
                     }
                     if (schedule.getFromTime() != null) {
                         existingSchedule.setFromTime(schedule.getFromTime());

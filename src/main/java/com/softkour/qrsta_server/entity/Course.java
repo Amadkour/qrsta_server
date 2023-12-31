@@ -15,18 +15,8 @@ import lombok.Data;
  */
 @Entity
 @Data
-@Table(name = "course")
-// @SuppressWarnings("common-java:DuplicatedBlocks")
-public class Course extends AbstractAuditingEntity<Long> {
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-    // "sequenceGenerator")
-    // @SequenceGenerator(name = "sequence_generator", sequenceName =
-    // "sequence_generator", allocationSize = 1, schema = "public")
-    @Column(name = "id")
-    private Long id;
+ @SuppressWarnings("common-java:DuplicatedBlocks")
+public class Course extends AbstractAuditingEntity {
 
     @NotNull
     private String name;

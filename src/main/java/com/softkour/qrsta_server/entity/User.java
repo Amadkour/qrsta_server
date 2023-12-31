@@ -24,14 +24,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "qrsta_user")
-public class User extends AbstractAuditingEntity<Long> {
+public class User extends AbstractAuditingEntity {
 
     // private static final long serialVersionUID = 1L;
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long id;
-
     @NotNull
     @Column( nullable = false)
     private String name;
@@ -88,9 +83,26 @@ public class User extends AbstractAuditingEntity<Long> {
     @JoinTable(name = "user__course", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     @JsonIgnoreProperties(value = { "sessions", "students", "schedules" }, allowSetters = true)
     private Set<Course> courses = new HashSet<>();
-    /// ==========================
     @Column
     private Instant ExpireOTPDateTime;
     @Column
     private Instant ExpirePasswordDate;
+
+    public Set<Session> removeSession(Session session){
+        sessions.remove(session);
+        return  sessions;
+    }
+    public Set<Session> addSession(Session session){
+        sessions.add(session);
+        return  sessions;
+    }
+
+    public Set<Course> removeCourse(Course course){
+        courses.remove(course);
+        return  courses;
+    }
+    public Set<Course> addCourse(Course course){
+        courses.add(course);
+        return  courses;
+    }
 }

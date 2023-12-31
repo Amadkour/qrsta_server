@@ -59,8 +59,8 @@ public class SessionService {
         return sessionRepository
                 .findById(session.getId())
                 .map(existingSession -> {
-                    if (session.getCreateAte() != null) {
-                        existingSession.setCreateAte(session.getCreateAte());
+                    if (session.getCreatedDate() != null) {
+                        existingSession.setCreatedDate(session.getCreatedDate());
                     }
                     if (session.getHaveQuiz() != null) {
                         existingSession.setHaveQuiz(session.getHaveQuiz());

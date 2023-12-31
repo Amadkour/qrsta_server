@@ -47,7 +47,7 @@ public class courseController {
                 Schedule schedule = new Schedule();
                 schedule.setFromTime(scheduleRequest.getFrom());
                 schedule.setToTime(scheduleRequest.getTo());
-                schedule.setDat(scheduleRequest.getDay());
+                schedule.setDay(scheduleRequest.getDay());
                 savedSchedules.add(scheduleService.save(schedule));
             }
             // ===========[ schedule ]===============//

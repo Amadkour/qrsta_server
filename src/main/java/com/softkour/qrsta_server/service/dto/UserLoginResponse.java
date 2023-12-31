@@ -7,7 +7,7 @@ import lombok.*;
 public class UserLoginResponse {
     private String name;
     private UserType type;
-    private String phone;
+    private String phoneNumber;
     private String token;
     private String address;
     private String macAddress;

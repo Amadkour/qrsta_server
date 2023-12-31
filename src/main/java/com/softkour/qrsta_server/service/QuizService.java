@@ -60,11 +60,11 @@ public class QuizService {
         return quizRepository
                 .findById(quiz.getId())
                 .map(existingQuiz -> {
-                    if (quiz.getQuizId() != null) {
-                        existingQuiz.setQuizId(quiz.getQuizId());
+                    if (quiz.getId() != null) {
+                        existingQuiz.setId(quiz.getId());
                     }
-                    if (quiz.getCreateAt() != null) {
-                        existingQuiz.setCreateAt(quiz.getCreateAt());
+                    if (quiz.getCreatedDate() != null) {
+                        existingQuiz.setCreatedDate(quiz.getCreatedDate());
                     }
                     if (quiz.getStartDate() != null) {
                         existingQuiz.setStartDate(quiz.getStartDate());
