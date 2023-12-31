@@ -17,6 +17,11 @@
 #       - '5432:5432'
 version: '2'
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    ports:
+      - "27070:27017"
   postgres-db:
     container_name: postgres-db
     image: postgres:latest

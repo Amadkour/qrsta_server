@@ -1,5 +1,6 @@
 package com.softkour.qrsta_server.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -101,5 +102,9 @@ public class CourseService {
     public void delete(Long id) {
         log.debug("Request to delete Course : {}", id);
         courseRepository.deleteById(id);
+    }
+
+    public List<Course> getCourses(Long teacherId){
+       return courseRepository.getCourseByTeacherId(teacherId);
     }
 }

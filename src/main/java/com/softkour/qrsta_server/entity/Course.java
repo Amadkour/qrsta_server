@@ -6,17 +6,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -47,6 +37,9 @@ public class Course extends AbstractAuditingEntity<Long> {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private CourseType type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
+    private User teacher ;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
     @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)

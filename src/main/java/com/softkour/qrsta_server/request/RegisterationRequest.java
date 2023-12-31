@@ -26,14 +26,19 @@ public class RegisterationRequest {
     @NotBlank
     @Size(min = 6, max = 40)
     private String password;
+    @NotBlank
+    @Size(min = 3, max = 50)
+    private String address;
 
     @NotBlank
     @Size(min = 10, max = 10)
     private String birthDate;
     @NotBlank
-    @Size(min = 11, max = 11)
+    @Size(min = 9, max = 11)
     private String phone;
-
+    @NotBlank
+    @Size(min = 9, max = 14)
+    private String nationalId;
     @NotBlank
     @Size(min = 6)
     private String macAddress;

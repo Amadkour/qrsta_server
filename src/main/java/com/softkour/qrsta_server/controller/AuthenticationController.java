@@ -57,10 +57,11 @@ public class AuthenticationController {
     public ResponseEntity<GenericResponse<Object>> loginUser(@RequestBody LoginRequest request) {
         Map<String, Object> responseMap = new HashMap<>();
         try {
-            logger.warn(request.toString());
+
             Authentication auth = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getPhone(), request.getPassword()));
             User user = userRepository.findUserByPhoneNumber(request.getPhone());
+
             if (user == null) {
                 responseMap.put("message", "user not found");
                 return GenericResponse.errorWithCoder(responseMap, Constants.ERROR_USER_NOT_FOUND);
@@ -68,7 +69,6 @@ public class AuthenticationController {
                 responseMap.put("message", "user not activate");
                 return GenericResponse.errorWithCoder(responseMap, Constants.ERROR_USER_NOT_ACTIVATE);
             } else if (auth.isAuthenticated()) {
-                logger.info("Logged In");
                 userRepository.save(user);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPhone());
                 String token = jwtTokenUtil.generateToken(userDetails);
@@ -86,8 +86,9 @@ public class AuthenticationController {
         } catch (BadCredentialsException e) {
             responseMap.put("message", "Invalid Credentials");
             return GenericResponse.error(responseMap);
-        } catch (Exception e) {
-            responseMap.put("message", "Something went wrong");
+        }
+        catch (Exception e) {
+            responseMap.put("message", e.getMessage());
             return GenericResponse.error(responseMap);
         }
     }
@@ -100,26 +101,7 @@ public class AuthenticationController {
         user.setName(registerationRequest.getName());
         user.setMacAddress(registerationRequest.getMacAddress());
         user.setPhoneNumber(registerationRequest.getPhone());
-        user.setPassword(new BCryptPasswordEncoder().encode(registerationRequest.getPassword()));
-        user.setOtp(otp.get());
-        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
-        user.setType(registerationRequest.getUserType());
-        user.setOrganization(registerationRequest.getOrganizationName());
-        user.setDob(LocalDate.parse(registerationRequest.getBirthDate()));
-//        user.setExpireOTPDateTime(LocalDateTime.now().plusMinutes(2));
-        User u = userRepository.save(user);
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("otp", u.getOtp());
-        return GenericResponse.success(responseMap);
-    }
-    @PostMapping("/parent_register")
-    public ResponseEntity<GenericResponse<Map<String, Object>>> createParent(
-            @RequestBody RegisterationRequest registerationRequest) {
-        User user = new User();
-        Supplier<String> otp = otpService.createRandomOneTimeOTP();
-        user.setName(registerationRequest.getName());
-        user.setMacAddress(registerationRequest.getMacAddress());
-        user.setPhoneNumber(registerationRequest.getPhone());
+        user.setNationalId(registerationRequest.getNationalId());
         user.setPassword(new BCryptPasswordEncoder().encode(registerationRequest.getPassword()));
         user.setOtp(otp.get());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
@@ -159,6 +141,7 @@ public class AuthenticationController {
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setOtp(otp.get());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
+        userRepository.save(user);
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("otp", user.getOtp());
         return GenericResponse.success(responseMap);
@@ -166,11 +149,13 @@ public class AuthenticationController {
 
     @GetMapping("change_password")
     public ResponseEntity<GenericResponse<String>> changePassword(@RequestHeader String phone,
-                                                                  @RequestHeader String password, @RequestHeader String otp) {
+                                                                  @RequestHeader String password,
+                                                                  @RequestHeader String otp) {
         User user = userRepository.findUserByPhoneNumber(phone);
         try {
             if (user.getOtp().equalsIgnoreCase(otp) && user.getExpireOTPDateTime().isBefore(Instant.now())) {
                 user.setPassword(new BCryptPasswordEncoder().encode(password));
+                userRepository.save(user);
             }
             return GenericResponse.successWithMessageOnly("success changed");
         } catch (Exception e) {

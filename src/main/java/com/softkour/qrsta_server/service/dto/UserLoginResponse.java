@@ -9,8 +9,10 @@ public class UserLoginResponse {
     private UserType type;
     private String phone;
     private String token;
+    private String address;
     private String macAddress;
     private String imageURL;
     private String organization;
+    private String nationalId;
 
 }

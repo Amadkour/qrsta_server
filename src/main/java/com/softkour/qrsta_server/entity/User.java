@@ -45,7 +45,13 @@ public class User extends AbstractAuditingEntity<Long> {
 
     @NotNull
     @Column( nullable = false, unique = true)
+    @Size(max = 11,min = 9)
     private String phoneNumber;
+
+    @NotNull
+    @Column( nullable = false, unique = true)
+    @Size(max = 14,min = 9)
+    private String nationalId;
 
     private String otp;
 
@@ -54,6 +60,9 @@ public class User extends AbstractAuditingEntity<Long> {
 
     @Column()
     private String macAddress;
+
+    @Column()
+    private String address;
 
     @Column( columnDefinition = "boolean default false")
     private boolean isActive;

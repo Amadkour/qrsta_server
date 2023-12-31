@@ -7,22 +7,21 @@ import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.request.ParentRegisterRequest;
-import com.softkour.qrsta_server.request.RegisterationRequest;
 import com.softkour.qrsta_server.security.JwtRequestFilter;
 import com.softkour.qrsta_server.service.OTPService;
+import com.softkour.qrsta_server.service.dto.UserLoginResponse;
+import com.softkour.qrsta_server.service.mapper.UserLoginMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/user/")
@@ -46,6 +45,7 @@ public class UserController {
     @PostMapping("/parent_register")
     public ResponseEntity<GenericResponse<Map<String, Object>>> createParent(
             @RequestBody ParentRegisterRequest parentRegisterRequest) {
+        logger.warn(MyUtils.getUserPhone(JwtRequestFilter.username));
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setName(parentRegisterRequest.getName());
@@ -80,5 +80,9 @@ public class UserController {
             responseMap.put("message", "Invalid Credentials");
             return GenericResponse.error(responseMap);
         }
+    }
+    @GetMapping("")
+    public ResponseEntity<GenericResponse<Stream<UserLoginResponse>>> getUsers(){
+       return GenericResponse.success(userRepository.findAll().stream().map(UserLoginMapper.INSTANCE::toDto));
     }
 }
