@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,8 +26,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-    public static String username;
-
+   public static String username;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -52,17 +50,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (IllegalArgumentException e) {
-                throw e;
+                logger.error("Unable to fetch JWT Token");
             } catch (ExpiredJwtException e) {
-                throw e;
+                logger.error("JWT Token is expired");
             } catch (Exception e) {
-                throw e;
+                logger.error(e.getMessage());
             }
         } else {
-            if (request.getRequestURI().contains("/api/auth"))
-                logger.warn("JWT Token does not begin with Bearer String");
-            else
-                throw new UsernameNotFoundException("JWT Token does not begin with Bearer String");
+            logger.warn("JWT Token does not begin with Bearer String");
         }
         chain.doFilter(request, response);
     }

@@ -42,7 +42,7 @@ public class User extends AbstractAuditingEntity {
     @NotNull
     @Column( nullable = false, unique = true)
     @Size(max = 11,min = 9)
-    @Pattern(regexp = Constants.PHONE_REGEX)
+//    @Pattern(regexp = Constants.PHONE_REGEX)
     private String phoneNumber;
 
     @NotNull
