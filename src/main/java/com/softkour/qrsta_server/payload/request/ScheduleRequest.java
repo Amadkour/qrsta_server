@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.request;
+package com.softkour.qrsta_server.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

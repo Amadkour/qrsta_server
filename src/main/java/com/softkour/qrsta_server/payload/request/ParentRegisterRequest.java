@@ -1,28 +1,19 @@
-package com.softkour.qrsta_server.request;
-
-import java.util.Set;
+package com.softkour.qrsta_server.payload.request;
 
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class LoginRequest {
-
+@Getter
+public class ParentRegisterRequest {
     @NotBlank
-    @Size(min = 6, max = 40)
-    private String password;
-
+    @Size(min = 3, max = 20)
+    private String name;
     @NotBlank
     @Size(min = 11, max = 11)
     private String phone;
-
-    @NotBlank
-    @Size(min = 6)
-    private String macAddress;
 }

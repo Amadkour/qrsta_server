@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.request;
+package com.softkour.qrsta_server.payload.request;
 
 import com.softkour.qrsta_server.config.Constants;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;

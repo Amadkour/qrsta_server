@@ -9,8 +9,8 @@ import com.softkour.qrsta_server.repo.SessionRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.dto.UserLoginResponse;
 import com.softkour.qrsta_server.service.dto.UserLogo;
-import com.softkour.qrsta_server.service.mapper.UserLoginMapper;
-import com.softkour.qrsta_server.service.mapper.UserLogoMapper;
+import com.softkour.qrsta_server.payload.mapper.UserLoginMapper;
+import com.softkour.qrsta_server.payload.mapper.UserLogoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

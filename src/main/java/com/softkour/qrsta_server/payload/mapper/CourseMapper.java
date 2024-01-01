@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.service.mapper;
+package com.softkour.qrsta_server.payload.mapper;
 
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.service.dto.CourseResponse;

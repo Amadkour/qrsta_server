@@ -4,7 +4,7 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
-import com.softkour.qrsta_server.request.PostRequest;
+import com.softkour.qrsta_server.payload.request.PostRequest;
 import com.softkour.qrsta_server.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
