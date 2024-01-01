@@ -1,7 +1,7 @@
 package com.softkour.qrsta_server.payload.mapper;
 
 import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.service.dto.SessionDateAndStudentGrade;
+import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -10,6 +10,6 @@ import org.mapstruct.factory.Mappers;
 public interface SessionDateAndStudentGradeMapper {
     SessionDateAndStudentGradeMapper INSTANCE= Mappers.getMapper(SessionDateAndStudentGradeMapper.class);
 
-    @Mapping(target = "attendance_count",expression = "java(session.getCourse().getStudents().size() - session.getStudents().size())")
+//    @Mapping(target = "attendance_count",expression = "java(session.getCourse().getStudents().size() - session.getStudents().size())")
     SessionDateAndStudentGrade toDto(Session session);
 }

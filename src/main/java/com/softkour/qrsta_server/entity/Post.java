@@ -1,8 +1,8 @@
 package com.softkour.qrsta_server.entity;
 
 
-import com.softkour.qrsta_server.service.dto.UserLoginResponse;
-import com.softkour.qrsta_server.service.dto.UserLogo;
+import com.softkour.qrsta_server.payload.response.UserLoginResponse;
+import com.softkour.qrsta_server.payload.response.UserLogo;
 import jakarta.persistence.Id;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;

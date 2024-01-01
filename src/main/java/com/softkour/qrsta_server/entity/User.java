@@ -10,6 +10,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.Set;
 // @SuppressWarnings("common-java:DuplicatedBlocks")
 @Setter
 @Getter
+@ToString
 @Table(name = "qrsta_user")
 public class User extends AbstractAuditingEntity {
 
@@ -36,6 +38,7 @@ public class User extends AbstractAuditingEntity {
     @Column()
     private UserType type;
 
+    @Enumerated(EnumType.STRING)
     @Column()
     private OrganizationType organization;
 
@@ -101,6 +104,7 @@ public class User extends AbstractAuditingEntity {
     }
     public Set<Session> addSession(Session session){
         sessions.add(session);
+        session.getStudents().add(this);
         return  sessions;
     }
 

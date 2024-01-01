@@ -9,7 +9,7 @@ import java.time.Instant;
 public class SessionDateAndStudentGrade {
     private Instant startDate;
     private  Instant endDate;
-
+    private long sessionIs;
     private int attendance_count;
     private int grade;
 

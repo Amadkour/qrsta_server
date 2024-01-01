@@ -3,12 +3,10 @@ package com.softkour.qrsta_server.service;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.payload.response.UserLogo;
 import com.softkour.qrsta_server.repo.PostRepository;
 import com.softkour.qrsta_server.repo.SessionRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
-import com.softkour.qrsta_server.service.dto.UserLoginResponse;
-import com.softkour.qrsta_server.service.dto.UserLogo;
 import com.softkour.qrsta_server.payload.mapper.UserLoginMapper;
 import com.softkour.qrsta_server.payload.mapper.UserLogoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 @Service
 public class PostService {
     @Autowired
