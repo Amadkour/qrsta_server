@@ -32,3 +32,17 @@ services:
       POSTGRES_USER: my_user
       POSTGRES_PASSWORD: my_password
       POSTGRES_DB: my-project-db
+
+  redis-server:
+    container_name: redis
+    image: 'redis'
+    ports:
+      - "6379:6379"
+#  java-service:
+#    build: .
+#    links:
+#      - redis-server
+#      - mongodb
+#      - postgres-db
+#    ports:
+#      - "8081:8081"

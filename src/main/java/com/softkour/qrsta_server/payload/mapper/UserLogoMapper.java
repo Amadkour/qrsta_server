@@ -5,10 +5,13 @@ import com.softkour.qrsta_server.payload.response.UserLogo;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
-public interface UserLogoMapper {
-    UserLogoMapper INSTANCE = Mappers.getMapper(UserLogoMapper.class);
-    UserLogo toDto(User user);
+public class UserLogoMapper {
+
+   public UserLogo toDto(User user) {
+        return new UserLogo(
+                user.getId(), user.getName(), user.getType(), user.getImageUrl()
+        );
+    }
 
 
 }

@@ -24,6 +24,7 @@ import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.ScheduleService;
+import org.webjars.NotFoundException;
 
 @RestController
 @RequestMapping("/api/course/")
@@ -63,21 +64,53 @@ public class courseController {
             return GenericResponse.error(e.toString());
         }
     }
-    @GetMapping("")
+    @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses(){
        try {
-            String phoneNumber = MyUtils.getUserPhone(JwtRequestFilter.username);
-            User user = userRepository.findUserByPhoneNumber(phoneNumber);
+
+            User user = MyUtils.getCurrentUserSession(userRepository);
             List<Course> courseList = new ArrayList<>();
             if (user.getType() == UserType.TEACHER) {
                 courseList = courseService.getCourses(user.getId());
             } else {
                 courseList = user.getCourses().stream().toList();
-              int a=  courseList.get(0).getStudents().size();
             }
-            return GenericResponse.success(courseList.stream().map(CourseMapper.INSTANCE::toDTOs));
+            return GenericResponse.success(courseList.stream().map(new CourseMapper()::toDTOs));
         }catch (Exception e){
            return GenericResponse.error(e.getMessage());
        }
+    }
+    @GetMapping("add_my_to_course")
+    public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(@RequestHeader(name = "course_id") Long courseId) {
+        try {
+            User u = MyUtils.getCurrentUserSession(userRepository);
+            courseService.addStudentToCourse(u, courseId);
+            return GenericResponse.successWithMessageOnly("add you successfully");
+        } catch (Exception e) {
+            return GenericResponse.error(e.getMessage());
+        }
+    }
+    @GetMapping("add_student_to_course")
+    public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(@RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "student_id") Long userId) {
+
+        try {
+            User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("student not found id: ".concat(String.valueOf(userId))));
+            courseService.addStudentToCourse(u, courseId);
+            return GenericResponse.success("add student to course successfully");
+        } catch (Exception e) {
+            return GenericResponse.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("remove_student_from_course")
+    public ResponseEntity<GenericResponse<Object>> removeStudentFromAttendance(@RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "student_id") Long userId) {
+
+        try {
+            User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("student not found id: ".concat(String.valueOf(userId))));
+            courseService.removeStudentFromCourse(u, courseId);
+            return GenericResponse.success("remove student from session successfully");
+        } catch (Exception e) {
+            return GenericResponse.error(e.getMessage());
+        }
     }
 }

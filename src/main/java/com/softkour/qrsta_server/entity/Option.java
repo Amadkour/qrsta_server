@@ -17,10 +17,7 @@ import java.util.Set;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Option extends AbstractAuditingEntity {
     @Column()
-    private String optionId;
-
-    @Column()
-    private String name;
+    private String title;
 
     @Column()
     private Boolean isCorrectAnswer;

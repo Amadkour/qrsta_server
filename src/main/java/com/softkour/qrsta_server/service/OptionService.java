@@ -37,11 +37,11 @@ public class OptionService {
         return optionRepository
                 .findById(option.getId())
                 .map(existingOption -> {
-                    if (option.getOptionId() != null) {
+                    if (option.getId() != null) {
                         existingOption.setId(option.getId());
                     }
-                    if (option.getName() != null) {
-                        existingOption.setName(option.getName());
+                    if (option.getTitle() != null) {
+                        existingOption.setTitle(option.getTitle());
                     }
                     if (option.getIsCorrectAnswer() != null) {
                         existingOption.setIsCorrectAnswer(option.getIsCorrectAnswer());

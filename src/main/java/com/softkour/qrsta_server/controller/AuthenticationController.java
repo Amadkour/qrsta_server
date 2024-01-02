@@ -74,7 +74,7 @@ public class AuthenticationController {
                 userRepository.save(user);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPhone());
                 String token = jwtTokenUtil.generateToken(userDetails);
-                UserLoginResponse userLoginResponse=UserLoginMapper.INSTANCE.toDto(user);
+                UserLoginResponse userLoginResponse=new UserLoginMapper().toDto(user);
                 userLoginResponse.setToken(token);
                 responseMap.put("user",userLoginResponse );
                 return GenericResponse.success(responseMap);

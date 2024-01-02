@@ -3,7 +3,11 @@ package com.softkour.qrsta_server.payload.response;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import lombok.*;
 
-@Data
+import java.io.Serializable;
+
+@Setter
+@Getter
+@AllArgsConstructor
 public class UserLoginResponse {
     private String name;
     private UserType type;

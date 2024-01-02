@@ -25,7 +25,6 @@ import java.util.Set;
 // @SuppressWarnings("common-java:DuplicatedBlocks")
 @Setter
 @Getter
-@ToString
 @Table(name = "qrsta_user")
 public class User extends AbstractAuditingEntity {
 
@@ -62,6 +61,9 @@ public class User extends AbstractAuditingEntity {
     private String macAddress;
 
     @Column()
+    private String imageUrl;
+
+    @Column()
     private String address;
 
     @Column( columnDefinition = "boolean default false")
@@ -79,17 +81,17 @@ public class User extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "parent", "sessions", "courses" }, allowSetters = true)
     private User parent;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
-    @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
+    @JsonIgnoreProperties(value = {"students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user__quiz", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id"))
     @JsonIgnoreProperties(value = { "students", "sessions" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user__course", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     @JsonIgnoreProperties(value = { "sessions", "students", "schedules" }, allowSetters = true)
     private Set<Course> courses = new HashSet<>();

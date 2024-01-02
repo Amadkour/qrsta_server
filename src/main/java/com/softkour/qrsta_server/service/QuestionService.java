@@ -60,14 +60,14 @@ public class QuestionService {
         return questionRepository
                 .findById(question.getId())
                 .map(existingQuestion -> {
-                    if (question.getQuestionId() != null) {
-                        existingQuestion.setQuestionId(question.getQuestionId());
+                    if (question.getId() != null) {
+                        existingQuestion.setId(question.getId());
                     }
-                    if (question.getName() != null) {
-                        existingQuestion.setName(question.getName());
+                    if (question.getTitle() != null) {
+                        existingQuestion.setTitle(question.getTitle());
                     }
-                    if (question.getCreateAt() != null) {
-                        existingQuestion.setCreateAt(question.getCreateAt());
+                    if (question.getCreatedDate() != null) {
+                        existingQuestion.setCreatedDate(question.getCreatedDate());
                     }
                     if (question.getGrade() != null) {
                         existingQuestion.setGrade(question.getGrade());

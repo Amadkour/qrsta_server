@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +22,7 @@ import java.util.Set;
 public class Quiz extends AbstractAuditingEntity {
 
     @Column()
-    private ZonedDateTime startDate;
+    private Instant startDate;
 
     @Column()
     private Integer questionsPerStudent;
@@ -34,6 +35,11 @@ public class Quiz extends AbstractAuditingEntity {
     @JoinTable(name = "quiz__session", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
     @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "quiz__course", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
+    @JsonIgnoreProperties(value = { "students", "quizzes", "sessions","schedules" }, allowSetters = true)
+    private Set<Course> courses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes")
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)

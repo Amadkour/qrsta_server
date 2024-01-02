@@ -83,6 +83,6 @@ public class UserController {
     }
     @GetMapping("")
     public ResponseEntity<GenericResponse<Stream<UserLoginResponse>>> getUsers(){
-       return GenericResponse.success(userRepository.findAll().stream().map(UserLoginMapper.INSTANCE::toDto));
+       return GenericResponse.success(userRepository.findAll().stream().map(new UserLoginMapper()::toDto));
     }
 }

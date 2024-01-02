@@ -32,12 +32,20 @@ public class Course extends AbstractAuditingEntity {
     private User teacher ;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
-    @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
+    @JsonIgnoreProperties(value = { "questions", "courses","sessions","students" }, allowSetters = true)
+    private Set<Quiz> quizzes = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "courses")
     @JsonIgnoreProperties(value = { "parent", "sessions", "courses" }, allowSetters = true)
     private Set<User> students = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
+    @JsonIgnoreProperties(value = {"courses" }, allowSetters = true)
+    private Set<User> offers = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)

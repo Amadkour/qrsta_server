@@ -11,20 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends
-      // EmployeeRepositoryWithBagRelationships,
-      JpaRepository<User, Long> {
-   // default Optional<User> findOneWithEagerRelationships(Long id) {
-   // return this.fetchBagRelationships(this.findById(id));
-   // }
-
-   // default List<User> findAllWithEagerRelationships() {
-   // return this.fetchBagRelationships(this.findAll());
-   // }
-
-   // default Page<User> findAllWithEagerRelationships(Pageable pageable) {
-   // return this.fetchBagRelationships(this.findAll(pageable));
-   // }
+public interface UserRepository extends JpaRepository<User, Long> {
 
    public User findUserByPhoneNumber(String phone);
 }

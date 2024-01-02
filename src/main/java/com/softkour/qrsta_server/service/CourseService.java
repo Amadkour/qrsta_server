@@ -3,6 +3,8 @@ package com.softkour.qrsta_server.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.repo.CourseRepository;
+import org.webjars.NotFoundException;
 
 @Service
 public class CourseService {
@@ -32,14 +35,15 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    /**
-     * Update a course.
-     *
-     * @param course the entity to save.
-     * @return the persisted entity.
-     */
-    public Course update(Course course) {
-        log.debug("Request to update Course : {}", course);
+    public Course addStudentToCourse(User user, Long courseId) {
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("session not found id: ".concat(courseId.toString())));
+        course.addStudent(user);
+        return courseRepository.save(course);
+    }
+
+    public Course removeStudentFromCourse(User user, Long courseId) {
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("session not found id: ".concat(courseId.toString())));
+        course.removeStudent(user);
         return courseRepository.save(course);
     }
 
@@ -89,9 +93,9 @@ public class CourseService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<Course> findOne(Long id) {
+    public Course findOne(Long id) {
         log.debug("Request to get Course : {}", id);
-        return courseRepository.findById(id);
+        return courseRepository.findById(id).orElseThrow(() -> new NotFoundException("this course not found id: ".concat(String.valueOf(id))));
     }
 
     /**
@@ -104,7 +108,7 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
-    public List<Course> getCourses(Long teacherId){
-       return courseRepository.getCourseByTeacherId(teacherId);
+    public List<Course> getCourses(Long teacherId) {
+        return courseRepository.getCourseByTeacherId(teacherId);
     }
 }

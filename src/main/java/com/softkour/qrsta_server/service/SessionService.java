@@ -46,7 +46,6 @@ public class SessionService {
     public Session addStudentToSession(User user, Long sessionId){
         Session session=sessionRepository.findById(sessionId).orElseThrow(()->new NotFoundException("session not found id: ".concat(sessionId.toString())));
         session.addStudent(user);
-log.warn(session.toString());
         return sessionRepository.save(session);
     }
 

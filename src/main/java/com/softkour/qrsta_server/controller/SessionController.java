@@ -4,13 +4,11 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.SessionObject;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.payload.mapper.SessionDateAndStudentGradeMapper;
 import com.softkour.qrsta_server.payload.mapper.SessionStudentsMapper;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
-import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudet;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.SessionObjectService;
@@ -43,7 +41,7 @@ public class SessionController {
 
         try {
             List<Session> sessionList = sessionService.findSessionsOfCourse(courseId);
-            return GenericResponse.success(sessionList.stream().map(SessionDateAndStudentGradeMapper.INSTANCE::toDto));
+            return GenericResponse.success(sessionList.stream().map(new SessionDateAndStudentGradeMapper()::toDto));
         } catch (Exception e) {
             return GenericResponse.error(e.getMessage());
         }
@@ -54,49 +52,53 @@ public class SessionController {
 
         try {
             Session session = sessionService.findOne(sessionId);
-            return GenericResponse.success(SessionStudentsMapper.INSTANCE.toDTOs(session));
+            return GenericResponse.success(new SessionStudentsMapper().toDTOs(session));
         } catch (Exception e) {
             return GenericResponse.error(e.getMessage());
         }
     }
+
     @GetMapping("take_attendance")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(@RequestHeader(name = "session_id") Long sessionId) {
 
         try {
-            User u= MyUtils.getCurrentUserSession(userRepository);
-            Session s= sessionService.addStudentToSession(u,sessionId);
-            return GenericResponse.success(s);
+            User u = MyUtils.getCurrentUserSession(userRepository);
+            sessionService.addStudentToSession(u, sessionId);
+            return GenericResponse.successWithMessageOnly("take you successfully");
         } catch (Exception e) {
             return GenericResponse.error(e.getMessage());
         }
     }
-    @GetMapping("add_sudent_to_attendance")
-    public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(@RequestHeader(name = "session_id") Long sessionId,@RequestHeader(name = "student_id") Long userId) {
+
+    @GetMapping("add_student_to_attendance")
+    public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(@RequestHeader(name = "session_id") Long sessionId, @RequestHeader(name = "student_id") Long userId) {
 
         try {
-            User u= userRepository.findById(userId).orElseThrow(() -> new NotFoundException("student not found id: ".concat(String.valueOf(userId))));
-                                sessionService.addStudentToSession(u,sessionId);
+            User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("student not found id: ".concat(String.valueOf(userId))));
+            sessionService.addStudentToSession(u, sessionId);
             return GenericResponse.success("add student to session successfully");
         } catch (Exception e) {
             return GenericResponse.error(e.getMessage());
         }
     }
-    @GetMapping("remove_sudent_from_attendance")
-    public ResponseEntity<GenericResponse<Object>> removeStudentFromAttendance(@RequestHeader(name = "session_id") Long sessionId,@RequestHeader(name = "student_id") Long userId) {
+
+    @GetMapping("remove_student_from_attendance")
+    public ResponseEntity<GenericResponse<Object>> removeStudentFromAttendance(@RequestHeader(name = "session_id") Long sessionId, @RequestHeader(name = "student_id") Long userId) {
 
         try {
-            User u= userRepository.findById(userId).orElseThrow(() -> new NotFoundException("student not found id: ".concat(String.valueOf(userId))));
-            sessionService.removeStudentToSession(u,sessionId);
+            User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("student not found id: ".concat(String.valueOf(userId))));
+            sessionService.removeStudentToSession(u, sessionId);
             return GenericResponse.success("remove student from session successfully");
         } catch (Exception e) {
             return GenericResponse.error(e.getMessage());
         }
     }
+
     @PostMapping("add_object")
     public ResponseEntity<GenericResponse<Object>> getSessionDetails(@RequestBody @Valid ObjectCreationRequest objectCreationRequest) {
 
         try {
-             sessionObjectService.save(objectCreationRequest.getItem(),objectCreationRequest.getType(), objectCreationRequest.getParentId());
+            sessionObjectService.save(objectCreationRequest.getItem(), objectCreationRequest.getType(), objectCreationRequest.getParentId());
             return GenericResponse.successWithMessageOnly("add subItem Successfully");
         } catch (Exception e) {
             return GenericResponse.error(e.getMessage());
@@ -108,7 +110,7 @@ public class SessionController {
     public ResponseEntity<GenericResponse<String>> createSession(@RequestBody @Valid SessionCreationRequest sessionCreationRequest) {
         try {
             Session session = new Session();
-            Course course = courseService.findOne(sessionCreationRequest.getCourseId()).orElseThrow(() -> new NotFoundException(String.valueOf(sessionCreationRequest.getCourseId())));
+            Course course = courseService.findOne(sessionCreationRequest.getCourseId());
             session.setCourse(course);
             session.setStartDate(Instant.parse(sessionCreationRequest.getFromDate()));
             session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()));

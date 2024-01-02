@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+
 @Service
 public class PostService {
     @Autowired
@@ -24,13 +25,13 @@ public class PostService {
     SessionRepository sessionRepository;
 
     public Post addPost(Post post) {
-        post.setOwner(UserLoginMapper.INSTANCE.toDto(MyUtils.getCurrentUserSession(userRepository)));
+        post.setOwner(new UserLoginMapper().toDto(MyUtils.getCurrentUserSession(userRepository)));
         post.setDate(Instant.now());
         return postRepository.save(post);
     }
 
     public Post addComment(Post post, String parentPostId) {
-        post.setOwner(UserLoginMapper.INSTANCE.toDto(MyUtils.getCurrentUserSession(userRepository)));
+        post.setOwner(new UserLoginMapper().toDto(MyUtils.getCurrentUserSession(userRepository)));
         post.setDate(Instant.now());
         Post parentPost = getPost(parentPostId);
         List<Post> comments = parentPost.getComments();
@@ -41,7 +42,7 @@ public class PostService {
 
     public Post addReplay(Post post, String parentPostId, String commentIndex) {
         int index = Integer.parseInt(commentIndex);
-        post.setOwner(UserLoginMapper.INSTANCE.toDto(MyUtils.getCurrentUserSession(userRepository)));
+        post.setOwner(new UserLoginMapper().toDto(MyUtils.getCurrentUserSession(userRepository)));
         post.setDate(Instant.now());
         post.setComments(null);
         Post parentPost = getPost(parentPostId);
@@ -63,7 +64,7 @@ public class PostService {
     }
 
     public UserLogo getCurrentLoggenUserLogo() {
-        return UserLogoMapper.INSTANCE.toDto(MyUtils.getCurrentUserSession(userRepository));
+        return new UserLogoMapper().toDto(MyUtils.getCurrentUserSession(userRepository));
     }
     ///==================================[like]===============================//
 
@@ -91,10 +92,11 @@ public class PostService {
         else
             comment.removeLike(getCurrentLoggenUserLogo());
         comments.remove(index);
-        comments.add(index,comment);
+        comments.add(index, comment);
         post.setComments(comments);
         return postRepository.save(post);
     }
+
     //================replay
     public Post updateLikeToReplay(String replayIndex, String commentIndex, String postId, boolean newValue) {
         int comIndex = Integer.parseInt(commentIndex);
@@ -146,10 +148,11 @@ public class PostService {
         else
             comment.removeDislike(getCurrentLoggenUserLogo());
         comments.remove(index);
-        comments.add(index,comment);
+        comments.add(index, comment);
         post.setComments(comments);
         return postRepository.save(post);
     }
+
     //================replay
     public Post updateDislikeToReplay(String replayIndex, String commentIndex, String postId, boolean newValue) {
         int comIndex = Integer.parseInt(commentIndex);

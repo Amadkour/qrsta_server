@@ -19,15 +19,9 @@ import java.util.Set;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Question extends AbstractAuditingEntity {
 
-    @Column()
-    private Long questionId;
-
     @NotNull
     @Column( nullable = false)
-    private String name;
-
-    @Column()
-    private ZonedDateTime createAt;
+    private String title;
 
     @Column()
     private Integer grade;
@@ -38,7 +32,7 @@ public class Question extends AbstractAuditingEntity {
     private Set<Option> options = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "rel_question__quiz", joinColumns = @JoinColumn(name = "question_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id"))
+    @JoinTable(name = "question__quiz", joinColumns = @JoinColumn(name = "question_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id"))
     @JsonIgnoreProperties(value = { "sessions", "quizzes" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
 

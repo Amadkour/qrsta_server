@@ -19,11 +19,13 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Session extends AbstractAuditingEntity {
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "sessions")
-    @JsonIgnoreProperties(value = {"sessions", "courses" }, allowSetters = true)
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
+    @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
     private Set<User> students = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "sessions")
