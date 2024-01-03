@@ -2,6 +2,7 @@ package com.softkour.qrsta_server.payload.request;
 
 import java.util.Set;
 
+import com.softkour.qrsta_server.entity.enumeration.DeviceType;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 
@@ -25,4 +26,9 @@ public class LoginRequest {
     @NotBlank
     @Size(min = 6)
     private String macAddress;
+
+    @NotBlank
+    private DeviceType deviceType;
+    @NotBlank
+    private String fvmToken;
 }

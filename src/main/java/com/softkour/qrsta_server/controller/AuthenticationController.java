@@ -54,8 +54,11 @@ public class AuthenticationController {
     JwtTokenUtil jwtTokenUtil;
     @Autowired
     OTPService otpService;
-
-    @PostMapping("/login")
+    @GetMapping("dummy")
+        public ResponseEntity<GenericResponse<String>> dummy(){
+        return GenericResponse.successWithMessageOnly("dddd");
+        }
+    @PostMapping("login")
     public ResponseEntity<GenericResponse<Object>> loginUser(@RequestBody LoginRequest request) {
         Map<String, Object> responseMap = new HashMap<>();
         try {
@@ -95,7 +98,7 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping("register")
     public ResponseEntity<GenericResponse<Object>> saveUser(
             @RequestBody @Valid RegisterationRequest registerationRequest) {
         try{

@@ -70,14 +70,14 @@ public class DatabaseConfiguration {
                 .bearerFormat("JWT")
                 .scheme("bearer");
     }
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new JedisConnectionFactory();
-    }
-
-    @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
-        RedisTemplate<?, ?> template = new RedisTemplate<>();
-        return template;
-    }
+//    @Bean
+//    public RedisConnectionFactory redisConnectionFactory() {
+//        return new JedisConnectionFactory();
+//    }
+//
+//    @Bean
+//    public RedisTemplate<?, ?> redisTemplate() {
+//        RedisTemplate<?, ?> template = new RedisTemplate<>();
+//        return template;
+//    }
 }
