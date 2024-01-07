@@ -39,7 +39,7 @@ public class quizController {
     OptionService optionService;
 
     @PostMapping("create")
-    public ResponseEntity<GenericResponse<String>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
+    public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
         try {
             Quiz quiz = new Quiz();
             quiz.setType(request.getType());
@@ -62,7 +62,7 @@ public class quizController {
             quizService.save(quiz);
             return GenericResponse.successWithMessageOnly("save quiz successfully");
         } catch (Exception e) {
-            return GenericResponse.error(e.getMessage());
+            return GenericResponse.errorOfException(e);
         }
     }
 }

@@ -1,37 +1,47 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Post;
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.payload.response.UserLogo;
-import com.softkour.qrsta_server.repo.PostRepository;
-import com.softkour.qrsta_server.repo.SessionRepository;
-import com.softkour.qrsta_server.repo.UserRepository;
-import com.softkour.qrsta_server.payload.mapper.UserLoginMapper;
-import com.softkour.qrsta_server.payload.mapper.UserLogoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.Post;
+import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.payload.response.AbstractUser;
+import com.softkour.qrsta_server.repo.PostRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class PostService {
     @Autowired
     PostRepository postRepository;
     @Autowired
-    UserRepository userRepository;
+    AuthService userService;
     @Autowired
-    SessionRepository sessionRepository;
+    SessionService sessionService;
+
+    public AbstractUser getCurrentUserAsAbstractUser() {
+        return MyUtils.getCurrentUserSession(userService).toAbstractUser();
+    }
+
+    public List<Post> posts(long courseId) {
+        return postRepository.findByCourseId(courseId);
+
+    }
 
     public Post addPost(Post post) {
-        post.setOwner(new UserLoginMapper().toDto(MyUtils.getCurrentUserSession(userRepository)));
+        post.setOwner(getCurrentUserAsAbstractUser());
         post.setDate(Instant.now());
+        log.warn(post.toString());
         return postRepository.save(post);
     }
 
     public Post addComment(Post post, String parentPostId) {
-        post.setOwner(new UserLoginMapper().toDto(MyUtils.getCurrentUserSession(userRepository)));
+        post.setOwner(getCurrentUserAsAbstractUser());
         post.setDate(Instant.now());
         Post parentPost = getPost(parentPostId);
         List<Post> comments = parentPost.getComments();
@@ -42,16 +52,16 @@ public class PostService {
 
     public Post addReplay(Post post, String parentPostId, String commentIndex) {
         int index = Integer.parseInt(commentIndex);
-        post.setOwner(new UserLoginMapper().toDto(MyUtils.getCurrentUserSession(userRepository)));
+        post.setOwner(getCurrentUserAsAbstractUser());
         post.setDate(Instant.now());
         post.setComments(null);
         Post parentPost = getPost(parentPostId);
         List<Post> comments = parentPost.getComments();
-        ///add replay
+        /// add replay
         Post comment = comments.get(index);
         List<Post> replays = comment.getComments();
         replays.add(post);
-        ///update comment
+        /// update comment
         comment.setComments(replays);
         comments.remove(index);
         comments.add(index, comment);
@@ -62,57 +72,53 @@ public class PostService {
     public Post getPost(String id) {
         return postRepository.findById(id).orElseThrow();
     }
+    /// ==================================[like]===============================//
 
-    public UserLogo getCurrentLoggenUserLogo() {
-        return new UserLogoMapper().toDto(MyUtils.getCurrentUserSession(userRepository));
-    }
-    ///==================================[like]===============================//
-
-    //==========post
+    // ==========post
 
     public Post updatePostLike(String postId, boolean newValue) {
         Post post = getPost(postId);
         if (newValue)
-            post.addLike(getCurrentLoggenUserLogo());
+            post.addLike(getCurrentUserAsAbstractUser());
         else
-            post.removeLike(getCurrentLoggenUserLogo());
+            post.removeLike(getCurrentUserAsAbstractUser());
         return postRepository.save(post);
     }
 
-    //===========comment
+    // ===========comment
     public Post updateCommentLike(String commentIndex, String postId, boolean newValue) {
         int index = Integer.parseInt(commentIndex);
         Post post = getPost(postId);
-        //comment
+        // comment
         List<Post> comments = post.getComments();
         Post comment = comments.get(index);
-        //update
+        // update
         if (newValue)
-            comment.addLike(getCurrentLoggenUserLogo());
+            comment.addLike(getCurrentUserAsAbstractUser());
         else
-            comment.removeLike(getCurrentLoggenUserLogo());
+            comment.removeLike(getCurrentUserAsAbstractUser());
         comments.remove(index);
         comments.add(index, comment);
         post.setComments(comments);
         return postRepository.save(post);
     }
 
-    //================replay
+    // ================replay
     public Post updateLikeToReplay(String replayIndex, String commentIndex, String postId, boolean newValue) {
         int comIndex = Integer.parseInt(commentIndex);
         int repIndex = Integer.parseInt(replayIndex);
         Post post = getPost(postId);
-        //comment
+        // comment
         List<Post> comments = post.getComments();
         Post comment = comments.get(comIndex);
-        //replay
+        // replay
         List<Post> replays = comment.getComments();
         Post replay = replays.get(repIndex);
-        ///update
+        /// update
         if (newValue)
-            replay.addLike(getCurrentLoggenUserLogo());
+            replay.addLike(getCurrentUserAsAbstractUser());
         else
-            replay.removeLike(getCurrentLoggenUserLogo());
+            replay.removeLike(getCurrentUserAsAbstractUser());
         replays.remove(repIndex);
         replays.add(repIndex, replay);
         comment.setComments(replays);
@@ -122,53 +128,53 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    ///==================================[dislike]===============================//
+    /// ==================================[dislike]===============================//
 
-    //==========post
+    // ==========post
 
     public Post updatePostDislike(String postId, boolean newValue) {
         Post post = getPost(postId);
         if (newValue)
-            post.addDislike(getCurrentLoggenUserLogo());
+            post.addDislike(getCurrentUserAsAbstractUser());
         else
-            post.removeDislike(getCurrentLoggenUserLogo());
+            post.removeDislike(getCurrentUserAsAbstractUser());
         return postRepository.save(post);
     }
 
-    //===========comment
+    // ===========comment
     public Post updateCommentDislike(String commentIndex, String postId, boolean newValue) {
         int index = Integer.parseInt(commentIndex);
         Post post = getPost(postId);
-        //comment
+        // comment
         List<Post> comments = post.getComments();
         Post comment = comments.get(index);
-        //update
+        // update
         if (newValue)
-            comment.addDislike(getCurrentLoggenUserLogo());
+            comment.addDislike(getCurrentUserAsAbstractUser());
         else
-            comment.removeDislike(getCurrentLoggenUserLogo());
+            comment.removeDislike(getCurrentUserAsAbstractUser());
         comments.remove(index);
         comments.add(index, comment);
         post.setComments(comments);
         return postRepository.save(post);
     }
 
-    //================replay
+    // ================replay
     public Post updateDislikeToReplay(String replayIndex, String commentIndex, String postId, boolean newValue) {
         int comIndex = Integer.parseInt(commentIndex);
         int repIndex = Integer.parseInt(replayIndex);
         Post post = getPost(postId);
-        //comment
+        // comment
         List<Post> comments = post.getComments();
         Post comment = comments.get(comIndex);
-        //replay
+        // replay
         List<Post> replays = comment.getComments();
         Post replay = replays.get(repIndex);
-        ///update
+        /// update
         if (newValue)
-            replay.addDislike(getCurrentLoggenUserLogo());
+            replay.addDislike(getCurrentUserAsAbstractUser());
         else
-            replay.removeDislike(getCurrentLoggenUserLogo());
+            replay.removeDislike(getCurrentUserAsAbstractUser());
         replays.remove(repIndex);
         replays.add(repIndex, replay);
         comment.setComments(replays);
@@ -178,21 +184,22 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    //===============================[ linked session ]===============================//
+    // ===============================[ linked session
+    // ]===============================//
     public Post linkSessionToPost(String postId, Long sessionId) {
         Post p = getPost(postId);
-        Session session = sessionRepository.getReferenceById(sessionId);
-        p.setLinkedSession(session);
+        Session session = sessionService.getReferenceById(sessionId);
+        p.setLinkedSessionId(session.getId());
         return postRepository.save(p);
     }
 
     public Post linkSessionToComment(String postId, String commentIndex, Long sessionId) {
         int comIndex = Integer.parseInt(commentIndex);
         Post p = getPost(postId);
-        Session session = sessionRepository.getReferenceById(sessionId);
+        Session session = sessionService.getReferenceById(sessionId);
         List<Post> comments = p.getComments();
         Post comment = comments.get(comIndex);
-        comment.setLinkedSession(session);
+        comment.setLinkedSessionId(session.getId());
         comments.remove(comIndex);
         comments.add(comIndex, comment);
         p.setComments(comments);
@@ -203,14 +210,14 @@ public class PostService {
         int comIndex = Integer.parseInt(commentIndex);
         int repIndex = Integer.parseInt(replayIndex);
         Post p = getPost(postId);
-        Session session = sessionRepository.getReferenceById(sessionId);
+        Session session = sessionService.getReferenceById(sessionId);
         List<Post> comments = p.getComments();
         Post comment = comments.get(comIndex);
-        //replay
+        // replay
         List<Post> replays = comment.getComments();
         Post replay = replays.get(repIndex);
-        ///update
-        replay.setLinkedSession(session);
+        /// update
+        replay.setLinkedSessionId(session.getId());
         replays.remove(repIndex);
         replays.add(repIndex, replay);
         comment.setComments(replays);

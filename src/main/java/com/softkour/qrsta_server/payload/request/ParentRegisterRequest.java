@@ -1,12 +1,17 @@
 package com.softkour.qrsta_server.payload.request;
 
-import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
+import java.time.Instant;
+import java.util.function.Supplier;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.service.OTPService;
+
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class ParentRegisterRequest {
@@ -14,6 +19,24 @@ public class ParentRegisterRequest {
     @Size(min = 3, max = 20)
     private String name;
     @NotBlank
-    @Size(min = 11, max = 11)
+    private String countryCode;
+    @NotBlank
+    @Size(min = 7, max = 10)
     private String phone;
+
+    @Autowired
+    OTPService otpService;
+
+    public User toUser() {
+        User user = new User();
+        Supplier<String> otp = otpService.createRandomOneTimeOTP();
+        user.setName(this.getName());
+        user.setPhoneNumber(this.getPhone());
+        user.setOtp(otp.get());
+        user.setCountryCode(this.getCountryCode());
+        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
+        user.setType(UserType.PARENT);
+        return user;
+
+    }
 }

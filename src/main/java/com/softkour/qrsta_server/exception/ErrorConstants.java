@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.exceptions;
+package com.softkour.qrsta_server.exception;
 
 import java.net.URI;
 

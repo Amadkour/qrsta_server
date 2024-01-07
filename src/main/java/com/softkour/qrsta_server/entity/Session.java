@@ -1,17 +1,26 @@
 package com.softkour.qrsta_server.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
-
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
+import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
+import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudents;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * A Session.
@@ -21,7 +30,6 @@ import java.util.Set;
 @Setter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Session extends AbstractAuditingEntity {
-
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
@@ -37,14 +45,15 @@ public class Session extends AbstractAuditingEntity {
     private Set<SessionObject> objects = new HashSet<>();
 
     @Column()
-    private Instant startDate ;
+    private Instant startDate;
 
     @Column()
-    private Instant endDate ;
+    private Instant endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "sessions", "students", "schedules" }, allowSetters = true)
     private Course course;
+
     public void setStudents(Set<User> students) {
         if (this.students != null) {
             this.students.forEach(i -> i.removeSession(this));
@@ -89,4 +98,24 @@ public class Session extends AbstractAuditingEntity {
         return this;
     }
 
+    public SessionDateAndStudentGrade toSessionDateAndStudentGrade() {
+        double grade = this.getQuizzes().stream().reduce((first, second) -> second).orElse(new Quiz()).getStudents()
+                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
+        return new SessionDateAndStudentGrade(
+                this.getStartDate(),
+                this.getEndDate(), this.getId(),
+                this.getStudents().size(),
+                this.getCourse().getStudents().size(),
+                grade);
+    }
+
+    public SessionDetailsStudent toSessionDetailsStudent() {
+        return new SessionDetailsStudent(
+                this.getStudents().stream().map((e) -> e.toAbstractUser()).collect(Collectors.toSet()));
+
+    }
+
+    public SessionDetailsWithoutStudents toSessionDetailsWithoutStudents() {
+        return new SessionDetailsWithoutStudents(this.getObjects(), this.getStartDate(), this.getEndDate());
+    }
 }

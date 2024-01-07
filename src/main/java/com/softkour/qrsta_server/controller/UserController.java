@@ -1,27 +1,28 @@
 package com.softkour.qrsta_server.controller;
 
+import java.util.stream.Stream;
 
-import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.payload.response.UserLoginResponse;
-import com.softkour.qrsta_server.repo.UserRepository;
-import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
-import com.softkour.qrsta_server.security.JwtRequestFilter;
-import com.softkour.qrsta_server.service.OTPService;
-import com.softkour.qrsta_server.payload.mapper.UserLoginMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import com.softkour.qrsta_server.config.GenericResponse;
+import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
+import com.softkour.qrsta_server.payload.response.AbstractUser;
+import com.softkour.qrsta_server.security.JwtRequestFilter;
+import com.softkour.qrsta_server.service.AuthService;
+import com.softkour.qrsta_server.service.OTPService;
+
+import io.lettuce.core.dynamic.annotation.Param;
 
 @RestController
 @RequestMapping("/api/user/")
@@ -30,59 +31,35 @@ public class UserController {
     @Autowired
     OTPService otpService;
     @Autowired
-    UserRepository userRepository;
+    AuthService userService;
     @Autowired
     JwtRequestFilter jwtRequestFilter;
 
     @GetMapping("logout")
     public ResponseEntity<GenericResponse<Object>> logout() {
-        User user = userRepository.findUserByPhoneNumber(MyUtils.getUserPhone(jwtRequestFilter.username));
+        User user = MyUtils.getCurrentUserSession(userService);
         user.setLogoutTimes(user.getLogoutTimes() + 1);
-        userRepository.save(user);
+        userService.save(user);
         return GenericResponse.successWithMessageOnly("logout successfully");
     }
 
     @PostMapping("/parent_register")
-    public ResponseEntity<GenericResponse<Map<String, Object>>> createParent(
+    public ResponseEntity<GenericResponse<Object>> createParent(
             @RequestBody ParentRegisterRequest parentRegisterRequest) {
-        logger.warn(MyUtils.getUserPhone(JwtRequestFilter.username));
-        User user = new User();
-        Supplier<String> otp = otpService.createRandomOneTimeOTP();
-        user.setName(parentRegisterRequest.getName());
-        user.setPhoneNumber(parentRegisterRequest.getPhone());
-        user.setOtp(otp.get());
-        user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
-        user.setType(UserType.PARENT);
-        User u = userRepository.save(user);
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("otp", u.getOtp());
-        return GenericResponse.success(responseMap);
+        User user = userService.createParent(parentRegisterRequest);
+        return GenericResponse
+                .successWithMessageOnly(user.getOtp().toString());
     }
 
     @PostMapping("verfy_parent_otp")
     public ResponseEntity<GenericResponse<Object>> verifyOtp(@RequestHeader String otp,
-                                                             @RequestHeader String parent_phone) {
-        User parentUser = userRepository.findUserByPhoneNumber(parent_phone);
-        Map<String, Object> responseMap = new HashMap<>();
-        if (parentUser.getOtp().equalsIgnoreCase(otp)) {
-            // user.setOtp(null);
-            parentUser.setActive(true);
-            userRepository.save(parentUser);
-
-            User childUser = userRepository.findUserByPhoneNumber(MyUtils.getUserPhone(JwtRequestFilter.username));
-            childUser.setParent(parentUser);
-            userRepository.save(childUser);
-
-            return GenericResponse.successWithMessageOnly("success verification");
-
-
-        } else {
-            responseMap.put("message", "Invalid Credentials");
-            return GenericResponse.error(responseMap);
-        }
+            @RequestHeader @Param("parent_phone_mber") String parentPhone) {
+        userService.verifyParentUser(otp, parentPhone, MyUtils.getCurrentUserSession(userService));
+        return GenericResponse.successWithMessageOnly("Yor parent created Successffly");
     }
-    @GetMapping("")
-    public ResponseEntity<GenericResponse<Stream<UserLoginResponse>>> getUsers(){
-       return GenericResponse.success(userRepository.findAll().stream().map(new UserLoginMapper()::toDto));
+
+    @GetMapping("all")
+    public ResponseEntity<GenericResponse<Stream<AbstractUser>>> getUsers() {
+        return GenericResponse.success(userService.getAllAsAbstract().stream().map((e) -> e.toAbstractUser()));
     }
 }

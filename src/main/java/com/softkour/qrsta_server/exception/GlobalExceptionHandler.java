@@ -1,9 +1,11 @@
 package com.softkour.qrsta_server.exception;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.softkour.qrsta_server.config.GenericResponse;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -55,29 +57,66 @@ import org.springframework.web.bind.annotation.RestController;
 ////    }
 //}
 
+import com.softkour.qrsta_server.config.GenericResponse;
+
+import lombok.extern.slf4j.Slf4j;
+
 @ControllerAdvice
 @RestController
 @Configuration
+@Slf4j
 public class GlobalExceptionHandler {
 
+    /// validation exceptions
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ResponseEntity<GenericResponse<List<ErrorModel>>> handleException(MethodArgumentNotValidException e) {
-        List<ErrorModel> errorModels = processErrors(e);
-        return GenericResponse.error(errorModels);
+    public ResponseEntity<GenericResponse<Object>> handleException(
+            MethodArgumentNotValidException e) {
+        log.warn("Exception handler===================validation ");
+        return GenericResponse.errorOfMap(processvalidationErrors(e));
     }
 
-    private List<ErrorModel> processErrors(MethodArgumentNotValidException e) {
-        List<ErrorModel> validationErrorModels = new ArrayList<>();
+    /// client exceptions
+    @ExceptionHandler(value = ClientException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<GenericResponse<Object>> handingRuntimeException(
+            ClientException exception) {
+
+        Map<String, Object> errMap = new HashMap<String, Object>();
+        log.warn("================================================" + exception.key);
+        log.warn("================================================" + exception.getLocalizedMessage());
+        errMap.put(exception.key, exception.getLocalizedMessage());
+        return GenericResponse.errorOfMap(errMap);
+    }
+
+    /// database constraint violation
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<GenericResponse<Object>> handleDataIntegrityViolationException(
+            DataIntegrityViolationException exception) {
+        return GenericResponse.errorOfException(exception);
+    }
+
+    public static Map<String, Object> processErrors(Exception e) {
+        Map<String, Object> validationErrorModels = new HashMap<String, Object>();
+        validationErrorModels.put("error", e.getLocalizedMessage());
+
+        return validationErrorModels;
+    }
+
+    public static Map<String, String> processDataIntegrityViolationException(DataIntegrityViolationException e) {
+        Map<String, String> validationErrorModels = new HashMap<String, String>();
+        String constraintName = ((ConstraintViolationException) e.getCause()).getConstraintName();
+
+        validationErrorModels.put(constraintName, e.getMostSpecificCause().getMessage());
+
+        return validationErrorModels;
+    }
+
+    private Map<String, Object> processvalidationErrors(MethodArgumentNotValidException e) {
+        Map<String, Object> validationErrorModels = new HashMap<String, Object>();
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-            ErrorModel validationErrorModel = ErrorModel
-                    .builder()
-                    .code(fieldError.getCode())
-//                    .source(fieldError.getObjectName() + "/" + fieldError.getField())
-                    .source( fieldError.getField())
-                    .detail(fieldError.getField() + " " + fieldError.getDefaultMessage())
-                    .build();
-            validationErrorModels.add(validationErrorModel);
+            validationErrorModels.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
         return validationErrorModels;
     }

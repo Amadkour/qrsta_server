@@ -1,18 +1,20 @@
 package com.softkour.qrsta_server.payload.response;
 
+import java.time.Instant;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
 @Setter
 @Getter
 @AllArgsConstructor
 public class SessionDateAndStudentGrade {
     private Instant startDate;
-    private  Instant endDate;
-    private long sessionIs;
-    private int attendance_count;
+    private Instant endDate;
+    private long sessionId;
+    private int absence_count;
+    private int expected_count;
     private double grade;
 
 }

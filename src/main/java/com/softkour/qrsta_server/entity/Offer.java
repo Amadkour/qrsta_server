@@ -1,13 +1,17 @@
 package com.softkour.qrsta_server.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import java.time.LocalDate;
+
+import com.softkour.qrsta_server.payload.response.OfferResponse;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Setter
@@ -23,6 +27,12 @@ public class Offer extends AbstractAuditingEntity {
     private LocalDate endDate;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinTable(name = "offer__course", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
-//    @JsonIgnoreProperties(value = {"quizzes", "sessions", "schedules", "offers"}, allowSetters = true)
+    // @JsonIgnoreProperties(value = {"quizzes", "sessions", "schedules", "offers"},
+    // allowSetters = true)
     private Course course;
+
+    public OfferResponse toOfferResponse() {
+        return new OfferResponse(this.getCourse().getName(), this.getMonths(), this.getCost(),
+                this.getCourse().toCourseResponse());
+    }
 }

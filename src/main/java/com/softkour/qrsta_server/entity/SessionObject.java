@@ -1,14 +1,20 @@
 package com.softkour.qrsta_server.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Setter
@@ -18,21 +24,20 @@ public class SessionObject extends AbstractAuditingEntity {
     private String title;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<SessionObject> subItems=new HashSet<>();
+    private Set<SessionObject> subItems = new HashSet<>();
 
-    @ManyToOne(fetch =FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Session session;
 
     @Column
     @Enumerated(EnumType.STRING)
     private SessionObjectType type;
 
-
-    public void addSubItem(SessionObject sessionObject){
+    public void addSubItem(SessionObject sessionObject) {
         subItems.add(sessionObject);
     }
 
-    public void removeSubItem(SessionObject sessionObject){
+    public void removeSubItem(SessionObject sessionObject) {
         subItems.remove(sessionObject);
     }
 }

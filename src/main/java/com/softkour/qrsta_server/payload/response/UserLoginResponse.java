@@ -1,12 +1,13 @@
 package com.softkour.qrsta_server.payload.response;
 
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-import lombok.*;
 
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 public class UserLoginResponse {
     private String name;
@@ -18,5 +19,6 @@ public class UserLoginResponse {
     private String imageURL;
     private String organization;
     private String nationalId;
+    private String countryCode;
 
 }

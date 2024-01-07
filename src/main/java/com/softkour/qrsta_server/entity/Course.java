@@ -5,8 +5,16 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
+import com.softkour.qrsta_server.payload.response.CourseResponse;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -15,7 +23,7 @@ import lombok.Data;
  */
 @Entity
 @Data
- @SuppressWarnings("common-java:DuplicatedBlocks")
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Course extends AbstractAuditingEntity {
 
     @NotNull
@@ -29,14 +37,14 @@ public class Course extends AbstractAuditingEntity {
     private CourseType type;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
-    private User teacher ;
+    private User teacher;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
-    @JsonIgnoreProperties(value = { "questions", "courses","sessions","students" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "questions", "courses", "sessions", "students" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "courses")
@@ -44,7 +52,7 @@ public class Course extends AbstractAuditingEntity {
     private Set<User> students = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
-    @JsonIgnoreProperties(value = {"courses" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
     private Set<User> offers = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
@@ -150,13 +158,12 @@ public class Course extends AbstractAuditingEntity {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "Course{" +
-                "id=" + getId() +
-                ", name='" + getName() + "'" +
-                ", type='" + getType() + "'" +
-                "}";
+    public CourseResponse toCourseResponse() {
+        return new CourseResponse(this.getId(),
+                this.getName(),
+                this.getStudents().size(),
+                this.getSessions().size(),
+                this.getCost(),
+                this.getType());
     }
 }

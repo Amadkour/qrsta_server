@@ -1,15 +1,17 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.repo.SessionRepository;
 import java.util.List;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
+
+import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.exception.ClientException;
+import com.softkour.qrsta_server.repo.SessionRepository;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
@@ -31,11 +33,14 @@ public class SessionService {
         return sessionRepository.findAllByCourse_Id(courseId);
     }
 
-//    @Transactional(readOnly = true)
+    // @Transactional(readOnly = true)
     public Session findOne(long id) {
-        log.warn("Request to get Session : {}", id);
-//        return sessionRepository.findById(id).orElseThrow(()-> new NotFoundException("Session not Found"));
-        return sessionRepository.findById(id).get();
+        return sessionRepository.findById(id)
+                .orElseThrow(() -> new ClientException("session_id", "Session not Found id: " + id));
+    }
+
+    public Session getReferenceById(long id) {
+        return sessionRepository.getReferenceById(id);
     }
 
     public void delete(Long id) {
@@ -43,14 +48,16 @@ public class SessionService {
         sessionRepository.deleteById(id);
     }
 
-    public Session addStudentToSession(User user, Long sessionId){
-        Session session=sessionRepository.findById(sessionId).orElseThrow(()->new NotFoundException("session not found id: ".concat(sessionId.toString())));
+    public Session addStudentToSession(User user, Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NotFoundException("session not found id: ".concat(sessionId.toString())));
         session.addStudent(user);
         return sessionRepository.save(session);
     }
 
-    public Session removeStudentToSession(User user, Long sessionId){
-        Session session=sessionRepository.findById(sessionId).orElseThrow(()->new NotFoundException("session not found id: ".concat(sessionId.toString())));
+    public Session removeStudentToSession(User user, Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NotFoundException("session not found id: ".concat(sessionId.toString())));
         session.removeStudent(user);
         return sessionRepository.save(session);
     }
