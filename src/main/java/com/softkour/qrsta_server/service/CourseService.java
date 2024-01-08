@@ -12,11 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.entity.assiociation_entity.StudentCourse;
-import com.softkour.qrsta_server.entity.embedded_pk.StudentCoursePK;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.CourseRepository;
-import com.softkour.qrsta_server.repo.StudentCourseRepo;
 
 @Service
 public class CourseService {
@@ -24,8 +21,6 @@ public class CourseService {
     private final Logger log = LoggerFactory.getLogger(CourseService.class);
     @Autowired
     CourseRepository courseRepository;
-    @Autowired
-    StudentCourseRepo studentCourseRepo;
 
     /**
      * Save a course.
@@ -42,9 +37,7 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
-        StudentCourse s = studentCourseRepo.save(new StudentCourse(user, course));
-
-        course.addStudent(s);
+        course.addStudent(user);
         return courseRepository.save(course);
     }
 
@@ -52,7 +45,6 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
-        studentCourseRepo.deleteById(new StudentCoursePK(user.getId(), courseId));
         // course.removeStudent(user);
         return courseRepository.save(course);
     }

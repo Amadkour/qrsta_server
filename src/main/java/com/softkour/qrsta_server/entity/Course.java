@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta_server.entity.assiociation_entity.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 
@@ -49,8 +48,8 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "questions", "courses", "sessions", "students" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
 
-    @OneToMany(mappedBy = "course")
-    private Set<StudentCourse> students = new HashSet<StudentCourse>();
+    @OneToMany(mappedBy = "courses")
+    private Set<User> students = new HashSet<User>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
@@ -94,20 +93,19 @@ public class Course extends AbstractAuditingEntity {
     // this.students = employees;
     // }
 
-    public Course students(Set<StudentCourse> employees) {
+    public Course students(Set<User> employees) {
         this.setStudents(employees);
         return this;
     }
 
-    public Course addStudent(StudentCourse employee) {
+    public Course addStudent(User employee) {
         this.students.add(employee);
         // employee.getCourse().getStudents().add();
         return this;
     }
 
-    public Course removeStudent(StudentCourse employee) {
+    public Course removeStudent(User employee) {
         this.students.remove(employee);
-        employee.getCourse().getStudents().remove(employee);
         return this;
     }
 

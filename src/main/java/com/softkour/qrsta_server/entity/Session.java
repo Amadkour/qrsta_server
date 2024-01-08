@@ -115,15 +115,17 @@ public class Session extends AbstractAuditingEntity {
         log.warn(String.valueOf(this.getCourse().getStudents().size()));
         log.warn(String.valueOf(this.getCourse().getId()));
         log.warn(String.valueOf(this.getStudents().size()));
+        // this.getCourse().getStudents().stream()
+        // .map((e) -> e.getStudent()
+        // .toStudntInSession(
+        // this.getStudents().stream().anyMatch((s) -> s.getId() ==
+        // e.getStudent().getId())))
+        // .toList()
         // this.getCourse().getStudents().stream().map(
         // (c) -> c.toStudntInSession(this.getStudents().stream().anyMatch((s) ->
         // s.getId() == c.getId())))
         // .collect(Collectors.toSet());
-        return new SessionDetailsStudent(this.getCourse().getStudents().stream()
-                .map((e) -> e.getStudent()
-                        .toStudntInSession(
-                                this.getStudents().stream().anyMatch((s) -> s.getId() == e.getStudent().getId())))
-                .toList());
+        return new SessionDetailsStudent(this.getStudents().stream().map((e) -> e.toStudntInSession(false)).toList());
 
     }
 

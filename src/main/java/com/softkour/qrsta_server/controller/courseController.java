@@ -20,7 +20,6 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.Schedule;
 import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.entity.assiociation_entity.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
@@ -73,7 +72,7 @@ public class courseController {
 
         return GenericResponse
                 .success(courseService.findOne(courseId).getStudents().stream()
-                        .map((e) -> e.getStudent().toAbstractUser()));
+                        .map((e) -> e.toAbstractUser()));
 
     }
 
@@ -87,8 +86,8 @@ public class courseController {
                 return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
             } else {
-                List<StudentCourse> courseList = user.getCourses().stream().toList();
-                return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
+                List<Course> courseList = user.getCourses().stream().toList();
+                return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
             }
         } catch (Exception e) {

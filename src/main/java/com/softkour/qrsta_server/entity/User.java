@@ -4,14 +4,13 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.DeviceType;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
+import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -136,14 +135,16 @@ public class User extends AbstractAuditingEntity {
 
     public AbstractUser toAbstractUser() {
         return new AbstractUser(
-                this.getId(), this.getName(), this.getType(), this.getImageUrl(), this.getSessions(), this.getCourses(),
-                this.getQuizzes());
+                this.getId(), this.getName(), this.getType(), this.getImageUrl());
     }
 
-    public AbstractUser toAbstractUser() {
-        return new AbstractUser(
-                this.getId(), this.getName(), this.getType(), this.getImageUrl(), this.getSessions(), this.getCourses(),
-                this.getQuizzes());
+    public StudntInSession toStudntInSession(boolean isPresent) {
+        return new StudntInSession(
+                this.getId(), this.getName(), this.getType(), this.getImageUrl(), isPresent
+        // this.getSessions(),
+        // this.getCourses(),
+        // this.getQuizzes()
+        );
     }
 
     public UserLoginResponse toUserLoginResponse() {

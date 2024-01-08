@@ -3,8 +3,6 @@ package com.softkour.qrsta_server.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-
-import com.softkour.qrsta_server.repo.StudentCourseRepo;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OfferService;
@@ -26,8 +24,6 @@ public class startDatabase implements CommandLineRunner {
     OfferService offerService;
     @Autowired
     PostService postService;
-    @Autowired
-    StudentCourseRepo studentCourseRepo;
 
     @Override
     public void run(String... args) throws Exception {
