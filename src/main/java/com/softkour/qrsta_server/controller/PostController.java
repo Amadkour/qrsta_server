@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.entity.Post;
+import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
 import com.softkour.qrsta_server.payload.request.PostRequest;
 import com.softkour.qrsta_server.service.PostService;
+import com.softkour.qrsta_server.service.SessionObjectService;
 import com.softkour.qrsta_server.service.SessionService;
 
 @RestController
@@ -21,6 +23,8 @@ public class PostController {
     PostService postService;
     @Autowired
     SessionService sessionService;
+    @Autowired
+    SessionObjectService sessionObjectService;
 
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> addPost(@RequestBody PostRequest postRequest) {
@@ -207,24 +211,24 @@ public class PostController {
             @RequestHeader String postId,
             @RequestHeader(required = false) String commentIndex,
             @RequestHeader(required = false) String replayIndex,
+            @RequestHeader(required = false) Long objectId,
+            @RequestHeader SessionObjectType linkType,
             @RequestHeader Long sessionId) {
-        try {
 
-            /// replay
-            if (replayIndex != null)
-                return GenericResponse
-                        .success(postService.linkSessionToReplay(replayIndex, commentIndex, postIndex, sessionId));
-            /// comment
-            else if (commentIndex != null)
-                return GenericResponse.success(postService.linkSessionToComment(commentIndex, postIndex, sessionId));
-            else
-                /// post
-                return GenericResponse.success(postService.linkSessionToPost(postIndex, sessionId));
+        /// replay
+        if (replayIndex != null && commentIndex != null)
+            return GenericResponse
+                    .success(postService.linkSessionToReplay(postId, commentIndex, replayIndex, sessionId, objectId,
+                            linkType));
+        /// comment
+        else if (commentIndex != null)
+            return GenericResponse.success(postService.linkSessionToComment(postId, commentIndex, sessionId, objectId,
+                    linkType));
+        else
+            /// post
+            return GenericResponse.success(postService.linkSessionToPost(postId, sessionId, objectId,
+                    linkType));
 
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-
-        }
     }
 
 }

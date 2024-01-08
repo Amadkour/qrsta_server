@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.repo.PostRepository;
 
@@ -23,6 +24,8 @@ public class PostService {
     AuthService userService;
     @Autowired
     SessionService sessionService;
+    @Autowired
+    SessionObjectService sessionObjectService;
 
     public AbstractUser getCurrentUserAsAbstractUser() {
         return MyUtils.getCurrentUserSession(userService).toAbstractUser();
@@ -186,19 +189,24 @@ public class PostService {
 
     // ===============================[ linked session
     // ]===============================//
-    public Post linkSessionToPost(String postId, Long sessionId) {
+    public Post linkSessionToPost(String postId, Long sessionId, Long parentId, SessionObjectType type) {
         Post p = getPost(postId);
+        addItemToSession(parentId, sessionId, p.getData(), type);
+
         Session session = sessionService.getReferenceById(sessionId);
         p.setLinkedSessionId(session.getId());
         return postRepository.save(p);
     }
 
-    public Post linkSessionToComment(String postId, String commentIndex, Long sessionId) {
+    public Post linkSessionToComment(String postId, String commentIndex, Long sessionId, Long parentId,
+            SessionObjectType type) {
         int comIndex = Integer.parseInt(commentIndex);
         Post p = getPost(postId);
         Session session = sessionService.getReferenceById(sessionId);
         List<Post> comments = p.getComments();
         Post comment = comments.get(comIndex);
+        addItemToSession(parentId, sessionId, comment.getData(), type);
+
         comment.setLinkedSessionId(session.getId());
         comments.remove(comIndex);
         comments.add(comIndex, comment);
@@ -206,7 +214,8 @@ public class PostService {
         return postRepository.save(p);
     }
 
-    public Post linkSessionToReplay(String postId, String commentIndex, String replayIndex, Long sessionId) {
+    public Post linkSessionToReplay(String postId, String commentIndex, String replayIndex, Long sessionId,
+            Long parentId, SessionObjectType type) {
         int comIndex = Integer.parseInt(commentIndex);
         int repIndex = Integer.parseInt(replayIndex);
         Post p = getPost(postId);
@@ -216,6 +225,7 @@ public class PostService {
         // replay
         List<Post> replays = comment.getComments();
         Post replay = replays.get(repIndex);
+        addItemToSession(parentId, sessionId, replay.getData(), type);
         /// update
         replay.setLinkedSessionId(session.getId());
         replays.remove(repIndex);
@@ -225,6 +235,10 @@ public class PostService {
         comments.add(comIndex, comment);
         p.setComments(comments);
         return postRepository.save(p);
+    }
+
+    public void addItemToSession(Long parentId, long sessionId, String itemString, SessionObjectType type) {
+        sessionObjectService.save(itemString, type, parentId, sessionService.findOne(sessionId));
     }
 
 }

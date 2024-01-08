@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudents;
+import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -116,6 +117,12 @@ public class Session extends AbstractAuditingEntity {
     }
 
     public SessionDetailsWithoutStudents toSessionDetailsWithoutStudents() {
-        return new SessionDetailsWithoutStudents(this.getObjects(), this.getStartDate(), this.getEndDate());
+        return new SessionDetailsWithoutStudents(
+                this.getObjects().stream()
+                        .map((e) -> new SessionObjectResponse(e.getTitle(),
+                                e.getSubItems().stream().map((s) -> new SessionObjectResponse(s.getTitle(),
+                                        null, s.getType(), s.getCreatedDate(), s.getId())).toList(),
+                                e.getType(), e.getCreatedDate(), e.getId()))
+                        .toList());
     }
 }

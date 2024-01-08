@@ -18,10 +18,12 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.entity.SessionObject;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
+import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.PostService;
@@ -74,6 +76,14 @@ public class SessionController {
         }
     }
 
+    @GetMapping("session_details")
+    public ResponseEntity<GenericResponse<Object>> getSessionDetails(
+            @RequestHeader(name = "session_id") Long sessionId) {
+        Session session = sessionService.findOne(sessionId);
+        return GenericResponse.success(session.toSessionDetailsWithoutStudents());
+
+    }
+
     @GetMapping("take_attendance")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "session_id") Long sessionId) {
@@ -114,16 +124,14 @@ public class SessionController {
     }
 
     @PostMapping("add_object")
-    public ResponseEntity<GenericResponse<Object>> getSessionDetails(
+    public ResponseEntity<GenericResponse<Object>> addObject(
             @RequestBody @Valid ObjectCreationRequest objectCreationRequest) {
+        SessionObject sessionObject = sessionObjectService.save(objectCreationRequest.getItem(),
+                objectCreationRequest.getType(),
+                objectCreationRequest.getParentId(), sessionService.findOne(objectCreationRequest.getSessionId()));
+        return GenericResponse.success(new SessionObjectResponse(sessionObject.getTitle(), null,
+                sessionObject.getType(), sessionObject.getCreatedDate(), sessionObject.getId()));
 
-        try {
-            sessionObjectService.save(objectCreationRequest.getItem(), objectCreationRequest.getType(),
-                    objectCreationRequest.getParentId());
-            return GenericResponse.successWithMessageOnly("add subItem Successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
     }
 
     @PostMapping("create")
