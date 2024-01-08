@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 
 import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.entity.User;
@@ -50,14 +49,16 @@ public class SessionService {
 
     public Session addStudentToSession(User user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("session not found id: ".concat(sessionId.toString())));
+                .orElseThrow(
+                        () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
         session.addStudent(user);
         return sessionRepository.save(session);
     }
 
     public Session removeStudentToSession(User user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("session not found id: ".concat(sessionId.toString())));
+                .orElseThrow(
+                        () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
         session.removeStudent(user);
         return sessionRepository.save(session);
     }

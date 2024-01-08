@@ -3,7 +3,6 @@ package com.softkour.qrsta_server.entity;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -22,6 +21,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A Session.
@@ -29,7 +29,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Slf4j
 public class Session extends AbstractAuditingEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -52,7 +52,7 @@ public class Session extends AbstractAuditingEntity {
     private Instant endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "sessions", "students", "schedules" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "sessions", "schedules" }, allowSetters = true)
     private Course course;
 
     public void setStudents(Set<User> students) {
@@ -111,8 +111,19 @@ public class Session extends AbstractAuditingEntity {
     }
 
     public SessionDetailsStudent toSessionDetailsStudent() {
-        return new SessionDetailsStudent(
-                this.getStudents().stream().map((e) -> e.toAbstractUser()).collect(Collectors.toSet()));
+
+        log.warn(String.valueOf(this.getCourse().getStudents().size()));
+        log.warn(String.valueOf(this.getCourse().getId()));
+        log.warn(String.valueOf(this.getStudents().size()));
+        // this.getCourse().getStudents().stream().map(
+        // (c) -> c.toStudntInSession(this.getStudents().stream().anyMatch((s) ->
+        // s.getId() == c.getId())))
+        // .collect(Collectors.toSet());
+        return new SessionDetailsStudent(this.getCourse().getStudents().stream()
+                .map((e) -> e.getStudent()
+                        .toStudntInSession(
+                                this.getStudents().stream().anyMatch((s) -> s.getId() == e.getStudent().getId())))
+                .toList());
 
     }
 

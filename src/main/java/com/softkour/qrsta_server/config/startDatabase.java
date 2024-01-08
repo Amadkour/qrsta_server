@@ -1,19 +1,10 @@
 package com.softkour.qrsta_server.config;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.softkour.qrsta_server.entity.Course;
-import com.softkour.qrsta_server.entity.Offer;
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.repo.StudentCourseRepo;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OfferService;
@@ -35,57 +26,62 @@ public class startDatabase implements CommandLineRunner {
     OfferService offerService;
     @Autowired
     PostService postService;
+    @Autowired
+    StudentCourseRepo studentCourseRepo;
 
     @Override
     public void run(String... args) throws Exception {
         for (int i = 1; i < 4; i++) {
 
-            User user = new User();
-            user.setNationalId("1231231231231".concat(String.valueOf(i)));
-            user.setType(UserType.TEACHER);
-            user.setName("Ahmed Madkour");
-            user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
-            user.setDob(LocalDate.now());
-            user.setPhoneNumber("111067223".concat(String.valueOf(i)));
-            user.setCountryCode("20");
-            user.setMacAddress("aaaa");
-            user.setActive(true);
-            user.setLogged(true);
-            user = userRepository.save(user);
-
-            /// =================course========================///
-            Course course = new Course();
-            course.setCost(10);
-            course.setName("course".concat(String.valueOf(i)));
-            course.setTeacher(user);
-            log.warn("==========================================");
-            log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
-            log.warn("==========================================");
-            course.setStudents(userRepository.findAll().stream().collect(Collectors.toSet()));
-            course.addStudent(user);
-            course = courseService.save(course);
-            // ===================session=====================//
-            Session session = new Session();
-            session.setCourse(course);
-            session.setStartDate(Instant.now());
-            session.setEndDate(Instant.now().plusSeconds(600));
-            session = sessionService.save(session);
-            session.addStudent(user);
-            sessionService.save(session);
-            // ==========================offer=====================
-            Offer offer = new Offer();
-            offer.setCost(100);
-            offer.setEndDate(LocalDate.now());
-            offer.setCourse(course);
-            offer.setMonths(3);
-            offerService.createOffer(offer);
-            // =======================[post]==================
-            // Post post = new Post();
-            // post.setData("first Post");
-            // post.setOwner(user.toAbstractUser());
-            // post.setSession(session);
-            // postService.addPost(post);
-
+            // User user = new User();
+            // user.setNationalId("1231231231231".concat(String.valueOf(i)));
+            // user.setType(UserType.TEACHER);
+            // user.setName("Ahmed Madkour");
+            // user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
+            // user.setDob(LocalDate.now());
+            // user.setPhoneNumber("111067223".concat(String.valueOf(i)));
+            // user.setCountryCode("20");
+            // user.setMacAddress("aaaa");
+            // user.setActive(true);
+            // user.setLogged(true);
+            // user = userRepository.save(user);
+            //
+            // /// =================course========================///
+            // Course course = new Course();
+            // course.setCost(10);
+            // course.setName("course".concat(String.valueOf(i)));
+            // course.setTeacher(user);
+            // course = courseService.save(course);
+            // log.warn("==========================================");
+            // log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
+            // log.warn("==========================================");
+            // StudentCourse studentCourse = new StudentCourse(null,user, course,0);
+            // studentCourse = studentCourseRepo.save(studentCourse);
+            // course.addStudent(studentCourse);
+            // // course.addStudent(user);
+            // course = courseService.save(course);
+            // // ===================session=====================//
+            // Session session = new Session();
+            // session.setCourse(course);
+            // session.setStartDate(Instant.now());
+            // session.setEndDate(Instant.now().plusSeconds(600));
+            // session = sessionService.save(session);
+            // session.addStudent(user);
+            // sessionService.save(session);
+            // // ==========================offer=====================
+            // Offer offer = new Offer();
+            // offer.setCost(100);
+            // offer.setEndDate(LocalDate.now());
+            // offer.setCourse(course);
+            // offer.setMonths(3);
+            // offerService.createOffer(offer);
+            // // =======================[post]==================
+            // // Post post = new Post();
+            // // post.setData("first Post");
+            // // post.setOwner(user.toAbstractUser());
+            // // post.setSession(session);
+            // // postService.addPost(post);
+            //
         }
 
     }

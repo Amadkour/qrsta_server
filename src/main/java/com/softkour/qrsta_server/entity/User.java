@@ -136,7 +136,14 @@ public class User extends AbstractAuditingEntity {
 
     public AbstractUser toAbstractUser() {
         return new AbstractUser(
-                this.getId(), this.getName(), this.getType(), this.getImageUrl());
+                this.getId(), this.getName(), this.getType(), this.getImageUrl(), this.getSessions(), this.getCourses(),
+                this.getQuizzes());
+    }
+
+    public AbstractUser toAbstractUser() {
+        return new AbstractUser(
+                this.getId(), this.getName(), this.getType(), this.getImageUrl(), this.getSessions(), this.getCourses(),
+                this.getQuizzes());
     }
 
     public UserLoginResponse toUserLoginResponse() {

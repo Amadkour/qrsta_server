@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.assiociation_entity.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 
@@ -35,8 +36,9 @@ public class Course extends AbstractAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private CourseType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "students", "quizes", "courses" }, allowSetters = true)
     private User teacher;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
@@ -47,9 +49,8 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "questions", "courses", "sessions", "students" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "courses")
-    @JsonIgnoreProperties(value = { "parent", "sessions", "courses" }, allowSetters = true)
-    private Set<User> students = new HashSet<>();
+    @OneToMany(mappedBy = "course")
+    private Set<StudentCourse> students = new HashSet<StudentCourse>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
@@ -93,20 +94,20 @@ public class Course extends AbstractAuditingEntity {
     // this.students = employees;
     // }
 
-    public Course students(Set<User> employees) {
+    public Course students(Set<StudentCourse> employees) {
         this.setStudents(employees);
         return this;
     }
 
-    public Course addStudent(User employee) {
+    public Course addStudent(StudentCourse employee) {
         this.students.add(employee);
-        employee.getCourses().add(this);
+        // employee.getCourse().getStudents().add();
         return this;
     }
 
-    public Course removeStudent(User employee) {
+    public Course removeStudent(StudentCourse employee) {
         this.students.remove(employee);
-        employee.getCourses().remove(this);
+        employee.getCourse().getStudents().remove(employee);
         return this;
     }
 

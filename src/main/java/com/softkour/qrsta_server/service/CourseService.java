@@ -3,19 +3,20 @@ package com.softkour.qrsta_server.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.softkour.qrsta_server.entity.Course;
+import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.assiociation_entity.StudentCourse;
+import com.softkour.qrsta_server.entity.embedded_pk.StudentCoursePK;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.CourseRepository;
-import org.webjars.NotFoundException;
+import com.softkour.qrsta_server.repo.StudentCourseRepo;
 
 @Service
 public class CourseService {
@@ -23,6 +24,8 @@ public class CourseService {
     private final Logger log = LoggerFactory.getLogger(CourseService.class);
     @Autowired
     CourseRepository courseRepository;
+    @Autowired
+    StudentCourseRepo studentCourseRepo;
 
     /**
      * Save a course.
@@ -36,14 +39,21 @@ public class CourseService {
     }
 
     public Course addStudentToCourse(User user, Long courseId) {
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("session not found id: ".concat(courseId.toString())));
-        course.addStudent(user);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(
+                        () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
+        StudentCourse s = studentCourseRepo.save(new StudentCourse(user, course));
+
+        course.addStudent(s);
         return courseRepository.save(course);
     }
 
     public Course removeStudentFromCourse(User user, Long courseId) {
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException("session not found id: ".concat(courseId.toString())));
-        course.removeStudent(user);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(
+                        () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
+        studentCourseRepo.deleteById(new StudentCoursePK(user.getId(), courseId));
+        // course.removeStudent(user);
         return courseRepository.save(course);
     }
 
@@ -74,28 +84,16 @@ public class CourseService {
                 .map(courseRepository::save);
     }
 
-    /**
-     * Get all the courses.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
     public Page<Course> findAll(Pageable pageable) {
         log.debug("Request to get all Courses");
         return courseRepository.findAll(pageable);
     }
 
-    /**
-     * Get one course by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
-    @Transactional(readOnly = true)
     public Course findOne(Long id) {
         log.debug("Request to get Course : {}", id);
-        return courseRepository.findById(id).orElseThrow(() -> new NotFoundException("this course not found id: ".concat(String.valueOf(id))));
+        return courseRepository.findById(id)
+                .orElseThrow(
+                        () -> new ClientException("course", "this course not found id: ".concat(String.valueOf(id))));
     }
 
     /**

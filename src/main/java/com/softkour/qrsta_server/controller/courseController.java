@@ -1,6 +1,5 @@
 package com.softkour.qrsta_server.controller;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +20,7 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.Schedule;
 import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.assiociation_entity.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
@@ -68,18 +68,29 @@ public class courseController {
         }
     }
 
+    @GetMapping("get_course_details")
+    public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader Long courseId) {
+
+        return GenericResponse
+                .success(courseService.findOne(courseId).getStudents().stream()
+                        .map((e) -> e.getStudent().toAbstractUser()));
+
+    }
+
     @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses() {
         try {
 
             User user = MyUtils.getCurrentUserSession(authService);
-            List<Course> courseList = new ArrayList<>();
             if (user.getType() == UserType.TEACHER) {
-                courseList = courseService.getCourses(user.getId());
+                List<Course> courseList = courseService.getCourses(user.getId());
+                return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
+
             } else {
-                courseList = user.getCourses().stream().toList();
+                List<StudentCourse> courseList = user.getCourses().stream().toList();
+                return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
+
             }
-            return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
