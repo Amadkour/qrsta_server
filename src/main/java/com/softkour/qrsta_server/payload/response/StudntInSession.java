@@ -1,5 +1,7 @@
 package com.softkour.qrsta_server.payload.response;
 
+import java.util.List;
+
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 
 import lombok.AllArgsConstructor;
@@ -12,7 +14,8 @@ public class StudntInSession {
     private String name;
     private UserType type;
     private String imageURL;
-    private boolean isPresent;
+    private List<Boolean> attendance;
+    private boolean isPresented;
     private int late;
     private double grade;
     private int firstSession;

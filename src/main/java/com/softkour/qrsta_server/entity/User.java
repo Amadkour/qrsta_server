@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -140,7 +139,7 @@ public class User extends AbstractAuditingEntity {
                 this.getId(), this.getName(), this.getType(), this.getImageUrl());
     }
 
-    public StudntInSession toStudntInSession(boolean isPresent, Long courseId) {
+    public StudntInSession toStudntInSession(List<Boolean> attendance, boolean isPresent, Long courseId) {
         StudentCourse studentCourse = this.getCourses().stream().filter(e -> e.getCourse().getId() == courseId).toList()
                 .get(0);
         Stream<StudentQuiz> studentQuizzes = this.getQuizzes().stream()
@@ -161,6 +160,7 @@ public class User extends AbstractAuditingEntity {
                 this.getName(),
                 this.getType(),
                 this.getImageUrl(),
+                attendance,
                 isPresent,
                 studentCourse.getLateMonthes(),
                 studentQuizzes

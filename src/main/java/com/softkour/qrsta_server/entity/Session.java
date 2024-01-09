@@ -111,16 +111,28 @@ public class Session extends AbstractAuditingEntity {
     }
 
     public SessionDetailsStudent toSessionDetailsStudent() {
+
+        Set<Session> sessions = this.getCourse().getSessions();
+        // this.getStudents().stream().anyMatch(m -> m.getId() ==
+        // e.getStudent().getId())
         return new SessionDetailsStudent(
                 this.getCourse().getStudents().stream()
                         .map((e) -> e.getStudent().toStudntInSession(
+                                /// attendance
+                                sessions.stream()
+                                        .map(s -> s.getStudents().stream()
+                                                .anyMatch(b -> b.getId() == e.getStudent().getId()))
+                                        .toList(),
+                                /// isPresent in this Session?
                                 this.getStudents().stream().anyMatch(m -> m.getId() == e.getStudent().getId()),
+                                /// course
                                 this.getCourse().getId()))
                         .toList());
 
     }
 
     public SessionDetailsWithoutStudents toSessionDetailsWithoutStudents() {
+
         return new SessionDetailsWithoutStudents(
                 this.getObjects().stream()
                         .map((e) -> new SessionObjectResponse(e.getTitle(),
