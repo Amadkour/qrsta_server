@@ -12,6 +12,7 @@ import lombok.Getter;
 public class StudntInSession {
     private Long id;
     private String name;
+    private String address;
     private UserType type;
     private String imageURL;
     private List<Boolean> attendance;

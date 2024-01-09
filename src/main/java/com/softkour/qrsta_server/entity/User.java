@@ -158,6 +158,7 @@ public class User extends AbstractAuditingEntity {
         return new StudntInSession(
                 this.getId(),
                 this.getName(),
+                this.getAddress(),
                 this.getType(),
                 this.getImageUrl(),
                 attendance,
