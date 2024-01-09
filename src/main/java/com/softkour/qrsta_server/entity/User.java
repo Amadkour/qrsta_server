@@ -3,7 +3,11 @@ package com.softkour.qrsta_server.entity;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.DeviceType;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
@@ -137,12 +141,32 @@ public class User extends AbstractAuditingEntity {
     }
 
     public StudntInSession toStudntInSession(boolean isPresent, Long courseId) {
+        StudentCourse studentCourse = this.getCourses().stream().filter(e -> e.getCourse().getId() == courseId).toList()
+                .get(0);
+        Stream<StudentQuiz> studentQuizzes = this.getQuizzes().stream()
+                .filter(q -> q.getQuiz().getCourses().contains(studentCourse.getCourse()));
+        List<Instant> dInstants = studentCourse.getCourse().getSessions().stream().map(s -> s.getCreatedDate())
+                .toList();
+        int firstIndex = 0;
+        for (int i = 0; i < dInstants.size(); i++) {
+            if (dInstants.get(i).isBefore(this.getCreatedDate()))
+                firstIndex = i;
+        }
+
+        // this.getQuizzes().stream()
+        // .filter(e -> e.getQuiz().getCourses().stream().anyMatch(c -> c.getId() ==
+        // courseId))
         return new StudntInSession(
-                this.getId(), this.getName(), this.getType(), this.getImageUrl(), isPresent, this.getCourses().stream()
-                        .filter((c) -> c.getCourse().getId() == courseId).findFirst().get().getLateMonthes(),
-                this.getQuizzes().stream()
-                        .filter(e -> e.getQuiz().getCourses().stream().anyMatch(c -> c.getId() == courseId))
-                        .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum)
+                this.getId(),
+                this.getName(),
+                this.getType(),
+                this.getImageUrl(),
+                isPresent,
+                studentCourse.getLateMonthes(),
+                studentQuizzes
+                        .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum),
+                firstIndex
+
         // this.getSessions(),
         // this.getCourses(),
         // this.getQuizzes()

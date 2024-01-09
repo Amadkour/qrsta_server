@@ -70,7 +70,7 @@ public class startDatabase implements CommandLineRunner {
             studentCourse.setCourse(course);
             studentCourse.setStudent(user);
             studentCourse.setLateMonthes(0);
-            course.addStudent(studentCourse);
+            // course.addStudent(studentCourse);
             List<User> users = userRepository.findAll();
             for (int u = 0; u < users.size(); u++) {
                 StudentCourse studentC = new StudentCourse();

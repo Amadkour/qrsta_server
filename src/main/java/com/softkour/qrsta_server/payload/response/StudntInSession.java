@@ -15,4 +15,5 @@ public class StudntInSession {
     private boolean isPresent;
     private int late;
     private double grade;
+    private int firstSession;
 }

@@ -55,14 +55,19 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
+        /// check user join this course
+        log.warn("=================student courses================");
+        log.warn(user.getCourses().stream().map(e -> e.getCourse().getId()).toList().toString());
+        log.warn(session.getCourse().getId().toString());
+        log.warn("============================================");
 
-        if (user.getCourses().stream().anyMatch(c -> c.getId() == session.getCourse().getId())) {
+        if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
             session.addStudent(user);
-
+            log.warn(session.getStudents().stream().map(e -> e.getId()).toList().toString());
             return sessionRepository.save(session);
         } else {
             throw new ClientException("student",
-                    "this student not enclude  in this course".concat(user.getId().toString()));
+                    "this student not joint to this course: user id=".concat(user.getId().toString()));
         }
     }
 
