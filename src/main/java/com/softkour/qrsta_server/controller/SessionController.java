@@ -143,8 +143,8 @@ public class SessionController {
             session.setCourse(course);
             session.setStartDate(Instant.parse(sessionCreationRequest.getFromDate()));
             session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()));
-            sessionService.save(session);
-            return GenericResponse.success("session add successfully");
+            session = sessionService.save(session);
+            return GenericResponse.success(session.toSessionDateAndStudentGrade());
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
