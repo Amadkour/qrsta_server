@@ -38,16 +38,14 @@ public class Quiz extends AbstractAuditingEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "quiz__course", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
-    @JsonIgnoreProperties(value = { "students", "quizzes", "sessions","schedules" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "students", "quizzes", "sessions", "schedules" }, allowSetters = true)
     private Set<Course> courses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes")
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
     private Set<Question> questions = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "quiz__student", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
-    @JsonIgnoreProperties(value = { "quiz" }, allowSetters = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.ALL)
     private Set<StudentQuiz> students = new HashSet<>();
 
     public void addSession(Session session) {
@@ -67,7 +65,6 @@ public class Quiz extends AbstractAuditingEntity {
         }
         this.questions = questions;
     }
-
 
     public Quiz addQuestion(Question question) {
         this.questions.add(question);

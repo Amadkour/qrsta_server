@@ -13,8 +13,6 @@ public class StudntInSession {
     private UserType type;
     private String imageURL;
     private boolean isPresent;
-    // private Set<Session> sessions = new HashSet<>();
-    // private Set<Course> courses = new HashSet<>();
-    // private Set<Quiz> quizzes = new HashSet<>();
-
+    private int late;
+    private double grade;
 }

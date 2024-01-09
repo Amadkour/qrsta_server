@@ -1,32 +1,31 @@
 package com.softkour.qrsta_server.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Setter
 @Getter
-public class StudentQuiz extends AbstractAuditingEntity {
+public class StudentCourse extends AbstractAuditingEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "quizes", "courses" }, allowSetters = true)
     private User student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "students", "courses", "sessions", "students" }, allowSetters = true)
-    private Quiz quiz;
+    @JsonIgnoreProperties(value = { "students", "quizes", "quizzes", "schedules", "sessions" }, allowSetters = true)
+    private Course course;
 
-    private double grade = 0;
+    @Column
+    private int lateMonthes = 0;
+
 }

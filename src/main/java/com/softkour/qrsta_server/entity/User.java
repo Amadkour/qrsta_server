@@ -11,15 +11,16 @@ import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -98,15 +99,6 @@ public class User extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user__quiz", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id"))
-    @JsonIgnoreProperties(value = { "students", "sessions" }, allowSetters = true)
-    private Set<Quiz> quizzes = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user__course", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
-    @JsonIgnoreProperties(value = { "sessions", "students", "schedules" }, allowSetters = true)
-    private Set<Course> courses = new HashSet<>();
     @Column
     private Instant ExpireOTPDateTime;
     @Column
@@ -117,18 +109,24 @@ public class User extends AbstractAuditingEntity {
         return sessions;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "student", cascade = CascadeType.ALL)
+    private Set<StudentCourse> courses = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "student", cascade = CascadeType.ALL)
+    private Set<StudentQuiz> quizzes = new HashSet<>();
+
     public Set<Session> addSession(Session session) {
         sessions.add(session);
         session.getStudents().add(this);
         return sessions;
     }
 
-    public Set<Course> removeCourse(Course course) {
+    public Set<StudentCourse> removeCourse(StudentCourse course) {
         courses.remove(course);
         return courses;
     }
 
-    public Set<Course> addCourse(Course course) {
+    public Set<StudentCourse> addCourse(StudentCourse course) {
         courses.add(course);
         return courses;
     }
@@ -138,9 +136,13 @@ public class User extends AbstractAuditingEntity {
                 this.getId(), this.getName(), this.getType(), this.getImageUrl());
     }
 
-    public StudntInSession toStudntInSession(boolean isPresent) {
+    public StudntInSession toStudntInSession(boolean isPresent, Long courseId) {
         return new StudntInSession(
-                this.getId(), this.getName(), this.getType(), this.getImageUrl(), isPresent
+                this.getId(), this.getName(), this.getType(), this.getImageUrl(), isPresent, this.getCourses().stream()
+                        .filter((c) -> c.getCourse().getId() == courseId).findFirst().get().getLateMonthes(),
+                this.getQuizzes().stream()
+                        .filter(e -> e.getQuiz().getCourses().stream().anyMatch(c -> c.getId() == courseId))
+                        .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum)
         // this.getSessions(),
         // this.getCourses(),
         // this.getQuizzes()

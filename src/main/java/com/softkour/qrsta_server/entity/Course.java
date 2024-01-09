@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -48,12 +49,12 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "questions", "courses", "sessions", "students" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
 
-    @OneToMany(mappedBy = "courses")
-    private Set<User> students = new HashSet<User>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course", cascade = CascadeType.ALL)
+    private Set<StudentCourse> students = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "course")
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
-    private Set<User> offers = new HashSet<>();
+    private Set<Offer> offers = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
@@ -83,28 +84,19 @@ public class Course extends AbstractAuditingEntity {
         return this;
     }
 
-    // public void setStudents(Set<User> employees) {
-    // if (this.students != null) {
-    // this.students.forEach(i -> i.removeCourse(this));
-    // }
-    // if (employees != null) {
-    // employees.forEach(i -> i.addCourse(this));
-    // }
-    // this.students = employees;
-    // }
-
-    public Course students(Set<User> employees) {
+    public Course students(Set<StudentCourse> employees) {
         this.setStudents(employees);
         return this;
     }
 
-    public Course addStudent(User employee) {
-        this.students.add(employee);
+    public Course addStudent(StudentCourse employee) {
+        if (!this.students.stream().anyMatch(e -> e.getId() == employee.getStudent().getId()))
+            this.students.add(employee);
         // employee.getCourse().getStudents().add();
         return this;
     }
 
-    public Course removeStudent(User employee) {
+    public Course removeStudent(StudentCourse employee) {
         this.students.remove(employee);
         return this;
     }
@@ -138,24 +130,6 @@ public class Course extends AbstractAuditingEntity {
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
     // setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Course)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((Course) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see
-        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
 
     public CourseResponse toCourseResponse() {
         return new CourseResponse(this.getId(),

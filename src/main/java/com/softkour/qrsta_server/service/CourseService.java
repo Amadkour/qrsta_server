@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.entity.Course;
+import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.CourseRepository;
@@ -29,7 +30,6 @@ public class CourseService {
      * @return the persisted entity.
      */
     public Course save(Course course) {
-        log.debug("Request to save Course : {}", course);
         return courseRepository.save(course);
     }
 
@@ -37,7 +37,7 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
-        course.addStudent(user);
+        // course.addStudent(new StudentCourse(user, course, 0));
         return courseRepository.save(course);
     }
 

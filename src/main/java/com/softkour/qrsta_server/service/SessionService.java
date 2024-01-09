@@ -2,6 +2,7 @@ package com.softkour.qrsta_server.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @Slf4j
 public class SessionService {
+
+    @Autowired
+    CourseService courseService;
 
     private final SessionRepository sessionRepository;
 
@@ -51,8 +55,15 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
-        session.addStudent(user);
-        return sessionRepository.save(session);
+
+        if (user.getCourses().stream().anyMatch(c -> c.getId() == session.getCourse().getId())) {
+            session.addStudent(user);
+
+            return sessionRepository.save(session);
+        } else {
+            throw new ClientException("student",
+                    "this student not enclude  in this course".concat(user.getId().toString()));
+        }
     }
 
     public Session removeStudentToSession(User user, Long sessionId) {
