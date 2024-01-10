@@ -103,8 +103,8 @@ public class SessionController {
 
         try {
             User u = authService.getUserById(userId);
-            sessionService.addStudentToSession(u, sessionId);
-            return GenericResponse.successWithMessageOnly("add student to session successfully");
+            Session s = sessionService.addStudentToSession(u, sessionId);
+            return GenericResponse.success(s.toSessionDetailsStudent());
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
