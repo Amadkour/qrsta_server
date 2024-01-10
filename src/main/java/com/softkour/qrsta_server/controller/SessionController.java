@@ -20,6 +20,7 @@ import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.entity.SessionObject;
 import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
@@ -105,7 +106,10 @@ public class SessionController {
             User u = authService.getUserById(userId);
             Session s = sessionService.addStudentToSession(u, sessionId);
             return GenericResponse
-                    .success(s.toSessionDetailsStudent().getStudents().stream().filter(e -> e.getId() == userId));
+                    .success(s.toSessionDetailsStudent().getStudents().stream().filter(e -> e.getId() == userId)
+                            .findFirst().orElseThrow(
+                                    () -> new ClientException("student",
+                                            "student not found id: ".concat(String.valueOf(userId)))));
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
