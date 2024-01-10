@@ -69,7 +69,7 @@ public class courseController {
     }
 
     @GetMapping("get_course_details")
-    public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader Long courseId) {
+    public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader("course_id") Long courseId) {
 
         return GenericResponse
                 .success(courseService.findOne(courseId).toSessionDetailsStudent());
