@@ -6,6 +6,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
+import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -128,8 +129,18 @@ public class Course extends AbstractAuditingEntity {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
-    // setters here
+    public SessionDetailsStudent toSessionDetailsStudent() {
+
+        Set<Session> sessions = this.getSessions();
+        // this.getStudents().stream().anyMatch(m -> m.getId() ==
+        // e.getStudent().getId())
+
+        return new SessionDetailsStudent(
+                getStudents().stream().map(e -> e.getStudent().toStudntInSession(sessions.stream()
+                        .map(s -> s.getStudents().stream()
+                                .anyMatch(b -> b.getId() == e.getStudent().getId()))
+                        .toList(), true, getId())).toList());
+    }
 
     public CourseResponse toCourseResponse() {
         return new CourseResponse(this.getId(),

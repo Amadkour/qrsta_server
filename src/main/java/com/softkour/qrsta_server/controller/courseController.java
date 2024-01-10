@@ -72,8 +72,7 @@ public class courseController {
     public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader Long courseId) {
 
         return GenericResponse
-                .success(courseService.findOne(courseId).getStudents().stream()
-                        .map((e) -> e.getStudent().toAbstractUser()));
+                .success(courseService.findOne(courseId).toSessionDetailsStudent());
 
     }
 
