@@ -104,7 +104,8 @@ public class SessionController {
         try {
             User u = authService.getUserById(userId);
             Session s = sessionService.addStudentToSession(u, sessionId);
-            return GenericResponse.success(s.toSessionDetailsStudent());
+            return GenericResponse
+                    .success(s.toSessionDetailsStudent().getStudents().stream().filter(e -> e.getId() == userId));
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
