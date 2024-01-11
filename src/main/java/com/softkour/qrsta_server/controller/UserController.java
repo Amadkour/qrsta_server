@@ -52,8 +52,8 @@ public class UserController {
     }
 
     @PostMapping("verfy_parent_otp")
-    public ResponseEntity<GenericResponse<Object>> verifyOtp(@RequestHeader String otp,
-            @RequestHeader @Param("parent_phone_mber") String parentPhone) {
+    public ResponseEntity<GenericResponse<Object>> verifyOtp(@RequestHeader("parent_otp") String otp,
+            @RequestHeader @Param("parent_phone_number") String parentPhone) {
         userService.verifyParentUser(otp, parentPhone, MyUtils.getCurrentUserSession(userService));
         return GenericResponse.successWithMessageOnly("Yor parent created Successffly");
     }

@@ -78,7 +78,7 @@ public class AuthService {
         if (authorRepository.existsByPhoneNumber(request.getPhone())) {
             throw new ClientException("phone_number", "phone number already exists");
         }
-        return authorRepository.save(request.toUser());
+        return authorRepository.save(request.toUser(otpService));
 
     }
 

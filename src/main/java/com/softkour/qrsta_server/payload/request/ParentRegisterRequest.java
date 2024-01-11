@@ -24,10 +24,7 @@ public class ParentRegisterRequest {
     @Size(min = 7, max = 10)
     private String phone;
 
-    @Autowired
-    OTPService otpService;
-
-    public User toUser() {
+    public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setName(this.getName());
