@@ -67,7 +67,7 @@ public class PublicUserController {
 
     @PostMapping("verfy_otp")
     public ResponseEntity<GenericResponse<Object>> verifyOtp(@Valid @RequestHeader("user_otp") String otp,
-            @Valid @RequestHeader String phone) {
+            @Valid @RequestHeader("phone") String phone) {
         User user = userRepository.findUserByPhoneNumber(phone);
         Map<String, Object> responseMap = new HashMap<>();
         if (user.getOtp().equalsIgnoreCase(otp)) {
