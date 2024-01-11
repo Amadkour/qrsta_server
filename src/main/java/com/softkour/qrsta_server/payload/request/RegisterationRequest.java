@@ -65,10 +65,9 @@ public class RegisterationRequest {
     @Unique()
     @Size(min = 6)
     private String macAddress;
-    @Autowired
-    OTPService otpService;
 
-    public User toUser() {
+
+    public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
 

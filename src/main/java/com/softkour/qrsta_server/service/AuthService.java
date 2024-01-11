@@ -36,6 +36,8 @@ public class AuthService {
     JwtUserDetailsService userDetailsService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    OTPService otpService;
 
     public User register(RegisterationRequest request) {
         if (authorRepository.existsByPhoneNumber(request.getPhone())) {
@@ -43,7 +45,7 @@ public class AuthService {
         } else if (authorRepository.existsByNationalId(request.getNationalId())) {
             throw new ClientException("national_id", "national_id number already exists");
         }
-        return authorRepository.save(request.toUser());
+        return authorRepository.save(request.toUser(otpService));
     }
 
     public UserLoginResponse login(LoginRequest request) {
