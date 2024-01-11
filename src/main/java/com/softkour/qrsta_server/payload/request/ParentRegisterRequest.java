@@ -35,7 +35,7 @@ public class ParentRegisterRequest {
         user.setOtp(otp.get());
         user.setCountryCode(this.getCountryCode());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
-        user.setType(UserType.PARENT);
+        user.setType(UserType.OBSERVER);
         return user;
 
     }
