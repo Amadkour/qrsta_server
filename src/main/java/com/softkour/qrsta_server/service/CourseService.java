@@ -37,7 +37,11 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
-        // course.addStudent(new StudentCourse(user, course, 0));
+        StudentCourse student = new StudentCourse();
+        student.setCourse(course);
+        student.setStudent(user);
+        student.setLateMonthes(0);
+        course.addStudent(student);
         return courseRepository.save(course);
     }
 
