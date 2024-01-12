@@ -18,15 +18,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Course;
+import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.Schedule;
+import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
+import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
+import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.ScheduleService;
+import com.softkour.qrsta_server.service.SessionService;
 
 @RestController
 @RequestMapping("/api/course/")
@@ -39,6 +44,10 @@ public class courseController {
     ScheduleService scheduleService;
     @Autowired
     AuthService authService;
+    @Autowired
+    PostService postService;
+    @Autowired
+    SessionService sessionService;
 
     @PostMapping("add_course")
     public ResponseEntity<GenericResponse<Object>> addCourse(@RequestBody CourseCreationRequest request) {
@@ -76,6 +85,19 @@ public class courseController {
 
     }
 
+    @GetMapping("course_sessions")
+    public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
+
+        Set<Session> sessionList = courseService.findOne(courseId).getSessions();
+        List<Post> postslist = postService.posts(courseId);
+        return GenericResponse.success(
+                new SessionAndSocialResponce(
+                        sessionList.stream().map((e) -> e.toSessionDateAndStudentGrade()).toList(),
+                        postslist.stream().map((e) -> e.toPostResponce(sessionService, authService)).toList())
+
+        );
+
+    }
     @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses() {
         try {

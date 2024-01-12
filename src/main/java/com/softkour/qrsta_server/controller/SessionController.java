@@ -41,29 +41,13 @@ import lombok.extern.slf4j.Slf4j;
 public class SessionController {
     @Autowired
     SessionService sessionService;
-    @Autowired
-    PostService postService;
+
     @Autowired
     CourseService courseService;
     @Autowired
     AuthService authService;
     @Autowired
     SessionObjectService sessionObjectService;
-
-    @GetMapping("course_sessions")
-    public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
-
-        List<Session> sessionList = sessionService.findSessionsOfCourse(courseId);
-        List<Post> postslist = postService.posts(courseId);
-        log.warn(postslist.stream().map((e) -> e.getLikes()).toList().toString());
-        return GenericResponse.success(
-                new SessionAndSocialResponce(
-                        sessionList.stream().map((e) -> e.toSessionDateAndStudentGrade()).toList(),
-                        postslist.stream().map((e) -> e.toPostResponce(sessionService, authService)).toList())
-
-        );
-
-    }
 
     @GetMapping("session_details_student")
     public ResponseEntity<GenericResponse<Object>> getSessionDetailsStudent(
