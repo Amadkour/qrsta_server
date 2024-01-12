@@ -33,7 +33,10 @@ import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.ScheduleService;
 import com.softkour.qrsta_server.service.SessionService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@Slf4j
 @RequestMapping("/api/course/")
 public class courseController {
     protected final Log logger = LogFactory.getLog(getClass());
@@ -71,7 +74,7 @@ public class courseController {
             course.setSchedules(savedSchedules);
             course.setTeacher(MyUtils.getCurrentUserSession(authService));
             courseService.save(course);
-            return GenericResponse.successWithMessageOnly("success add course");
+            return GenericResponse.success(course);
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
@@ -89,6 +92,7 @@ public class courseController {
     public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
 
         Set<Session> sessionList = courseService.findOne(courseId).getSessions();
+        log.warn(String.valueOf(sessionList.size()));
         List<Post> postslist = postService.posts(courseId);
         return GenericResponse.success(
                 new SessionAndSocialResponce(
