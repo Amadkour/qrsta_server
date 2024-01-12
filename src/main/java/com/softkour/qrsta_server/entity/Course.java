@@ -93,7 +93,6 @@ public class Course extends AbstractAuditingEntity {
     public Course addStudent(StudentCourse employee) {
         if (!this.students.stream().anyMatch(e -> e.getId() == employee.getStudent().getId()))
             this.students.add(employee);
-        employee.getStudent().addCourse(employee);
         return this;
     }
 
