@@ -42,11 +42,15 @@ public class startDatabase implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        for (int i = 1; i < 4; i++) {
+        for (int i = 2; i < 5; i++) {
 
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
+            if (1 == i)
             user.setType(UserType.TEACHER);
+        else
+            user.setType(UserType.STUDENT);
+
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
             user.setDob(LocalDate.now());
