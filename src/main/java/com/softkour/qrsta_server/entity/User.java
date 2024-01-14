@@ -102,6 +102,10 @@ public class User extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
+    @JsonIgnoreProperties(value = { "students", "course" }, allowSetters = true)
+    private Set<Offer> offers = new HashSet<>();
+
     @Column
     private Instant ExpireOTPDateTime;
     @Column

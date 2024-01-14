@@ -57,7 +57,7 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses", cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
     private Set<Schedule> schedules = new HashSet<>();
 
@@ -147,6 +147,7 @@ public class Course extends AbstractAuditingEntity {
                 this.getStudents().size(),
                 this.getSessions().size(),
                 this.getCost(),
-                this.getType());
+                this.getType(),
+                this.getSchedules().stream().map(s -> s.toScheduleResponse()).toList());
     }
 }

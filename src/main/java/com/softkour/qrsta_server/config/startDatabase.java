@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.Offer;
+import com.softkour.qrsta_server.entity.Schedule;
 import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
@@ -47,9 +48,9 @@ public class startDatabase implements CommandLineRunner {
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
             if (2 == i)
-            user.setType(UserType.TEACHER);
-        else
-            user.setType(UserType.STUDENT);
+                user.setType(UserType.TEACHER);
+            else
+                user.setType(UserType.STUDENT);
 
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
@@ -75,6 +76,12 @@ public class startDatabase implements CommandLineRunner {
             studentCourse.setStudent(user);
             studentCourse.setLateMonthes(0);
             // course.addStudent(studentCourse);
+            course.addStudent(studentCourse);
+            Schedule schedule = new Schedule();
+            schedule.setDay("monday");
+            schedule.setFromTime("02:00 PM");
+            schedule.setToTime("04:00 PM");
+            course.addSchedule(schedule);
             List<User> users = userRepository.findAll();
             for (int u = 0; u < users.size(); u++) {
                 StudentCourse studentC = new StudentCourse();
@@ -83,6 +90,7 @@ public class startDatabase implements CommandLineRunner {
                 studentC.setLateMonthes(u);
                 course.addStudent(studentC);
             }
+
             course = courseService.save(course);
             // ===================session=====================//
             Session session = new Session();

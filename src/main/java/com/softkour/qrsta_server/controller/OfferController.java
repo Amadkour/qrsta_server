@@ -1,10 +1,8 @@
 package com.softkour.qrsta_server.controller;
 
 import java.time.LocalDate;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Offer;
 import com.softkour.qrsta_server.payload.request.OfferCreationRequest;
 import com.softkour.qrsta_server.service.AuthService;
@@ -51,35 +48,20 @@ public class OfferController {
         }
     }
 
-    @Cacheable(value = "offers")
-    @GetMapping("teacher_offers")
+    @GetMapping("all")
     public ResponseEntity<GenericResponse<Object>> getTeacherOffers() {
-        try {
-            return GenericResponse.success(offerService.getTeacherOffers(MyUtils.getCurrentUserSession(authService))
-                    .stream().map((e) -> e.toOfferResponse()).collect(Collectors.toSet()));
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
-    }
 
-    @GetMapping("student_offers")
-    public ResponseEntity<GenericResponse<Object>> getStudentOffers() {
-        try {
-            return GenericResponse.success(offerService.getStudentOffers(MyUtils.getCurrentUserSession(authService))
-                    .stream().map((e) -> e.toOfferResponse()).collect(Collectors.toSet()));
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+        return GenericResponse.success(offerService.userAvilableOffers()
+                .stream().map((e) -> e.toOfferResponse()).toList());
+
     }
 
     @GetMapping("all")
-    public ResponseEntity<GenericResponse<Object>> all() {
-        try {
-            return GenericResponse
-                    .success(offerService.all().stream().map((e) -> e.toOfferResponse()).collect(Collectors.toSet()));
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+    public ResponseEntity<GenericResponse<Object>> getStudentSubscripOffers() {
+
+        return GenericResponse.success(offerService.studentSubscribedeOffers()
+                .stream().map((e) -> e.toOfferResponse()).toList());
+
     }
 
 }
