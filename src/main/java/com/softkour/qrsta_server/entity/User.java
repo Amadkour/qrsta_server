@@ -82,6 +82,8 @@ public class User extends AbstractAuditingEntity {
     @Column(columnDefinition = "boolean default false")
     private boolean isActive;
     @Column(columnDefinition = "boolean default false")
+    private boolean needToReplace;
+    @Column(columnDefinition = "boolean default false")
     private boolean isLogged;
 
     @Column(columnDefinition = "integer default 0")
@@ -101,6 +103,10 @@ public class User extends AbstractAuditingEntity {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
+    @JsonIgnoreProperties(value = { "students", "course" }, allowSetters = true)
+    private Set<Offer> offers = new HashSet<>();
 
     @Column
     private Instant ExpireOTPDateTime;

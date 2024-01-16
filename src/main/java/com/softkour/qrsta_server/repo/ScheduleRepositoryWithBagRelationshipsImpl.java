@@ -1,21 +1,19 @@
 package com.softkour.qrsta_server.repo;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import com.softkour.qrsta_server.entity.Schedule;
 
-/**
- * Utility repository to load bag relationships based on
- * https://vladmihalcea.com/hibernate-multiplebagfetchexception/
- */
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 public class ScheduleRepositoryWithBagRelationshipsImpl implements ScheduleRepositoryWithBagRelationships {
 
     @PersistenceContext

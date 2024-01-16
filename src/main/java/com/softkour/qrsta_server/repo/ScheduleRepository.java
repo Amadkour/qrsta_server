@@ -2,9 +2,10 @@ package com.softkour.qrsta_server.repo;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.softkour.qrsta_server.entity.Schedule;
@@ -29,4 +30,10 @@ public interface ScheduleRepository extends ScheduleRepositoryWithBagRelationshi
     default Page<Schedule> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
     }
+
+    List<Schedule> findAllByCourses_teacher_Id(Long userId);
+
+    List<Schedule> findAllByCourses_students_student_Id(Long userId);
+
+    void deleteAllByCourses_id(Long courseId);
 }

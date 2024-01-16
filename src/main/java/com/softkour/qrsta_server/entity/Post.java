@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.PostResponce;
 import com.softkour.qrsta_server.service.AuthService;
@@ -16,11 +17,9 @@ import com.softkour.qrsta_server.service.SessionService;
 
 import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 @Document
 @Data
-@Slf4j
 public class Post {
     @Id
     String id;
@@ -28,6 +27,7 @@ public class Post {
     long sessionId;
     long courseId;
     AbstractUser owner;
+    CourseType type;
     private long linkedSessionId;
     Set<String> media = new HashSet<>();
     Set<AbstractUser> likes = new HashSet<>();

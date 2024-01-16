@@ -54,30 +54,36 @@ public class courseController {
 
     @PostMapping("add_course")
     public ResponseEntity<GenericResponse<Object>> addCourse(@RequestBody CourseCreationRequest request) {
-        try {
-            // ===========[ schedule ]===============//
-            Set<Schedule> savedSchedules = new HashSet<>();
-            for (int i = 0; i < request.getSchedules().size(); i++) {
 
-                ScheduleRequest scheduleRequest = request.getSchedules().get(i);
-                Schedule schedule = new Schedule();
-                schedule.setFromTime(scheduleRequest.getFrom());
-                schedule.setToTime(scheduleRequest.getTo());
-                schedule.setDay(scheduleRequest.getDay());
-                savedSchedules.add(scheduleService.save(schedule));
-            }
-            // ===========[ schedule ]===============//
-            Course course = new Course();
-            course.setName(request.getName());
-            course.setType(request.getCourseType());
-            course.setCost(request.getCost());
-            course.setSchedules(savedSchedules);
-            course.setTeacher(MyUtils.getCurrentUserSession(authService));
-            courseService.save(course);
-            return GenericResponse.success(course);
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
+        /// if update
+        if (request.getId() != null) {
+            scheduleService.deleteAllAppointmentOfCourse(request.getId());
         }
+
+        // ===========[ schedule ]===============//
+        Set<Schedule> savedSchedules = new HashSet<>();
+        for (int i = 0; i < request.getSchedules().size(); i++) {
+            ScheduleRequest scheduleRequest = request.getSchedules().get(i);
+            Schedule schedule = new Schedule();
+            schedule.setFromTime(scheduleRequest.getFrom());
+            schedule.setToTime(scheduleRequest.getTo());
+            schedule.setDay(scheduleRequest.getDay());
+            schedule.setId(scheduleRequest.getId());
+
+            savedSchedules.add(scheduleService.save(schedule));
+        }
+        // ===========[ schedule ]===============//
+        Course course = new Course();
+        course.setName(request.getName());
+        course.setType(request.getCourseType());
+        course.setCost(request.getCost());
+        course.setSchedules(savedSchedules);
+        course.setId(request.getId());
+
+        course.setTeacher(MyUtils.getCurrentUserSession(authService));
+
+        return GenericResponse.success(courseService.save(course).toCourseResponse());
+
     }
 
     @GetMapping("get_course_details")
@@ -102,6 +108,7 @@ public class courseController {
         );
 
     }
+
     @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses() {
         try {
