@@ -7,6 +7,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.payload.response.OfferResponse;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,14 +27,14 @@ public class Offer extends AbstractAuditingEntity {
     @Column
     private double cost;
     @Column
-    private boolean holdout;
+    private boolean soldout;
     @Column
     private LocalDate endDate;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinTable(name = "offer__course", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     private Course course;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "user__offer", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
     @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
     private Set<User> students = new HashSet<>();
@@ -41,5 +42,9 @@ public class Offer extends AbstractAuditingEntity {
     public OfferResponse toOfferResponse() {
         return new OfferResponse(this.getCourse().getName(), this.getMonths(), this.getCost(),
                 this.getCourse().toCourseResponse());
+    }
+
+    public void addStudent(User user) {
+        students.add(user);
     }
 }

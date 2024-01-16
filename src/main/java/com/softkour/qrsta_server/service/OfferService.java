@@ -9,6 +9,7 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Offer;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.OfferRepo;
 
 @Service
@@ -43,6 +44,17 @@ public class OfferService {
         User u = MyUtils.getCurrentUserSession(authService);
 
         return offerRepo.findBySoldoutAndStudents_id(false, u.getId());
+    }
+
+    public Offer studentSubscribeToOffer(Long offerId) {
+        User u = MyUtils.getCurrentUserSession(authService);
+        Offer offer = offerRepo.findById(offerId)
+                .orElseThrow(() -> new ClientException("offer", "Not Found this Offer: " + offerId));
+        if (offer.isSoldout()) {
+            throw new ClientException("offer", "This Offer is soldout: " + offerId);
+        }
+        offer.addStudent(u);
+        return offerRepo.save(offer);
     }
 
 }

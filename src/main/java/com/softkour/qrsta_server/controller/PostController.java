@@ -32,11 +32,10 @@ public class PostController {
         Post post = new Post();
         post.setData(postRequest.getData());
         post.setMedia(postRequest.getMedia());
+        post.setType(postRequest.getType());
         if (postRequest.getSessionId() != null)
             post.setSessionId(postRequest.getSessionId());
         /// add replay
-        System.out.println("================================================================");
-        System.out.println(postRequest.toString());
         if (postRequest.getCommentIndex() != null && postRequest.getParentId() != null)
             return GenericResponse
                     .success(postService.addReplay(post, postRequest.getParentId(), postRequest.getCommentIndex()));

@@ -34,4 +34,6 @@ public interface ScheduleRepository extends ScheduleRepositoryWithBagRelationshi
     List<Schedule> findAllByCourses_teacher_Id(Long userId);
 
     List<Schedule> findAllByCourses_students_student_Id(Long userId);
+
+    void deleteAllByCourses_id(Long courseId);
 }

@@ -85,7 +85,13 @@ public class ScheduleService {
         return scheduleRepository.findOneWithEagerRelationships(id);
     }
 
+    @Transactional
     public void delete(Long id) {
         scheduleRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteAllAppointmentOfCourse(Long courseId) {
+        scheduleRepository.deleteAllByCourses_id(courseId);
     }
 }

@@ -96,7 +96,7 @@ public class startDatabase implements CommandLineRunner {
             Session session = new Session();
             session.setCourse(course);
             session.setStartDate(Instant.now());
-            session.setEndDate(Instant.now().plusSeconds(600));
+            session.setEndDate(Instant.now().plusSeconds(5));
             session = sessionService.save(session);
             session.addStudent(user);
             sessionService.save(session);

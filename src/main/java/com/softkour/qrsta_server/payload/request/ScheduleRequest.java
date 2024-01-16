@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ScheduleRequest {
+    private Long id;
     @NotBlank
     @Size(min = 7, max = 8)
     private String day;

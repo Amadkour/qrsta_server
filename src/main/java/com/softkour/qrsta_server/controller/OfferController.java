@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,11 +57,19 @@ public class OfferController {
 
     }
 
-    @GetMapping("all")
-    public ResponseEntity<GenericResponse<Object>> getStudentSubscripOffers() {
+    @GetMapping("subscribed-offers")
+    public ResponseEntity<GenericResponse<Object>> getStudentSubscribedOffers() {
 
         return GenericResponse.success(offerService.studentSubscribedeOffers()
                 .stream().map((e) -> e.toOfferResponse()).toList());
+
+    }
+
+    @GetMapping("subscribe")
+    public ResponseEntity<GenericResponse<Object>> getStudentSubscribeInOffers(
+            @RequestHeader("offer_id") Long offerId) {
+
+        return GenericResponse.success(offerService.studentSubscribeToOffer(offerId).toOfferResponse());
 
     }
 
