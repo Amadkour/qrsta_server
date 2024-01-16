@@ -86,7 +86,6 @@ public class CourseService {
     }
 
     public Course findOne(Long id) {
-        log.debug("Request to get Course : {}", id);
         return courseRepository.findById(id)
                 .orElseThrow(
                         () -> new ClientException("course", "this course not found id: ".concat(String.valueOf(id))));

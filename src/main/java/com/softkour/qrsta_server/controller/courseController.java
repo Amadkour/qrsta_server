@@ -90,7 +90,7 @@ public class courseController {
 
     @GetMapping("course_sessions")
     public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
-
+        log.warn("====================here==========:" + courseId);
         Set<Session> sessionList = courseService.findOne(courseId).getSessions();
         log.warn(String.valueOf(sessionList.size()));
         List<Post> postslist = postService.posts(courseId);
