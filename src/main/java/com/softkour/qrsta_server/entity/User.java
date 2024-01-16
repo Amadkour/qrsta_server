@@ -82,6 +82,8 @@ public class User extends AbstractAuditingEntity {
     @Column(columnDefinition = "boolean default false")
     private boolean isActive;
     @Column(columnDefinition = "boolean default false")
+    private boolean needToReplace;
+    @Column(columnDefinition = "boolean default false")
     private boolean isLogged;
 
     @Column(columnDefinition = "integer default 0")

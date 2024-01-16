@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.exception.ClientException;
+import com.softkour.qrsta_server.payload.request.AcceptRequest;
 import com.softkour.qrsta_server.repo.CourseRepository;
+import com.softkour.qrsta_server.repo.StudentCourseRepository;
 
 @Service
 public class CourseService {
@@ -22,13 +25,9 @@ public class CourseService {
     private final Logger log = LoggerFactory.getLogger(CourseService.class);
     @Autowired
     CourseRepository courseRepository;
+    @Autowired
+    StudentCourseRepository studentCourseRepository;
 
-    /**
-     * Save a course.
-     *
-     * @param course the entity to save.
-     * @return the persisted entity.
-     */
     public Course save(Course course) {
         return courseRepository.save(course);
     }
@@ -41,6 +40,13 @@ public class CourseService {
         student.setCourse(course);
         student.setStudent(user);
         student.setLateMonthes(0);
+        if (course.getType() == CourseType.PRIVATE) {
+            student.setActive(false);
+        } else {
+            student.setActive(true);
+
+        }
+
         course.addStudent(student);
         return courseRepository.save(course);
     }
@@ -53,12 +59,6 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    /**
-     * Partially update a course.
-     *
-     * @param course the entity to update partially.
-     * @return the persisted entity.
-     */
     public Optional<Course> partialUpdate(Course course) {
         log.debug("Request to partially update Course : {}", course);
 
@@ -104,5 +104,28 @@ public class CourseService {
 
     public List<Course> getCourses(Long teacherId) {
         return courseRepository.getCourseByTeacherId(teacherId);
+    }
+
+    public List<Course> getAllDisableStudentsOfCourses(Long teacherId) {
+        return courseRepository.getCourseByTeacherIdAndStudents_active(teacherId, false);
+    }
+
+    public String acceptToJoinCourse(List<AcceptRequest> requests) {
+        for (AcceptRequest request : requests) {
+            StudentCourse user = studentCourseRepository.findByStudent_id(request.getId());
+            user.setActive(true);
+            studentCourseRepository.save(user);
+        }
+        return "accept to join successfully";
+
+    }
+
+    public String cancleRequest(List<AcceptRequest> requests) {
+        for (AcceptRequest request : requests) {
+            StudentCourse user = studentCourseRepository.findByStudent_id(request.getId());
+            studentCourseRepository.delete(user);
+        }
+        return "cancle join request successfully";
+
     }
 }

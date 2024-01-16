@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.exception.ClientException;
+import com.softkour.qrsta_server.payload.request.AcceptRequest;
 import com.softkour.qrsta_server.payload.request.LoginRequest;
 import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
@@ -82,8 +83,36 @@ public class AuthService {
 
     }
 
+    public String acceptToChangeDevice(List<AcceptRequest> requests) {
+        for (AcceptRequest acceptRequest : requests) {
+            User user = authorRepository.findById(acceptRequest.getId())
+                    .orElseThrow(() -> new ClientException("switch_device", "user not fount: " + acceptRequest
+                            .getId()));
+            user.setMacAddress(acceptRequest.getMacAddress());
+            authorRepository.save(user);
+        }
+        return "accept to change device successfully";
+
+    }
+
+    public String cancleRequest(List<AcceptRequest> requests) {
+        for (AcceptRequest acceptRequest : requests) {
+            User user = authorRepository.findById(acceptRequest.getId())
+                    .orElseThrow(() -> new ClientException("switch_device", "user not fount: " + acceptRequest
+                            .getId()));
+            user.setNeedToReplace(false);
+            authorRepository.save(user);
+        }
+        return "cancle request successfully";
+
+    }
+
     public User getUserByPhoneNumber(String phoneNumber) {
         return authorRepository.findUserByPhoneNumber(phoneNumber);
+    }
+
+    public List<User> getNeedToReplaceUsers(Long teacherId) {
+        return authorRepository.findAllUserByNeedToReplaceAndCourses_course_teacherId(false, teacherId);
     }
 
     public User save(User user) {
