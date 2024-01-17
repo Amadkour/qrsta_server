@@ -71,7 +71,9 @@ public class User extends AbstractAuditingEntity {
     private LocalDate dob;
 
     @Column()
-    private String macAddress;
+    private String registerMacAddress;
+    @Column()
+    private String loginMacAddress;
 
     @Column()
     private String imageUrl;
@@ -175,7 +177,6 @@ public class User extends AbstractAuditingEntity {
                         .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum),
                 firstIndex + 1
 
-
         );
     }
 
@@ -186,7 +187,7 @@ public class User extends AbstractAuditingEntity {
                 this.getPhoneNumber(),
                 "token",
                 this.getAddress(),
-                this.getMacAddress(),
+                getLoginMacAddress() == getRegisterMacAddress(),
                 this.getImageUrl(),
                 (this.getOrganization() == null) ? null : this.getOrganization().name(),
                 this.getNationalId(),

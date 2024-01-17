@@ -57,7 +57,7 @@ public class startDatabase implements CommandLineRunner {
             user.setDob(LocalDate.now());
             user.setPhoneNumber("111067223".concat(String.valueOf(i)));
             user.setCountryCode("20");
-            user.setMacAddress("aaaa");
+            user.setRegisterMacAddress("aaaa");
             user.setActive(true);
             user.setLogged(true);
             user = userRepository.save(user);

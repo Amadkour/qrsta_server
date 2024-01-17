@@ -62,6 +62,7 @@ public class AuthService {
             } else if (auth.isAuthenticated()) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPhone());
                 String token = jwtTokenUtil.generateToken(userDetails);
+                user.setLoginMacAddress(request.getMacAddress());
                 UserLoginResponse userLoginResponse = user.toUserLoginResponse();
                 userLoginResponse.setToken(token);
                 return userLoginResponse;
@@ -88,7 +89,7 @@ public class AuthService {
             User user = authorRepository.findById((Long.parseLong(acceptRequest.getId())))
                     .orElseThrow(() -> new ClientException("switch_device", "user not fount: " + acceptRequest
                             .getId()));
-            user.setMacAddress(acceptRequest.getMacAddress());
+            user.setRegisterMacAddress(user.getLoginMacAddress());
             authorRepository.save(user);
         }
         return "accept to change device successfully";

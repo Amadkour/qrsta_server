@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.function.Supplier;
 
 import org.checkerframework.common.aliasing.qual.Unique;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 
@@ -66,14 +65,13 @@ public class RegisterationRequest {
     @Size(min = 6)
     private String macAddress;
 
-
     public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
 
         user.setName(this.getName());
         user.setCountryCode(this.getCountryCode());
-        user.setMacAddress(this.getMacAddress());
+        user.setRegisterMacAddress(this.getMacAddress());
         user.setPhoneNumber(this.getPhone());
         user.setNationalId(this.getNationalId());
         user.setPassword(new BCryptPasswordEncoder().encode(this.getPassword()));

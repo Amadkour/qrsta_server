@@ -10,6 +10,4 @@ import lombok.Setter;
 public class AcceptRequest {
     @NotNull
     private String id;
-    private String macAddress;
-
 }
