@@ -65,6 +65,13 @@ public class ProfileServices {
 
     }
 
+    @GetMapping("request_to_change_device")
+    public ResponseEntity<GenericResponse<Object>> requestToChangeDevice() {
+        User u = MyUtils.getCurrentUserSession(authService);
+        u.setNeedToReplace(true);
+        authService.save(u);
+        return GenericResponse.successWithMessageOnly("request send to your teachers successfully");
+    }
     @PostMapping("accept")
     public ResponseEntity<GenericResponse<Object>> accept(@RequestHeader("type") String type,
             @RequestBody RequstForm items) {
@@ -78,14 +85,14 @@ public class ProfileServices {
         return GenericResponse.successWithMessageOnly(message);
     }
 
-    @GetMapping("cancle_request")
+    @PostMapping("cancle_request")
     public ResponseEntity<GenericResponse<Object>> cancel(@RequestHeader("type") String type,
-            @RequestHeader("data") List<AcceptRequest> data) {
+            @RequestBody RequstForm items) {
         String message;
         if (type == "device") {
-            message = authService.cancleRequest(data);
+            message = authService.cancleRequest(items.getItems());
         } else {
-            message = courseService.cancleRequest(data);
+            message = courseService.cancleRequest(items.getItems());
 
         }
         return GenericResponse.successWithMessageOnly(message);
