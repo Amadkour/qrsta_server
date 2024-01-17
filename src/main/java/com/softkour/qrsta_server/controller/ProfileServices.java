@@ -8,6 +8,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +20,7 @@ import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
+import com.softkour.qrsta_server.payload.request.RequstForm;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
 
@@ -41,7 +44,8 @@ public class ProfileServices {
             for (StudentCourse s : c.getStudents()) {
                 Map<String, Object> item = new HashMap<String, Object>();
                 item.put("type", "course");
-                item.put("user_id", s.getStudent().getId());
+                item.put("user_id", s.getId());
+                item.put("user_course", s.getCourse().getName());
                 item.put("user_image", s.getStudent().getImageUrl());
                 item.put("user_name", s.getStudent().getName());
                 map.add(item);
@@ -52,6 +56,7 @@ public class ProfileServices {
             Map<String, Object> item = new HashMap<String, Object>();
             item.put("type", "device");
             item.put("user_id", user.getId());
+            item.put("user_course", user.getCourses().stream().toList().get(0).getCourse().getName());
             item.put("user_image", user.getImageUrl());
             item.put("user_name", user.getName());
             map.add(item);
@@ -60,14 +65,14 @@ public class ProfileServices {
 
     }
 
-    @GetMapping("accept")
+    @PostMapping("accept")
     public ResponseEntity<GenericResponse<Object>> accept(@RequestHeader("type") String type,
-            @RequestHeader("data") List<AcceptRequest> data) {
+            @RequestBody RequstForm items) {
         String message;
         if (type == "device") {
-            message = authService.acceptToChangeDevice(data);
+            message = authService.acceptToChangeDevice(items.getItems());
         } else {
-            message = courseService.acceptToJoinCourse(data);
+            message = courseService.acceptToJoinCourse(items.getItems());
 
         }
         return GenericResponse.successWithMessageOnly(message);

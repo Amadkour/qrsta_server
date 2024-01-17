@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 public class AcceptRequest {
     @NotNull
-    private Long id;
+    private String id;
     private String macAddress;
 
 }

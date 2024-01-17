@@ -85,7 +85,7 @@ public class AuthService {
 
     public String acceptToChangeDevice(List<AcceptRequest> requests) {
         for (AcceptRequest acceptRequest : requests) {
-            User user = authorRepository.findById(acceptRequest.getId())
+            User user = authorRepository.findById((Long.parseLong(acceptRequest.getId())))
                     .orElseThrow(() -> new ClientException("switch_device", "user not fount: " + acceptRequest
                             .getId()));
             user.setMacAddress(acceptRequest.getMacAddress());
@@ -97,7 +97,7 @@ public class AuthService {
 
     public String cancleRequest(List<AcceptRequest> requests) {
         for (AcceptRequest acceptRequest : requests) {
-            User user = authorRepository.findById(acceptRequest.getId())
+            User user = authorRepository.findById((Long.parseLong(acceptRequest.getId())))
                     .orElseThrow(() -> new ClientException("switch_device", "user not fount: " + acceptRequest
                             .getId()));
             user.setNeedToReplace(false);

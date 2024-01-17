@@ -18,6 +18,7 @@ public class StudntInSession {
     private List<Boolean> attendance;
     private boolean isPresented;
     private int late;
+    private boolean active;
     private double grade;
     private int firstSession;
 }

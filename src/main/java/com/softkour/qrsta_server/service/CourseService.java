@@ -109,9 +109,15 @@ public class CourseService {
         return courseRepository.getCourseByTeacherIdAndStudents_active(teacherId, false);
     }
 
+    // public Course getActiveCourse(Long courseId) {
+    // return courseRepository.getCourseByIdAndStudents_active(courseId, true);
+    // }
+
     public String acceptToJoinCourse(List<AcceptRequest> requests) {
         for (AcceptRequest request : requests) {
-            StudentCourse user = studentCourseRepository.findByStudent_id(request.getId());
+            StudentCourse user = studentCourseRepository.findById(Long.parseLong(request.getId())).orElseThrow(
+                    () -> new ClientException("course",
+                            "this course not found id: ".concat(String.valueOf(request.getId()))));
             user.setActive(true);
             studentCourseRepository.save(user);
         }
@@ -121,7 +127,9 @@ public class CourseService {
 
     public String cancleRequest(List<AcceptRequest> requests) {
         for (AcceptRequest request : requests) {
-            StudentCourse user = studentCourseRepository.findByStudent_id(request.getId());
+            StudentCourse user = studentCourseRepository.findById(Long.parseLong(request.getId())).orElseThrow(
+                    () -> new ClientException("course",
+                            "this course not found id: ".concat(String.valueOf(request.getId()))));
             studentCourseRepository.delete(user);
         }
         return "cancle join request successfully";

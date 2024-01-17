@@ -170,13 +170,12 @@ public class User extends AbstractAuditingEntity {
                 attendance,
                 isPresent,
                 studentCourse.getLateMonthes(),
+                studentCourse.isActive(),
                 studentQuizzes
                         .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum),
                 firstIndex + 1
 
-        // this.getSessions(),
-        // this.getCourses(),
-        // this.getQuizzes()
+
         );
     }
 

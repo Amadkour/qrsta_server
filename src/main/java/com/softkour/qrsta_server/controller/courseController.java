@@ -27,6 +27,7 @@ import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
+import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.PostService;
@@ -89,8 +90,11 @@ public class courseController {
     @GetMapping("get_course_details")
     public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader("course_id") Long courseId) {
 
+        SessionDetailsStudent result = courseService.findOne(courseId).toSessionDetailsStudent();
+        result.setStudents(result.getStudents().stream().dropWhile(e -> !e.isActive()).toList());
+
         return GenericResponse
-                .success(courseService.findOne(courseId).toSessionDetailsStudent());
+                .success(result);
 
     }
 
@@ -119,7 +123,7 @@ public class courseController {
                 return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
             } else {
-                List<StudentCourse> courseList = user.getCourses().stream().toList();
+                List<StudentCourse> courseList = user.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
                 return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
             }
