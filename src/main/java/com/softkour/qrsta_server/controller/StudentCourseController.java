@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.entity.StudentCourse;
-import com.softkour.qrsta_server.repo.StudentCourseRepo;
+import com.softkour.qrsta_server.repo.StudentCourseRepository;
 
 @RestController
 @RequestMapping("/late/")
 public class StudentCourseController {
     @Autowired
-    StudentCourseRepo studentCourseRepo;
+    StudentCourseRepository studentCourseRepo;
 
     @GetMapping("all")
     public ResponseEntity<GenericResponse<List<String>>> getAll() {

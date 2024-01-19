@@ -19,8 +19,8 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.Course;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
-import com.softkour.qrsta_server.payload.request.AcceptRequest;
 import com.softkour.qrsta_server.payload.request.RequstForm;
+import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
 
@@ -32,6 +32,8 @@ public class ProfileServices {
     CourseService courseService;
     @Autowired
     AuthService authService;
+    @Autowired
+    StudentCourseRepository studentCourseRepo;
 
     @GetMapping("requests")
     public ResponseEntity<GenericResponse<List<Map<String, Object>>>> getAllRequestes() {
@@ -40,6 +42,8 @@ public class ProfileServices {
         List<User> users = authService.getNeedToReplaceUsers(u.getId());
 
         List<Map<String, Object>> map = new ArrayList<Map<String, Object>>();
+        /// =====================[ course ]================///
+
         for (Course c : courses) {
             for (StudentCourse s : c.getStudents()) {
                 Map<String, Object> item = new HashMap<String, Object>();
@@ -51,7 +55,7 @@ public class ProfileServices {
                 map.add(item);
             }
         }
-
+        /// =====================[ device ]================///
         for (User user : users) {
             Map<String, Object> item = new HashMap<String, Object>();
             item.put("type", "device");
@@ -72,6 +76,7 @@ public class ProfileServices {
         authService.save(u);
         return GenericResponse.successWithMessageOnly("request send to your teachers successfully");
     }
+
     @PostMapping("accept")
     public ResponseEntity<GenericResponse<Object>> accept(@RequestHeader("type") String type,
             @RequestBody RequstForm items) {
@@ -96,6 +101,13 @@ public class ProfileServices {
 
         }
         return GenericResponse.successWithMessageOnly(message);
+    }
+
+    @GetMapping("analysis")
+    public ResponseEntity<GenericResponse<List<StudentCourse>>> getAnalysis() {
+        User u = MyUtils.getCurrentUserSession(authService);
+
+        return GenericResponse.success(studentCourseRepo.findAllByCourseTeacherIdAndFinished(u.getId(), false));
     }
 
 }

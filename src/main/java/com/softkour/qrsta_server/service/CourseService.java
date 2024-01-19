@@ -39,7 +39,7 @@ public class CourseService {
         StudentCourse student = new StudentCourse();
         student.setCourse(course);
         student.setStudent(user);
-        student.setLateMonthes(0);
+        student.setLate(0);
         if (course.getType() == CourseType.PRIVATE) {
             student.setActive(false);
         } else {

@@ -16,7 +16,7 @@ import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.repo.StudentCourseRepo;
+import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OfferService;
@@ -39,7 +39,7 @@ public class startDatabase implements CommandLineRunner {
     @Autowired
     PostService postService;
     @Autowired
-    StudentCourseRepo studentCourseRepo;
+    StudentCourseRepository studentCourseRepo;
 
     @Override
     public void run(String... args) throws Exception {
@@ -74,7 +74,7 @@ public class startDatabase implements CommandLineRunner {
             StudentCourse studentCourse = new StudentCourse();
             studentCourse.setCourse(course);
             studentCourse.setStudent(user);
-            studentCourse.setLateMonthes(0);
+            studentCourse.setLate(0);
             // course.addStudent(studentCourse);
             course.addStudent(studentCourse);
             Schedule schedule = new Schedule();
@@ -87,7 +87,7 @@ public class startDatabase implements CommandLineRunner {
                 StudentCourse studentC = new StudentCourse();
                 studentC.setCourse(course);
                 studentC.setStudent(users.get(u));
-                studentC.setLateMonthes(u);
+                studentC.setLate(u);
                 course.addStudent(studentC);
             }
 

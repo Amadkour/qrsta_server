@@ -84,13 +84,13 @@ public class User extends AbstractAuditingEntity {
     @Column(columnDefinition = "boolean default false")
     private boolean isActive;
     @Column(columnDefinition = "boolean default false")
+    private boolean usePayment;
+    @Column(columnDefinition = "boolean default true")
     private boolean needToReplace;
     @Column(columnDefinition = "boolean default false")
     private boolean isLogged;
-
     @Column(columnDefinition = "integer default 0")
     private int logoutTimes;
-
     @Column()
     private String password;
     @Column()
@@ -171,7 +171,7 @@ public class User extends AbstractAuditingEntity {
                 this.getImageUrl(),
                 attendance,
                 isPresent,
-                studentCourse.getLateMonthes(),
+                studentCourse.getLate(),
                 studentCourse.isActive(),
                 studentQuizzes
                         .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum),

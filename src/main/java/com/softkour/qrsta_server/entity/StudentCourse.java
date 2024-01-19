@@ -23,8 +23,10 @@ public class StudentCourse extends AbstractAuditingEntity {
     private Course course;
 
     @Column
-    private int lateMonthes = 0;
+    private int late = 0;
     @Column
-    private boolean active;
+    private boolean active = false;
+    @Column
+    private boolean finished = true;
 
 }
