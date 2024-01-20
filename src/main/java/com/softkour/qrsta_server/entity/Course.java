@@ -53,7 +53,7 @@ public class Course extends AbstractAuditingEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course", cascade = CascadeType.ALL)
     private Set<StudentCourse> students = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "course")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
     @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
 

@@ -2,7 +2,9 @@ package com.softkour.qrsta_server.config;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -102,11 +104,13 @@ public class startDatabase implements CommandLineRunner {
             sessionService.save(session);
             // ==========================offer=====================
             Offer offer = new Offer();
-            offer.setCost(100);
-            offer.setEndDate(LocalDate.now());
-            offer.setCourse(course);
+            Set<Course> cs = new HashSet<Course>();
+            cs.add(course);
+            offer.setCost("100");
+            offer.setEndDate(Instant.now());
+            offer.setCourses(cs);
             offer.setMonths(3);
-            offerService.createOffer(offer);
+            offerService.save(offer);
             // =======================[post]==================
             // Post post = new Post();
             // post.setData("first Post");

@@ -1,6 +1,7 @@
 package com.softkour.qrsta_server.controller;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @Validated
-@RequestMapping("/offer/")
+@RequestMapping("/api/offer/")
 public class OfferController {
     @Autowired
     CourseService courseService;
@@ -35,15 +36,16 @@ public class OfferController {
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> createOffer(@RequestBody @Valid OfferCreationRequest request) {
         try {
+            Offer offer = new Offer();
             for (int i = 0; i < request.getCourseIds().size(); i++) {
-                Offer offer = new Offer();
                 offer.setCost(request.getCost());
-                offer.setCourse(courseService.findOne(request.getCourseIds().get(i)));
+                offer.setCourses(new HashSet<>(request.getCourseIds().stream().map(e -> courseService
+                        .findOne(e)).toList()));
                 offer.setMonths(request.getMonths());
-                offer.setEndDate(LocalDate.parse(request.getEndDate()));
-                offerService.createOffer(offer);
+                offer.setEndDate(Instant.parse(request.getEndDate()));
+                offer = offerService.save(offer);
             }
-            return GenericResponse.successWithMessageOnly("offer create successfully");
+            return GenericResponse.success(offer.toOfferResponse());
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
@@ -70,6 +72,15 @@ public class OfferController {
             @RequestHeader("offer_id") Long offerId) {
 
         return GenericResponse.success(offerService.studentSubscribeToOffer(offerId).toOfferResponse());
+
+    }
+
+    @GetMapping("change_status")
+    public ResponseEntity<GenericResponse<Object>> changeStatus(
+            @RequestHeader("offer_id") Long offerId, @RequestHeader("offer_status") boolean status) {
+        Offer offer = offerService.findOffer(offerId);
+        offer.setSoldout(status);
+        return GenericResponse.success(offerService.save(offer).toOfferResponse());
 
     }
 

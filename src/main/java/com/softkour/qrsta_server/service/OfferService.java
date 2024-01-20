@@ -19,8 +19,12 @@ public class OfferService {
     @Autowired
     AuthService authService;
 
-    public Offer createOffer(Offer offer) {
+    public Offer save(Offer offer) {
         return offerRepo.save(offer);
+    }
+
+    public Offer findOffer(Long offerId) {
+        return offerRepo.findById(offerId).orElseThrow(() -> new ClientException("offer", "not found this offer"));
     }
 
     public List<Offer> userAvilableOffers() {
@@ -33,11 +37,11 @@ public class OfferService {
     }
 
     public List<Offer> teacherAllOffers(Long teacherId) {
-        return offerRepo.findByCourse_teacher_id(teacherId);
+        return offerRepo.findByCourses_teacher_id(teacherId);
     }
 
     public List<Offer> studentAvailableOffers(Long studentId) {
-        return offerRepo.findBySoldoutAndCourse_students_id(false, studentId);
+        return offerRepo.findBySoldoutAndCourses_students_id(false, studentId);
     }
 
     public List<Offer> studentSubscribedeOffers() {

@@ -1,6 +1,6 @@
 package com.softkour.qrsta_server.entity;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +14,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,23 +24,25 @@ public class Offer extends AbstractAuditingEntity {
     @Column
     private int months;
     @Column
-    private double cost;
+    private String cost;
     @Column
     private boolean soldout;
     @Column
-    private LocalDate endDate;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinTable(name = "offer__course", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
-    private Course course;
+    private Instant endDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "course__offer", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
+    @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
+    private Set<Course> courses = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "user__offer", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
     @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
     private Set<User> students = new HashSet<>();
 
     public OfferResponse toOfferResponse() {
-        return new OfferResponse(this.getCourse().getName(), this.getMonths(), this.getCost(),
-                this.getCourse().toCourseResponse());
+        return new OfferResponse(getId(), getCourses().stream().map(e -> e.toCourseResponse()).toList(), getMonths(),
+                getCost(), getEndDate(), isSoldout());
     }
 
     public void addStudent(User user) {

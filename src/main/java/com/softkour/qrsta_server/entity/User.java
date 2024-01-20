@@ -107,7 +107,7 @@ public class User extends AbstractAuditingEntity {
     private Set<Session> sessions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
-    @JsonIgnoreProperties(value = { "students", "course" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "students", "courses" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
 
     @Column
