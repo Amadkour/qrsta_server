@@ -1,9 +1,10 @@
 package com.softkour.qrsta_server.payload.request;
 
-import jakarta.persistence.Column;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 public class OptionCreationRequest {
     private String title;
     private Boolean isCorrectAnswer;

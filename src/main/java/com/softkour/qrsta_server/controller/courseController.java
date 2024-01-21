@@ -26,6 +26,7 @@ import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
+import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.service.AuthService;
@@ -87,6 +88,15 @@ public class courseController {
 
     }
 
+    @GetMapping("update_cost")
+    public ResponseEntity<GenericResponse<CourseResponse>> updateCost(@RequestHeader("course_id") Long courseId,
+            @RequestHeader("cost") double cost) {
+        Course c = courseService.findOne(courseId);
+        c.setCost(cost);
+        return GenericResponse.success(courseService.save(c).toCourseResponse());
+
+    }
+
     @GetMapping("get_course_details")
     public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader("course_id") Long courseId) {
 
@@ -100,7 +110,6 @@ public class courseController {
 
     @GetMapping("course_sessions")
     public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
-        log.warn("====================here==========:" + courseId);
         Set<Session> sessionList = courseService.findOne(courseId).getSessions();
         log.warn(String.valueOf(sessionList.size()));
         List<Post> postslist = postService.posts(courseId);

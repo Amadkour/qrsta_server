@@ -23,6 +23,10 @@ public class OfferService {
         return offerRepo.save(offer);
     }
 
+    public void delete(Long offerId) {
+        offerRepo.deleteById(offerId);
+    }
+
     public Offer findOffer(Long offerId) {
         return offerRepo.findById(offerId).orElseThrow(() -> new ClientException("offer", "not found this offer"));
     }

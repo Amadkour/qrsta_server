@@ -67,6 +67,13 @@ public class OfferController {
 
     }
 
+    @GetMapping("delete")
+    public ResponseEntity<GenericResponse<Object>> deleteOffer(
+            @RequestHeader("offer_id") Long offerId) {
+        offerService.delete(offerId);
+        return GenericResponse.successWithMessageOnly("delete offer Successflly");
+
+    }
     @GetMapping("subscribe")
     public ResponseEntity<GenericResponse<Object>> getStudentSubscribeInOffers(
             @RequestHeader("offer_id") Long offerId) {
