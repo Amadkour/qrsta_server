@@ -18,13 +18,14 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * A Course.
- */
 @Entity
-@Data
+@Setter
+@Getter
+@Slf4j
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Course extends AbstractAuditingEntity {
 
@@ -133,18 +134,20 @@ public class Course extends AbstractAuditingEntity {
         Set<Session> sessions = this.getSessions();
         // this.getStudents().stream().anyMatch(m -> m.getId() ==
         // e.getStudent().getId())
-
+        log.warn(String.valueOf(sessions.size()));
+        log.warn(String.valueOf(getStudents().size()));
         return new SessionDetailsStudent(
-                getStudents().stream().map(e -> e.getStudent().toStudntInSession(sessions.stream()
-                        .map(s -> s.getStudents().stream()
-                                .anyMatch(b -> b.getId() == e.getStudent().getId()))
-                        .toList(), true, getId())).toList());
+                getStudents().stream().map(e -> e.getStudent().toStudntInSession(
+                        sessions.stream()
+                                .map(s -> s.getStudents().stream().anyMatch(b -> b.getId() == e.getStudent().getId()))
+                                .toList(),
+                        true, getId())).toList());
     }
 
     public CourseResponse toCourseResponse() {
         return new CourseResponse(this.getId(),
                 this.getName(),
-                this.getStudents().size(),
+                this.getStudents().stream().dropWhile(e -> !e.isActive()).toList().size(),
                 this.getSessions().size(),
                 this.getCost(),
                 this.getType(),

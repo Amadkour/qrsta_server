@@ -17,6 +17,7 @@ import com.softkour.qrsta_server.entity.Schedule;
 import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.entity.StudentCourse;
 import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
@@ -69,6 +70,7 @@ public class startDatabase implements CommandLineRunner {
             course.setCost(10);
             course.setName("course".concat(String.valueOf(i)));
             course.setTeacher(user);
+            course.setType(CourseType.PUBLIC);
             course = courseService.save(course);
             log.warn("==========================================");
             log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
@@ -88,6 +90,7 @@ public class startDatabase implements CommandLineRunner {
             for (int u = 0; u < users.size(); u++) {
                 StudentCourse studentC = new StudentCourse();
                 studentC.setCourse(course);
+                studentC.setActive(true);
                 studentC.setStudent(users.get(u));
                 studentC.setLate(u);
                 course.addStudent(studentC);

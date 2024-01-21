@@ -101,7 +101,9 @@ public class courseController {
     public ResponseEntity<GenericResponse<Object>> addCourseDetails(@RequestHeader("course_id") Long courseId) {
 
         SessionDetailsStudent result = courseService.findOne(courseId).toSessionDetailsStudent();
-        result.setStudents(result.getStudents().stream().dropWhile(e -> !e.isActive()).toList());
+        result.getStudents().stream().map(e -> e.isActive());
+        // result.setStudents(result.getStudents().stream().dropWhile(e ->
+        // !e.isActive()).toList());
 
         return GenericResponse
                 .success(result);
