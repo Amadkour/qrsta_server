@@ -21,15 +21,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
-/**
- * A Session.
- */
 @Entity
 @Getter
 @Setter
-@Slf4j
 public class Session extends AbstractAuditingEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -74,28 +69,6 @@ public class Session extends AbstractAuditingEntity {
     public Session removeStudent(User employee) {
         this.students.remove(employee);
         employee.getSessions().remove(this);
-        return this;
-    }
-
-    public void setQuizzes(Set<Quiz> quizzes) {
-        if (this.quizzes != null) {
-            this.quizzes.forEach(i -> i.removeSession(this));
-        }
-        if (quizzes != null) {
-            quizzes.forEach(i -> i.addSession(this));
-        }
-        this.quizzes = quizzes;
-    }
-
-    public Session addQuiz(Quiz quiz) {
-        this.quizzes.add(quiz);
-        quiz.getSessions().add(this);
-        return this;
-    }
-
-    public Session removeQuiz(Quiz quiz) {
-        this.quizzes.remove(quiz);
-        quiz.getSessions().remove(this);
         return this;
     }
 

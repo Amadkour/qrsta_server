@@ -1,5 +1,6 @@
 package com.softkour.qrsta_server.controller;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -110,8 +111,9 @@ public class courseController {
 
     }
 
-    @GetMapping("course_sessions")
-    public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
+    @GetMapping("course_sessions_posts")
+    public ResponseEntity<GenericResponse<Object>> getCourseSessionsPosts(
+            @RequestHeader(name = "course_id") Long courseId) {
         Set<Session> sessionList = courseService.findOne(courseId).getSessions();
         log.warn(String.valueOf(sessionList.size()));
         List<Post> postslist = postService.posts(courseId);
@@ -124,6 +126,25 @@ public class courseController {
 
     }
 
+    @GetMapping("course_sessions")
+    public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
+        return GenericResponse.success(
+                courseService.findOne(courseId).getSessions().stream().map((e) -> e.toSessionDateAndStudentGrade())
+                        .toList());
+
+    }
+
+    @GetMapping("future_course_sessions")
+    public ResponseEntity<GenericResponse<Object>> getFutureCourseSessions(
+            @RequestHeader(name = "course_id") Long courseId) {
+        Instant now = Instant.now();
+        return GenericResponse.success(
+                courseService.findOne(courseId).getSessions().stream()
+                        .dropWhile(e -> e.getStartDate().isAfter(now))
+                        .map((e) -> e.toSessionDateAndStudentGrade())
+                        .toList());
+
+    }
     @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses() {
         try {

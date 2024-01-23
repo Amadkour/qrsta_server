@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
+import com.softkour.qrsta_server.entity.CourseQuiz;
 import com.softkour.qrsta_server.entity.Option;
 import com.softkour.qrsta_server.entity.Question;
 import com.softkour.qrsta_server.entity.Quiz;
+import com.softkour.qrsta_server.entity.Session;
 import com.softkour.qrsta_server.payload.request.QuizCreationRequest;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OptionService;
@@ -43,8 +45,14 @@ public class quizController {
         try {
             Quiz quiz = new Quiz();
             quiz.setType(request.getType());
-            quiz.setSessions(request.getSessionIds().stream().map(sessionService::findOne).collect(Collectors.toSet()));
-            quiz.setCourses(request.getSessionIds().stream().map(courseService::findOne).collect(Collectors.toSet()));
+
+            quiz.setCourses(
+                    request.getCoures().stream().map(
+                            e -> new CourseQuiz(
+                                    e.getSessionsId().stream().map(s -> sessionService.findOne(s))
+                                            .collect(Collectors.toSet()),
+                                    courseService.findOne(e.getCourseId()), null))
+                            .collect(Collectors.toSet()));
             /// questions
             quiz.setQuestions(request.getQuestions().stream().map(q -> {
                 Question question = new Question();

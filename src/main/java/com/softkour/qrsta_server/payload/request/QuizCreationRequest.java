@@ -15,8 +15,7 @@ public class QuizCreationRequest {
     private int timePerSeconds;
     private int questionsPerStudent;
     private QuizType type;
-    private Set<Long> sessionIds = new HashSet<>();
-    private Set<Long> courseIds = new HashSet<>();
+    private Set<QuizCourseSession> coures = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
 }

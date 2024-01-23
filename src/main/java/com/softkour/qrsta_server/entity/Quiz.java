@@ -32,14 +32,9 @@ public class Quiz extends AbstractAuditingEntity {
     private QuizType type;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "quiz__session", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
-    @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
-    private Set<Session> sessions = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "quiz__course", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
-    @JsonIgnoreProperties(value = { "students", "quizzes", "sessions", "schedules" }, allowSetters = true)
-    private Set<Course> courses = new HashSet<>();
+    @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
+    private Set<CourseQuiz> courses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes")
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
@@ -47,14 +42,6 @@ public class Quiz extends AbstractAuditingEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.ALL)
     private Set<StudentQuiz> students = new HashSet<>();
-
-    public void addSession(Session session) {
-        this.sessions.add(session);
-    }
-
-    public void removeSession(Session session) {
-        this.sessions.remove(session);
-    }
 
     public void setQuestions(Set<Question> questions) {
         if (this.questions != null) {
