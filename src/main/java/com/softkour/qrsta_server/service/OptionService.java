@@ -1,6 +1,6 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.entity.Option;
+import com.softkour.qrsta_server.entity.quiz.Option;
 import com.softkour.qrsta_server.repo.OptionRepository;
 import java.util.List;
 import java.util.Optional;

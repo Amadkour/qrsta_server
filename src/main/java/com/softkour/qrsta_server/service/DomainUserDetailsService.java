@@ -26,7 +26,7 @@ public class DomainUserDetailsService implements UserDetailsService {
         log.debug("Authenticating {}", phone);
 
         // if (new P().isValid(phone, null)) {
-        com.softkour.qrsta_server.entity.User user = userRepository.findUserByPhoneNumber(phone);
+        com.softkour.qrsta_server.entity.user.User user = userRepository.findUserByPhoneNumber(phone);
         if (user == null) {
             throw new ClientException("user", "User not found: " + phone);
         }

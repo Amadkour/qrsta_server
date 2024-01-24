@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.softkour.qrsta_server.entity.Course;
+import com.softkour.qrsta_server.entity.course.Course;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {

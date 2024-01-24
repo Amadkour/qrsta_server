@@ -10,10 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.softkour.qrsta_server.entity.Course;
-import com.softkour.qrsta_server.entity.StudentCourse;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
+import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
 import com.softkour.qrsta_server.repo.CourseRepository;

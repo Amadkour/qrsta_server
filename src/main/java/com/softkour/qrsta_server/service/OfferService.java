@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Offer;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Offer;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.OfferRepo;
 

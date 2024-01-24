@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.LoginRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
 import com.softkour.qrsta_server.repo.UserRepository;

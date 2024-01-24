@@ -1,10 +1,14 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.quiz;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,14 +27,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CourseQuiz extends AbstractAuditingEntity {
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "course_quiz__session", joinColumns = @JoinColumn(name = "course_quiz_id"), inverseJoinColumns = @JoinColumn(name = "session_id"))
-    @JsonIgnoreProperties(value = { "students", "quizes", "course" }, allowSetters = true)
-    private Set<Session> sessions = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "students", "quizes", "schedules" }, allowSetters = true)
     private Course course;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.ALL)
+    private Set<SessionQuiz> sessions = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "courses", "sessions", "students" }, allowSetters = true)

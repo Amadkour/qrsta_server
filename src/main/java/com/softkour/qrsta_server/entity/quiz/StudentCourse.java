@@ -1,6 +1,9 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.quiz;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+import com.softkour.qrsta_server.entity.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

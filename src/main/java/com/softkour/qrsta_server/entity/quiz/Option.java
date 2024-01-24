@@ -1,6 +1,8 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.quiz;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

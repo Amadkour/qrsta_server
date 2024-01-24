@@ -1,21 +1,66 @@
 package com.softkour.qrsta_server.payload.request;
+
+import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
+import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
+import com.softkour.qrsta_server.entity.quiz.Option;
+import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.entity.quiz.Quiz;
+import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
+import com.softkour.qrsta_server.service.CourseService;
+import com.softkour.qrsta_server.service.OptionService;
+import com.softkour.qrsta_server.service.QuestionService;
+import com.softkour.qrsta_server.service.SessionService;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
 public class QuizCreationRequest {
     private Long id;
     private Instant startDate;
-    private int timePerSeconds;
-    private int questionsPerStudent;
+    private String timePerMinutes;
+    private String questionsPerStudent;
     private QuizType type;
-    private Set<QuizCourseSession> coures = new HashSet<>();
+    private Set<QuizCourseSession> courses = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
+
+    public Quiz toQuiz(CourseService courseService, SessionService sessionService, OptionService optionService,
+            QuestionService questionService) {
+        Quiz quiz = new Quiz();
+        quiz.setType(getType());
+        quiz.setQuestionsPerStudent(getQuestionsPerStudent());
+        quiz.setTimePerMinutes(getTimePerMinutes());
+        quiz.setStartDate(getStartDate());
+        quiz.setCourses(
+                getCourses().stream().map(e -> new CourseQuiz(
+                        courseService.findOne(e.getCourseId()),
+                        e.getSessionsId().stream()
+                                .map(s -> new SessionQuiz(sessionService.findOne(s)))
+                                .collect(Collectors.toSet()),
+                        null))
+                        .collect(Collectors.toSet()));
+        /// questions
+        quiz.setQuestions(getQuestions().stream().map(q -> {
+            Question question = new Question();
+            /// options
+            question.setOptions(q.getOptions().stream().map(o -> {
+                Option option = new Option();
+                option.setTitle(o.getTitle());
+                option.setIsCorrectAnswer(o.getIsCorrectAnswer());
+                return optionService.save(option);
+            }).collect(Collectors.toSet()));
+            question.setTitle(q.getTitle());
+            question.setGrade(q.getGrade());
+            return questionService.save(question);
+        }).collect(Collectors.toSet()));
+        return quiz;
+    }
 
 }

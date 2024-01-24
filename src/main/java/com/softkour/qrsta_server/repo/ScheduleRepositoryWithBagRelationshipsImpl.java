@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
-import com.softkour.qrsta_server.entity.Schedule;
+import com.softkour.qrsta_server.entity.course.Schedule;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

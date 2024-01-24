@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.softkour.qrsta_server.entity.Post;
+import com.softkour.qrsta_server.entity.post.Post;
 
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {

@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Course;
-import com.softkour.qrsta_server.entity.StudentCourse;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.RequstForm;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;

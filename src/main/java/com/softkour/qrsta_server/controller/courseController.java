@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Course;
-import com.softkour.qrsta_server.entity.Post;
-import com.softkour.qrsta_server.entity.Schedule;
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.StudentCourse;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.course.Schedule;
+import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.post.Post;
+import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
@@ -140,7 +140,7 @@ public class courseController {
         Instant now = Instant.now();
         return GenericResponse.success(
                 courseService.findOne(courseId).getSessions().stream()
-                        .dropWhile(e -> e.getStartDate().isAfter(now))
+                        // .dropWhile(e -> e.getStartDate().isAfter(now))
                         .map((e) -> e.toSessionDateAndStudentGrade())
                         .toList());
 

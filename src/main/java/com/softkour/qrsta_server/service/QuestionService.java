@@ -1,6 +1,6 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.entity.Question;
+import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.repo.QuestionRepository;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service Implementation for managing
- * {@link com.softkour.qrsta_server.domain.Question}.
+ * {@link com.softkour.qrsta_server.entity.quiz.domain.Question}.
  */
 @Service
 @Transactional

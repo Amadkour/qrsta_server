@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.entity.Offer;
+import com.softkour.qrsta_server.entity.course.Offer;
 import com.softkour.qrsta_server.payload.request.OfferCreationRequest;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;

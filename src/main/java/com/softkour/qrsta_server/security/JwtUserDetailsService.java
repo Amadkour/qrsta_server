@@ -19,7 +19,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String phone) {
-        com.softkour.qrsta_server.entity.User user = userRepository.findUserByPhoneNumber(phone);
+        com.softkour.qrsta_server.entity.user.User user = userRepository.findUserByPhoneNumber(phone);
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority(user.getType().name()));
         return new org.springframework.security.core.userdetails.User(

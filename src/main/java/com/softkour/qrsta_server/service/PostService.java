@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Post;
-import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
+import com.softkour.qrsta_server.entity.post.Post;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.repo.PostRepository;
 

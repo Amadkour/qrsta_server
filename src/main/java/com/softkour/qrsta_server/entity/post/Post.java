@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.post;
 
 import java.time.Instant;
 import java.util.ArrayList;

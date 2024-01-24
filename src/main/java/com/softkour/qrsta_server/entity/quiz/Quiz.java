@@ -1,7 +1,9 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.quiz;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+import com.softkour.qrsta_server.payload.response.QuizResponce;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,23 +27,22 @@ public class Quiz extends AbstractAuditingEntity {
     private Instant startDate;
 
     @Column()
-    private Integer questionsPerStudent;
+    private String questionsPerStudent;
+
+    @Column()
+    private String timePerMinutes;
 
     @Enumerated(EnumType.STRING)
     @Column()
     private QuizType type;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "quiz__course", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
     private Set<CourseQuiz> courses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes")
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
     private Set<Question> questions = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.ALL)
-    private Set<StudentQuiz> students = new HashSet<>();
 
     public void setQuestions(Set<Question> questions) {
         if (this.questions != null) {
@@ -65,13 +66,18 @@ public class Quiz extends AbstractAuditingEntity {
         return this;
     }
 
-    public Quiz addStudent(StudentQuiz studentQuiz) {
-        this.students.add(studentQuiz);
-        return this;
-    }
+    public QuizResponce toQuizModel() {
+        QuizResponce quizResponce = new QuizResponce();
+        quizResponce.setCourses(getCourses().stream().map(e -> e.getCourse().getName()).toList());
+        quizResponce.setStartDate(getStartDate());
+        quizResponce.setPoints(getQuestions().stream().reduce(0, (a, b) -> a + b.getGrade(), Integer::sum));
+        quizResponce.setId(getId());
+        quizResponce.setQuestionCount(getQuestions().size());
+        quizResponce.setStudentCount(
+                getCourses().stream().reduce(0, (a, b) -> a + b.getCourse().getStudents().size(), Integer::sum));
+        quizResponce.setType(getType());
+        quizResponce.setTimePerMinutes(getTimePerMinutes());
+        return quizResponce;
 
-    public Quiz removeStudent(StudentQuiz studentQuiz) {
-        this.students.remove(studentQuiz);
-        return this;
     }
 }

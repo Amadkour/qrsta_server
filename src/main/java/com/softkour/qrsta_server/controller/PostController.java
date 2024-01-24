@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.entity.Post;
 import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
+import com.softkour.qrsta_server.entity.post.Post;
 import com.softkour.qrsta_server.payload.request.PostRequest;
 import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionObjectService;

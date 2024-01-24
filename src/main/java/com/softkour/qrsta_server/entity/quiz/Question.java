@@ -1,6 +1,8 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.quiz;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -20,7 +22,7 @@ import java.util.Set;
 public class Question extends AbstractAuditingEntity {
 
     @NotNull
-    @Column( nullable = false)
+    @Column(nullable = false)
     private String title;
 
     @Column()

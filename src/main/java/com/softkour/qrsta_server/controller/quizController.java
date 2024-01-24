@@ -1,5 +1,8 @@
 package com.softkour.qrsta_server.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.entity.CourseQuiz;
-import com.softkour.qrsta_server.entity.Option;
-import com.softkour.qrsta_server.entity.Question;
-import com.softkour.qrsta_server.entity.Quiz;
-import com.softkour.qrsta_server.entity.Session;
+import com.softkour.qrsta_server.entity.course.Session;
+import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
+import com.softkour.qrsta_server.entity.quiz.Option;
+import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.entity.quiz.Quiz;
+import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
+import com.softkour.qrsta_server.payload.request.QuizCourseSession;
 import com.softkour.qrsta_server.payload.request.QuizCreationRequest;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OptionService;
@@ -26,7 +31,7 @@ import com.softkour.qrsta_server.service.SessionService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/quiz/")
+@RequestMapping("api/quiz/")
 @Validated
 public class quizController {
     @Autowired
@@ -42,35 +47,8 @@ public class quizController {
 
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
-        try {
-            Quiz quiz = new Quiz();
-            quiz.setType(request.getType());
+        Quiz quiz = quizService.save(request.toQuiz(courseService, sessionService, optionService, questionService));
+        return GenericResponse.success(quiz.toQuizModel());
 
-            quiz.setCourses(
-                    request.getCoures().stream().map(
-                            e -> new CourseQuiz(
-                                    e.getSessionsId().stream().map(s -> sessionService.findOne(s))
-                                            .collect(Collectors.toSet()),
-                                    courseService.findOne(e.getCourseId()), null))
-                            .collect(Collectors.toSet()));
-            /// questions
-            quiz.setQuestions(request.getQuestions().stream().map(q -> {
-                Question question = new Question();
-                /// options
-                question.setOptions(q.getOptions().stream().map(o -> {
-                    Option option = new Option();
-                    option.setTitle(o.getTitle());
-                    option.setIsCorrectAnswer(o.getIsCorrectAnswer());
-                    return optionService.save(option);
-                }).collect(Collectors.toSet()));
-                question.setTitle(q.getTitle());
-                question.setGrade(q.getGrade());
-                return questionService.save(question);
-            }).collect(Collectors.toSet()));
-            quizService.save(quiz);
-            return GenericResponse.successWithMessageOnly("save quiz successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
     }
 }

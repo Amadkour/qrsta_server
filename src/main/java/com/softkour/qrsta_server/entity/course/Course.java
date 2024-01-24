@@ -1,10 +1,14 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.course;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
+import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
+import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 
@@ -47,9 +51,9 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
-    @JsonIgnoreProperties(value = { "questions", "courses", "sessions", "students" }, allowSetters = true)
-    private Set<Quiz> quizzes = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+    @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
+    private Set<CourseQuiz> quizzes = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course", cascade = CascadeType.ALL)
     private Set<StudentCourse> students = new HashSet<>();

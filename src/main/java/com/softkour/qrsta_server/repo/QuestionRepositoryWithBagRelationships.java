@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
-import com.softkour.qrsta_server.entity.Question;
+import com.softkour.qrsta_server.entity.quiz.Question;
 
 public interface QuestionRepositoryWithBagRelationships {
     Optional<Question> fetchBagRelationships(Optional<Question> question);

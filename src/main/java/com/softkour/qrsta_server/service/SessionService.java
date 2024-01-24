@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Session;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.SessionRepository;
 

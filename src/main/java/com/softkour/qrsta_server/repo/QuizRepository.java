@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
-import com.softkour.qrsta_server.entity.Quiz;
+import com.softkour.qrsta_server.entity.quiz.Quiz;
 
 /**
  * Spring Data JPA repository for the Quiz entity.

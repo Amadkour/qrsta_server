@@ -1,9 +1,10 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.course;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

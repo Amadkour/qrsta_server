@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
-import com.softkour.qrsta_server.entity.Question;
+import com.softkour.qrsta_server.entity.quiz.Question;
 
 /**
  * Utility repository to load bag relationships based on

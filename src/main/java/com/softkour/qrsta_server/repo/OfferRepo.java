@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.softkour.qrsta_server.entity.Offer;
+import com.softkour.qrsta_server.entity.course.Offer;
 
 public interface OfferRepo extends JpaRepository<Offer, Long> {
     public List<Offer> findByCourses_teacher_id(Long id);

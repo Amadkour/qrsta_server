@@ -1,6 +1,6 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.entity.Quiz;
+import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.repo.QuizRepository;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.softkour.qrsta_server.domain.Quiz}.
+ * Service Implementation for managing
+ * {@link com.softkour.qrsta_server.entity.quiz.domain.Quiz}.
  */
 @Service
 @Transactional

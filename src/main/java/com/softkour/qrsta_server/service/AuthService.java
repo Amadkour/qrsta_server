@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
 import com.softkour.qrsta_server.payload.request.LoginRequest;

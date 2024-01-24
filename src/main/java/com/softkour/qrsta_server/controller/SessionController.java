@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Course;
-import com.softkour.qrsta_server.entity.Post;
-import com.softkour.qrsta_server.entity.Session;
-import com.softkour.qrsta_server.entity.SessionObject;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.course.Session;
+import com.softkour.qrsta_server.entity.course.SessionObject;
+import com.softkour.qrsta_server.entity.post.Post;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;

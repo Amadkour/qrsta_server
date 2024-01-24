@@ -5,8 +5,8 @@ import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.service.OTPService;
 
 import jakarta.validation.constraints.NotBlank;

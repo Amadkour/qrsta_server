@@ -9,9 +9,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 
 import com.softkour.qrsta_server.config.Constants;
-import com.softkour.qrsta_server.entity.User;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.service.OTPService;
 
 import jakarta.validation.constraints.NotBlank;

@@ -1,10 +1,12 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.course;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.OfferResponse;
 
 import jakarta.persistence.CascadeType;

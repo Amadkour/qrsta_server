@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.softkour.qrsta_server.entity.Schedule;
+import com.softkour.qrsta_server.entity.course.Schedule;
 
 /**
  * Spring Data JPA repository for the Schedule entity.

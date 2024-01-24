@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.entity;
+package com.softkour.qrsta_server.entity.user;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -8,9 +8,13 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.course.Offer;
+import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.DeviceType;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.quiz.StudentQuiz;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
@@ -39,8 +43,6 @@ import lombok.Setter;
 @Getter
 @Table(name = "qrsta_user")
 public class User extends AbstractAuditingEntity {
-
-    // private static final long serialVersionUID = 1L;
     @NotNull
     @Column(nullable = false)
     private String name;
@@ -56,7 +58,6 @@ public class User extends AbstractAuditingEntity {
     @NotNull
     @Column(nullable = false, unique = true)
     @Size(max = 10, min = 7)
-    // @Pattern(regexp = Constants.PHONE_REGEX)
     private String phoneNumber;
 
     @Column(nullable = true, unique = true)
@@ -151,7 +152,7 @@ public class User extends AbstractAuditingEntity {
         StudentCourse studentCourse = this.getCourses().stream().filter(e -> e.getCourse().getId() == courseId).toList()
                 .get(0);
         Stream<StudentQuiz> studentQuizzes = this.getQuizzes().stream()
-                .filter(q -> q.getQuiz().getCourses().contains(studentCourse.getCourse()));
+                .filter(q -> q.getQuiz().getQuiz().getCourse().getId() == studentCourse.getCourse().getId());
         List<Instant> dInstants = studentCourse.getCourse().getSessions().stream().map(s -> s.getCreatedDate())
                 .toList();
         int firstIndex = 0;

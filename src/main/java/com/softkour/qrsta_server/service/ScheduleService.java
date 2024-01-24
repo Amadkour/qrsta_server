@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.Schedule;
-import com.softkour.qrsta_server.entity.User;
+import com.softkour.qrsta_server.entity.course.Schedule;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.repo.ScheduleRepository;
 
 @Service
