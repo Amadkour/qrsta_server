@@ -1,6 +1,6 @@
 package com.softkour.qrsta_server.payload.request;
 
-import com.softkour.qrsta_server.entity.course.Course;
+import com.google.firebase.database.annotations.NotNull;
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
 import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
 import com.softkour.qrsta_server.entity.quiz.Option;
@@ -11,40 +11,54 @@ import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OptionService;
 import com.softkour.qrsta_server.service.QuestionService;
 import com.softkour.qrsta_server.service.SessionService;
-
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Setter
 @Getter
+@Slf4j
 public class QuizCreationRequest {
     private Long id;
     private Instant startDate;
+    @NotNull
     private String timePerMinutes;
+
     private String questionsPerStudent;
+    @NotNull
     private QuizType type;
+    @NotNull
     private Set<QuizCourseSession> courses = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
     public Quiz toQuiz(CourseService courseService, SessionService sessionService, OptionService optionService,
             QuestionService questionService) {
+
         Quiz quiz = new Quiz();
         quiz.setType(getType());
         quiz.setQuestionsPerStudent(getQuestionsPerStudent());
         quiz.setTimePerMinutes(getTimePerMinutes());
         quiz.setStartDate(getStartDate());
         quiz.setCourses(
-                getCourses().stream().map(e -> new CourseQuiz(
-                        courseService.findOne(e.getCourseId()),
+                getCourses().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
+                    @Override
+                    public CourseQuiz apply(QuizCourseSession e) {
+                        log.warn(String.valueOf(sessionService.findOne(1).getId()));
+                        CourseQuiz courseQuiz = new CourseQuiz();
+                        courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
+
                         e.getSessionsId().stream()
-                                .map(s -> new SessionQuiz(sessionService.findOne(s)))
-                                .collect(Collectors.toSet()),
-                        null))
+                                .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
+
+                        return courseQuiz;
+                    }
+                })
                         .collect(Collectors.toSet()));
         /// questions
         quiz.setQuestions(getQuestions().stream().map(q -> {

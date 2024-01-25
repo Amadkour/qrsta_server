@@ -8,19 +8,17 @@ import com.softkour.qrsta_server.payload.response.QuizResponce;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * A Quiz.
- */
 @Entity
 @Setter
 @Getter
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Slf4j
 public class Quiz extends AbstractAuditingEntity {
 
     @Column()
@@ -36,7 +34,7 @@ public class Quiz extends AbstractAuditingEntity {
     @Column()
     private QuizType type;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
     private Set<CourseQuiz> courses = new HashSet<>();
 
@@ -69,7 +67,25 @@ public class Quiz extends AbstractAuditingEntity {
     public QuizResponce toQuizModel() {
         QuizResponce quizResponce = new QuizResponce();
         quizResponce.setCourses(getCourses().stream().map(e -> e.getCourse().getName()).toList());
+        if (getType() == QuizType.ONLINE) {
         quizResponce.setStartDate(getStartDate());
+    } else {
+        log.warn(String.valueOf(getCourses().iterator().next().getSessions().size()));
+        Instant now = Instant.now();
+        if (getType() == QuizType.BEGIN) {
+            quizResponce.setStartDate(
+                    getCourses().iterator().next().getSessions().stream()
+                            // .takeWhile(e -> e.getSession().getStartDate().isAfter(now))
+                            .toList().get(0)
+                            .getSession().getStartDate());
+        } else if (getType() == QuizType.END) {
+            quizResponce.setStartDate(
+                    getCourses().iterator().next().getSessions().stream()
+                            // .takeWhile(e -> e.getSession().getStartDate().isAfter(now))
+                            .toList().get(0)
+                            .getSession().getEndDate().minusSeconds(Integer.parseInt(getTimePerMinutes()) * 60));
+        }
+    }
         quizResponce.setPoints(getQuestions().stream().reduce(0, (a, b) -> a + b.getGrade(), Integer::sum));
         quizResponce.setId(getId());
         quizResponce.setQuestionCount(getQuestions().size());

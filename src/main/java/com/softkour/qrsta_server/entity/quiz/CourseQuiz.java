@@ -19,21 +19,27 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CourseQuiz extends AbstractAuditingEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonIgnoreProperties(value = { "students", "quizes", "schedules" }, allowSetters = true)
     private Course course;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.PERSIST)
     private Set<SessionQuiz> sessions = new HashSet<>();
 
+    public void addSession(SessionQuiz sessionQuiz) {
+        sessions.add(sessionQuiz);
+        sessionQuiz.setQuiz(this);
+    }
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "courses", "sessions", "students" }, allowSetters = true)
     private Quiz quiz;

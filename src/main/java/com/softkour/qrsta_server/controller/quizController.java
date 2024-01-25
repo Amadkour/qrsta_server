@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,10 +30,12 @@ import com.softkour.qrsta_server.service.QuizService;
 import com.softkour.qrsta_server.service.SessionService;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("api/quiz/")
 @Validated
+@Slf4j
 public class quizController {
     @Autowired
     QuizService quizService;
@@ -49,6 +52,12 @@ public class quizController {
     public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
         Quiz quiz = quizService.save(request.toQuiz(courseService, sessionService, optionService, questionService));
         return GenericResponse.success(quiz.toQuizModel());
+
+    }
+
+    @GetMapping("all")
+    public ResponseEntity<GenericResponse<Object>> allQuiz() {
+        return GenericResponse.success(quizService.findAll().stream().map(e -> e.toQuizModel()));
 
     }
 }
