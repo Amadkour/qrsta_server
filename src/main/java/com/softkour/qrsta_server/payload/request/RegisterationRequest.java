@@ -27,6 +27,8 @@ import lombok.ToString;
 @ToString
 @Validated
 public class RegisterationRequest {
+
+    private Long id;
     @NotBlank
     @Size(min = 3, max = 20)
     private String name;
@@ -68,18 +70,18 @@ public class RegisterationRequest {
     public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
-
-        user.setName(this.getName());
-        user.setCountryCode(this.getCountryCode());
-        user.setRegisterMacAddress(this.getMacAddress());
-        user.setPhoneNumber(this.getPhone());
-        user.setNationalId(this.getNationalId());
+        user.setId(getId());
+        user.setName(getName());
+        user.setCountryCode(getCountryCode());
+        user.setRegisterMacAddress(getMacAddress());
+        user.setPhoneNumber(getPhone());
+        user.setNationalId(getNationalId());
         user.setPassword(new BCryptPasswordEncoder().encode(this.getPassword()));
         user.setOtp(otp.get());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
-        user.setType(this.getUserType());
-        user.setOrganization(this.getOrganizationName());
-        user.setDob(LocalDate.parse(this.getBirthDate()));
+        user.setType(getUserType());
+        user.setOrganization(getOrganizationName());
+        user.setDob(LocalDate.parse(getBirthDate()));
         return user;
 
     }

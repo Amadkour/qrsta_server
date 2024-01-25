@@ -49,6 +49,10 @@ public class AuthService {
         return authorRepository.save(request.toUser(otpService));
     }
 
+    public User update(RegisterationRequest request) {
+        return authorRepository.save(request.toUser(otpService));
+    }
+
     public UserLoginResponse login(LoginRequest request) {
         try {
             Authentication auth = authenticationManager

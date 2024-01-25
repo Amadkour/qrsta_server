@@ -17,12 +17,14 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
+import com.softkour.qrsta_server.payload.request.RegisterationRequest;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.security.JwtRequestFilter;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.OTPService;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user/")
@@ -34,6 +36,16 @@ public class UserController {
     AuthService userService;
     @Autowired
     JwtRequestFilter jwtRequestFilter;
+
+    @PostMapping("update")
+    public ResponseEntity<GenericResponse<Object>> saveUser(
+            @RequestBody @Valid RegisterationRequest registerationRequest) {
+
+        User u = userService.update(registerationRequest);
+
+        return GenericResponse.success(u.toUserLoginResponse());
+
+    }
 
     @GetMapping("logout")
     public ResponseEntity<GenericResponse<Object>> logout() {
