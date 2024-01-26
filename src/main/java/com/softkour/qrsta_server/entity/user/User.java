@@ -192,6 +192,7 @@ public class User extends AbstractAuditingEntity {
                 this.getImageUrl(),
                 (this.getOrganization() == null) ? null : this.getOrganization().name(),
                 this.getNationalId(),
-                this.getCountryCode());
+                this.getCountryCode(),
+                getLoginMacAddress().equalsIgnoreCase(getRegisterMacAddress()));
     }
 }

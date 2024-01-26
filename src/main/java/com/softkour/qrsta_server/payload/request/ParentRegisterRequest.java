@@ -15,22 +15,22 @@ import lombok.Getter;
 
 @Getter
 public class ParentRegisterRequest {
-    @NotBlank
-    @Size(min = 3, max = 20)
+    // @Size(min = 3, max = 20)
     private String name;
     @NotBlank
     private String countryCode;
     @NotBlank
     @Size(min = 7, max = 10)
     private String phone;
-
+    // @Size(max = 14, min = 9)
+    private String nationalId;
     public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
-        user.setName(this.getName());
-        user.setPhoneNumber(this.getPhone());
+        user.setName(getName());
+        user.setPhoneNumber(getPhone());
         user.setOtp(otp.get());
-        user.setCountryCode(this.getCountryCode());
+        user.setCountryCode(getCountryCode());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
         user.setType(UserType.OBSERVER);
         return user;

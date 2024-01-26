@@ -2,6 +2,7 @@ package com.softkour.qrsta_server.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -80,12 +82,30 @@ public class AuthService {
         }
     }
 
-    public User createParent(ParentRegisterRequest request) {
-        if (authorRepository.existsByPhoneNumber(request.getPhone())) {
-            throw new ClientException("phone_number", "phone number already exists");
-        }
-        return authorRepository.save(request.toUser(otpService));
+    public String createParent(ParentRegisterRequest request) {
+        /// link
+        if (request.getNationalId() == null) {
+            if (!authorRepository.existsByPhoneNumber(request.getPhone())) {
+                throw new ClientException("phone_number", "phone number are invaild");
+            } else {
+                User u = authorRepository.findUserByPhoneNumber(request.getPhone());
+                if (u.getType() == UserType.STUDENT) {
+                    throw new ClientException("phone_number", "linked account must be a parent");
+                }
+                Supplier<String> otp = otpService.createRandomOneTimeOTP();
+                u.setOtp(otp.get());
+                authorRepository.save(u);
+                return u.getOtp();
+            }
+        } else {
+            /// create
+            if (authorRepository.existsByPhoneNumber(request.getPhone())) {
+                throw new ClientException("phone_number", "phone number already exists");
+            }
+            User user = authorRepository.save(request.toUser(otpService));
+            return user.getOtp();
 
+        }
     }
 
     public String acceptToChangeDevice(List<AcceptRequest> requests) {
@@ -136,7 +156,6 @@ public class AuthService {
         if (parentUser.getOtp().equalsIgnoreCase(otp) && Instant.now().isBefore(parentUser.getExpireOTPDateTime())) {
             parentUser.setActive(true);
             parentUser = save(parentUser);
-            MyUtils.getCurrentUserSession(null);
             currentUser.setParent(parentUser);
             save(currentUser);
             return parentUser;

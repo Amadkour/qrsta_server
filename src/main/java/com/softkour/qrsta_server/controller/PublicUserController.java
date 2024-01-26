@@ -26,10 +26,12 @@ import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.OTPService;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("api/auth/")
 @Validated
+@Slf4j
 public class PublicUserController {
 
     @Autowired
@@ -84,7 +86,8 @@ public class PublicUserController {
     }
 
     @GetMapping("forget_password")
-    public ResponseEntity<GenericResponse<Map<String, Object>>> forgetPassword(@RequestHeader String phone) {
+    public ResponseEntity<GenericResponse<Map<String, Object>>> forgetPassword(@RequestHeader("phone") String phone,
+            @RequestHeader("phone_code") String phoneCode) {
         User user = userRepository.findUserByPhoneNumber(phone);
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setOtp(otp.get());
@@ -96,19 +99,20 @@ public class PublicUserController {
     }
 
     @GetMapping("change_password")
-    public ResponseEntity<GenericResponse<Object>> changePassword(@RequestHeader String phone,
-            @RequestHeader String password,
-            @RequestHeader String otp) {
+    public ResponseEntity<GenericResponse<Object>> changePassword(@RequestHeader("phone") String phone,
+            @RequestHeader("phone_code") String phoneCode,
+            @RequestHeader("password") String password,
+            @RequestHeader("otp") String otp) {
         User user = userRepository.findUserByPhoneNumber(phone);
-        try {
-            if (user.getOtp().equalsIgnoreCase(otp) && user.getExpireOTPDateTime().isBefore(Instant.now())) {
+        if (user.getOtp().equalsIgnoreCase(otp) && user.getExpireOTPDateTime().isAfter(Instant.now())) {
                 user.setPassword(new BCryptPasswordEncoder().encode(password));
                 userRepository.save(user);
-            }
-            return GenericResponse.successWithMessageOnly("success changed");
-        } catch (Exception e) {
-            return GenericResponse.successWithMessageOnly(e.getMessage());
+                return GenericResponse.successWithMessageOnly("success changed");
 
-        }
+            }
+            log.warn(user.getOtp());
+            log.warn(String.valueOf(user.getExpireOTPDateTime().isBefore(Instant.now())));
+            return GenericResponse.errorWithMessageOnly("error in update");
+
     }
 }

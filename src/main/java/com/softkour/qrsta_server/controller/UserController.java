@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.validation.Valid;
 
 @RestController
+@Validated
 @RequestMapping("/api/user/")
 public class UserController {
     protected final Log logger = LogFactory.getLog(getClass());
@@ -57,10 +59,9 @@ public class UserController {
 
     @PostMapping("/parent_register")
     public ResponseEntity<GenericResponse<Object>> createParent(
-            @RequestBody ParentRegisterRequest parentRegisterRequest) {
-        User user = userService.createParent(parentRegisterRequest);
+            @RequestBody @Valid ParentRegisterRequest parentRegisterRequest) {
         return GenericResponse
-                .successWithMessageOnly(user.getOtp().toString());
+                .successWithMessageOnly(userService.createParent(parentRegisterRequest));
     }
 
     @PostMapping("verfy_parent_otp")
@@ -74,4 +75,5 @@ public class UserController {
     public ResponseEntity<GenericResponse<Stream<AbstractUser>>> getUsers() {
         return GenericResponse.success(userService.getAllAsAbstract().stream().map((e) -> e.toAbstractUser()));
     }
+
 }

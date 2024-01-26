@@ -20,5 +20,6 @@ public class UserLoginResponse {
     private String organization;
     private String nationalId;
     private String countryCode;
+    private boolean validDevice;
 
 }
