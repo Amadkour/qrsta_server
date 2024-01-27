@@ -28,7 +28,6 @@ import lombok.ToString;
 @Validated
 public class RegisterationRequest {
 
-    private Long id;
     @NotBlank
     @Size(min = 3, max = 20)
     private String name;
@@ -70,7 +69,6 @@ public class RegisterationRequest {
     public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
-        user.setId(getId());
         user.setName(getName());
         user.setCountryCode(getCountryCode());
         user.setRegisterMacAddress(getMacAddress());

@@ -7,11 +7,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AbstractUser {
+public class AbstractChild {
     private Long id;
     private String name;
     private UserType type;
     private String imageURL;
     private String phone;
-
+    private Long coursesCount;
 }

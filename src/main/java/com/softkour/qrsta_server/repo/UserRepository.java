@@ -14,6 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
    public List<User> findAllUserByNeedToReplaceAndCourses_course_teacherId(boolean needToReplace, Long teacherId);
 
+   public List<User> findAllChildrenByParent_id(Long parentId);
+
    public boolean existsByPhoneNumber(String phone);
 
    public boolean existsByNationalId(String nationalId);

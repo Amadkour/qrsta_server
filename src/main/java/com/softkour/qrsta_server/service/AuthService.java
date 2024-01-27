@@ -21,6 +21,7 @@ import com.softkour.qrsta_server.payload.request.AcceptRequest;
 import com.softkour.qrsta_server.payload.request.LoginRequest;
 import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
+import com.softkour.qrsta_server.payload.request.UpdateUserRequest;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.security.JwtTokenUtil;
@@ -51,8 +52,8 @@ public class AuthService {
         return authorRepository.save(request.toUser(otpService));
     }
 
-    public User update(RegisterationRequest request) {
-        return authorRepository.save(request.toUser(otpService));
+    public User update(UpdateUserRequest request) {
+        return authorRepository.save(request.toUser());
     }
 
     public UserLoginResponse login(LoginRequest request) {
@@ -94,6 +95,7 @@ public class AuthService {
                 }
                 Supplier<String> otp = otpService.createRandomOneTimeOTP();
                 u.setOtp(otp.get());
+                u.setExpireOTPDateTime(Instant.now());
                 authorRepository.save(u);
                 return u.getOtp();
             }
@@ -144,16 +146,32 @@ public class AuthService {
         return authorRepository.save(user);
     }
 
-    public List<User> getAllAsAbstract() {
-        return authorRepository.findAll();
+    public List<User> getChildren(AuthService authService) {
+        return authorRepository.findAllChildrenByParent_id(
+                MyUtils.getCurrentUserSession(authService).getId());
     }
 
-    public void verifyUser(String otp) {
+    public User getParent(AuthService authService) {
+        log.warn("my phone is:" + MyUtils.getCurrentUserSession(authService).getPhoneNumber());
+        return MyUtils.getCurrentUserSession(authService).getParent();
+    }
+
+    public User deleteChild(Long childId) {
+        User u = authorRepository.findById(childId).orElseThrow(() -> new ClientException("user", "parent not found"));
+        u.setParent(null);
+        return authorRepository.save(u);
+    }
+
+    public User addChild(AuthService authService, Long childId) {
+        User child = authorRepository.findById(childId)
+                .orElseThrow(() -> new ClientException("user", "parent not found"));
+        child.setParent(MyUtils.getCurrentUserSession(authService));
+        return authorRepository.save(child);
     }
 
     public User verifyParentUser(String otp, String parentPhone, User currentUser) {
         User parentUser = getUserByPhoneNumber(parentPhone);
-        if (parentUser.getOtp().equalsIgnoreCase(otp) && Instant.now().isBefore(parentUser.getExpireOTPDateTime())) {
+        if (parentUser.getOtp().equalsIgnoreCase(otp) && Instant.now().isAfter(parentUser.getExpireOTPDateTime())) {
             parentUser.setActive(true);
             parentUser = save(parentUser);
             currentUser.setParent(parentUser);

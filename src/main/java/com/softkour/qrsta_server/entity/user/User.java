@@ -15,6 +15,7 @@ import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 import com.softkour.qrsta_server.entity.quiz.StudentQuiz;
+import com.softkour.qrsta_server.payload.response.AbstractChild;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
@@ -145,7 +146,13 @@ public class User extends AbstractAuditingEntity {
 
     public AbstractUser toAbstractUser() {
         return new AbstractUser(
-                this.getId(), this.getName(), this.getType(), this.getImageUrl());
+                this.getId(), this.getName(), this.getType(), this.getImageUrl(), getPhoneNumber());
+    }
+
+    public AbstractChild toAbstractChild() {
+        return new AbstractChild(
+                this.getId(), this.getName(), this.getType(), this.getImageUrl(), getPhoneNumber(),
+                getCourses().stream().dropWhile(e -> !e.isActive()).count());
     }
 
     public StudntInSession toStudntInSession(List<Boolean> attendance, boolean isPresent, Long courseId) {
