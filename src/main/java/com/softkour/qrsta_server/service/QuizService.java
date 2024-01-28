@@ -1,17 +1,21 @@
 package com.softkour.qrsta_server.service;
 
-import com.softkour.qrsta_server.config.MyUtils;
-import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.entity.quiz.Quiz;
-import com.softkour.qrsta_server.entity.user.User;
-import com.softkour.qrsta_server.repo.QuizRepository;
 import java.util.List;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.entity.quiz.Quiz;
+import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.exception.ClientException;
+import com.softkour.qrsta_server.repo.QuizRepository;
 
 @Service
 @Transactional
@@ -28,19 +32,16 @@ public class QuizService {
         this.quizRepository = quizRepository;
     }
 
-
     public Quiz save(Quiz quiz) {
         log.debug("Request to save Quiz : {}", quiz);
         return quizRepository.save(quiz);
     }
 
     public Quiz update(Quiz quiz) {
-        log.debug("Request to update Quiz : {}", quiz);
         return quizRepository.save(quiz);
     }
 
     public Optional<Quiz> partialUpdate(Quiz quiz) {
-        log.debug("Request to partially update Quiz : {}", quiz);
 
         return quizRepository
                 .findById(quiz.getId())
@@ -82,8 +83,34 @@ public class QuizService {
         }
         return quizRepository.findAll();
     }
+
+    @Transactional(readOnly = true)
+    public Quiz findById(Long quizId) {
+        return quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public String correct(List<List<String>> answers, Long quizId) {
+        User u = MyUtils.getCurrentUserSession(authService);
+        Quiz q = quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
+        List<Question> questions = q.getQuestions().stream().toList();
+        int totalPoints = questions.stream().reduce(0, (a, b) -> a + b.getGrade(), Integer::sum);
+        int points = 0;
+        for (int i = 0; i < answers.size(); i++) {
+            List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(e -> e.getIsCorrectAnswer())
+                    .map(e -> e.getTitle()).toList();
+
+            if (answers.get(i).stream().allMatch(e -> correctAnswer.contains(e))
+                    && answers.get(i).size() == correctAnswer.size()) {
+                points += questions.get(i).getGrade();
+            }
+        }
+
+        return String.valueOf(points) + '/' + String.valueOf(totalPoints);
+
+    }
+
     public void delete(Long id) {
-        log.debug("Request to delete Quiz : {}", id);
         quizRepository.deleteById(id);
     }
 }

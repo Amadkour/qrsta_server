@@ -11,10 +11,10 @@ import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 public interface StudentCourseRepository extends JpaRepository<StudentCourse, Long> {
     StudentCourse findByStudent_id(Long userId);
 
-    List<StudentCourse> findAllByCourseTeacherIdAndFinished(Long teacherId, boolean finished);
+    List<StudentCourse> findAllByCourse_teacher_idAndFinished(Long teacherId, boolean finished);
 
-    double getCourseCostByCourseTeacherIdAndFinishedAndLate(Long teacherId, boolean finished, int late);
+    double getCourseCostByCourse_teacher_idAndFinishedAndLate(Long teacherId, boolean finished, int late);
 
-    List<StudentCourse> getStudentsByCourseTeacherIdAndStudentParentIdAndActiveAndFinished(
+    List<StudentCourse> getStudentsByCourse_teacher_idAndStudent_parent_idAndActiveAndFinished(
             Long teacherId, Long parentId, boolean active, boolean finished);
 }

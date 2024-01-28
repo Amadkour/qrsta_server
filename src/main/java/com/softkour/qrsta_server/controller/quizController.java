@@ -60,4 +60,10 @@ public class quizController {
         return GenericResponse.success(quizService.findAll().stream().map(e -> e.toQuizModel()));
 
     }
+
+    @GetMapping("quiz_profile_for_teacher")
+    public ResponseEntity<GenericResponse<Object>> getQuiz() {
+        return GenericResponse.success(quizService.findAll().stream().map(e -> e.toQuizModel()));
+
+    }
 }
