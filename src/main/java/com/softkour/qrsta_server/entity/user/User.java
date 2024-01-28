@@ -19,6 +19,7 @@ import com.softkour.qrsta_server.payload.response.AbstractChild;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
+import com.softkour.qrsta_server.payload.response.UserUpdateResponse;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -195,11 +196,26 @@ public class User extends AbstractAuditingEntity {
                 this.getPhoneNumber(),
                 "token",
                 this.getAddress(),
-                getLoginMacAddress() == getRegisterMacAddress(),
                 this.getImageUrl(),
                 (this.getOrganization() == null) ? null : this.getOrganization().name(),
                 this.getNationalId(),
                 this.getCountryCode(),
-                getLoginMacAddress().equalsIgnoreCase(getRegisterMacAddress()));
+                getLoginMacAddress().equalsIgnoreCase(getRegisterMacAddress()),
+                getDob());
+    }
+
+    public UserLoginResponse toUpdateResponse() {
+        return new UserLoginResponse(
+                this.getName(),
+                this.getType(),
+                this.getPhoneNumber(),
+                null,
+                this.getAddress(),
+                this.getImageUrl(),
+                (this.getOrganization() == null) ? null : this.getOrganization().name(),
+                this.getNationalId(),
+                this.getCountryCode(),
+                true,
+                getDob());
     }
 }

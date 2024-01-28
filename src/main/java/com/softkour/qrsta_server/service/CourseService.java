@@ -33,9 +33,13 @@ public class CourseService {
     }
 
     public Course addStudentToCourse(User user, Long courseId) {
+        if (user.getCourses().stream().anyMatch(e -> e.getCourse().getId().compareTo(courseId) == 0)) {
+            throw new ClientException("course", "you are aready joined in this course: ".concat(courseId.toString()));
+
+        } else {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(
-                        () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
+                        () -> new ClientException("course", "course not found id: ".concat(courseId.toString())));
         StudentCourse student = new StudentCourse();
         student.setCourse(course);
         student.setStudent(user);
@@ -50,6 +54,7 @@ public class CourseService {
         course.addStudent(student);
         return courseRepository.save(course);
     }
+}
 
     public Course removeStudentFromCourse(User user, Long courseId) {
         Course course = courseRepository.findById(courseId)

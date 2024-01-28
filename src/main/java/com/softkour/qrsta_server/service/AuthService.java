@@ -53,7 +53,9 @@ public class AuthService {
     }
 
     public User update(UpdateUserRequest request) {
-        return authorRepository.save(request.toUser());
+        User user = authorRepository.findUserByPhoneNumber(request.getPhoneNumber());
+        User updateUser = request.toUser(user);
+        return authorRepository.save(updateUser);
     }
 
     public UserLoginResponse login(LoginRequest request) {

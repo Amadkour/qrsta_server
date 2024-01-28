@@ -47,7 +47,7 @@ public class UserController {
 
         User u = userService.update(registerationRequest);
 
-        return GenericResponse.success(u.toUserLoginResponse());
+        return GenericResponse.success(u.toUpdateResponse());
 
     }
 
