@@ -107,7 +107,7 @@ public class ProfileServices {
     public ResponseEntity<GenericResponse<List<StudentCourse>>> getAnalysis() {
         User u = MyUtils.getCurrentUserSession(authService);
 
-        return GenericResponse.success(studentCourseRepo.findAllByCourseTeacherIdAndFinished(u.getId(), false));
+        return GenericResponse.success(studentCourseRepo.findAllByCourse_teacher_idAndFinished(u.getId(), false));
     }
 
 }

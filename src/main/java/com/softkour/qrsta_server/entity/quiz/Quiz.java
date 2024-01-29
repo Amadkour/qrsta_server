@@ -3,6 +3,7 @@ package com.softkour.qrsta_server.entity.quiz;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
@@ -80,26 +81,23 @@ public class Quiz extends AbstractAuditingEntity {
             quizResponce.setStartDate(getStartDate());
         } else {
             log.warn(String.valueOf(getCourses().iterator().next().getSessions().size()));
-            Instant now = Instant.now();
             if (getType() == QuizType.BEGIN) {
                 quizResponce.setStartDate(
                         getCourses().iterator().next().getSessions().stream()
-                                // .takeWhile(e -> e.getSession().getStartDate().isAfter(now))
                                 .toList().get(0)
                                 .getSession().getStartDate());
             } else if (getType() == QuizType.END) {
                 quizResponce.setStartDate(
                         getCourses().iterator().next().getSessions().stream()
-                                // .takeWhile(e -> e.getSession().getStartDate().isAfter(now))
                                 .toList().get(0)
                                 .getSession().getEndDate().minusSeconds(Integer.parseInt(getTimePerMinutes()) * 60));
             }
         }
-        quizResponce.setPoints(getQuestions().stream().reduce(0, (a, b) -> a + b.getGrade(), Integer::sum));
+        quizResponce.setPoints(getQuestions().stream().mapToInt(e -> e.getGrade()).sum());
         quizResponce.setId(getId());
         quizResponce.setQuestionCount(getQuestions().size());
         quizResponce.setStudentCount(
-                getCourses().stream().reduce(0, (a, b) -> a + b.getCourse().getStudents().size(), Integer::sum));
+                getCourses().stream().mapToInt(e -> e.getCourse().getStudents().size()).sum());
         quizResponce.setType(getType());
         quizResponce.setTimePerMinutes(getTimePerMinutes());
         return quizResponce;
@@ -112,13 +110,15 @@ public class Quiz extends AbstractAuditingEntity {
         return question;
     }
 
-    public QuestionCreationRequest toTeacherQuiz() {
+    public QuizCreationRequest toTeacherQuiz() {
         QuizCreationRequest quiz = new QuizCreationRequest();
         quiz.setCourses(getCourses().stream().map(e -> new QuizCourseSession(
-                e.getCourse().getId(), e.getSessions().stream().map(s -> s.getSession().getId()).toList())).toList());
+                e.getCourse().getId(), e.getSessions().stream().map(s -> s.getSession().getId()).toList()))
+                .collect(Collectors.toSet()));
         quiz.setQuestions(
                 getQuestions().stream().map(e -> new QuestionCreationRequest(e.getId(), e.getTitle(), e.getGrade(),
-                        e.getOptions().stream().map(o -> new OptionCreationRequest()).toList())).toList());
+                        e.getOptions().stream().map(o -> new OptionCreationRequest()).collect(Collectors.toSet())))
+                        .collect(Collectors.toSet()));
         return quiz;
     }
 }

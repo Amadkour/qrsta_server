@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,8 +63,12 @@ public class quizController {
     }
 
     @GetMapping("quiz_profile_for_teacher")
-    public ResponseEntity<GenericResponse<Object>> getQuiz() {
-        return GenericResponse.success(quizService.findAll().stream().map(e -> e.toQuizModel()));
+    public ResponseEntity<GenericResponse<Object>> getQuiz(@RequestHeader("quiz_id") Long quizId) {
+        return GenericResponse.success(quizService.findById(quizId).toTeacherQuiz());
+    }
 
+    @GetMapping("quiz_profile_for_student")
+    public ResponseEntity<GenericResponse<Object>> getStudentQuiz(@RequestHeader("quiz_id") Long quizId) {
+        return GenericResponse.success(quizService.findById(quizId).toStudentQuiz());
     }
 }
