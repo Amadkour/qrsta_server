@@ -42,6 +42,7 @@ public class QuizCreationRequest {
 
         Quiz quiz = new Quiz();
         quiz.setType(getType());
+        quiz.setId(getId());
         quiz.setQuestionsPerStudent(getQuestionsPerStudent());
         quiz.setTimePerMinutes(getTimePerMinutes());
         quiz.setStartDate(getStartDate());
