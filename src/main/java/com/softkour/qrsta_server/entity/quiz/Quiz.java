@@ -117,7 +117,9 @@ public class Quiz extends AbstractAuditingEntity {
                 .collect(Collectors.toSet()));
         quiz.setQuestions(
                 getQuestions().stream().map(e -> new QuestionCreationRequest(e.getId(), e.getTitle(), e.getGrade(),
-                        e.getOptions().stream().map(o -> new OptionCreationRequest()).collect(Collectors.toSet())))
+                        e.getOptions().stream()
+                                .map(o -> new OptionCreationRequest(o.getTitle(), o.getIsCorrectAnswer()))
+                                .collect(Collectors.toSet())))
                         .collect(Collectors.toSet()));
         return quiz;
     }
