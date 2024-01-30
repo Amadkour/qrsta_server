@@ -2,6 +2,7 @@ package com.softkour.qrsta_server.entity.quiz;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,11 +45,11 @@ public class Quiz extends AbstractAuditingEntity {
     @Column()
     private QuizType type;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
     private Set<CourseQuiz> courses = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes", cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
     private Set<Question> questions = new HashSet<>();
 
@@ -104,10 +105,12 @@ public class Quiz extends AbstractAuditingEntity {
 
     }
 
-    public Set<Question> toStudentQuiz() {
-        Set<Question> question = getQuestions();
-        question.stream().forEach(e -> e.getOptions().stream().forEach(o -> o.setIsCorrectAnswer(false)));
-        return question;
+    public List<QuestionCreationRequest> toStudentQuiz() {
+        return getQuestions().stream()
+                .map(e -> new QuestionCreationRequest(e.getId(), e.getTitle(), e.getGrade(), e.getOptions().stream()
+                        .map(o -> new OptionCreationRequest(o.getTitle(), false)).collect(Collectors.toSet())))
+                .toList();
+
     }
 
     public QuizCreationRequest toTeacherQuiz() {

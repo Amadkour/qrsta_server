@@ -1,6 +1,7 @@
 package com.softkour.qrsta_server.controller;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,11 +52,19 @@ public class quizController {
 
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
-        Quiz quiz = quizService.save(request.toQuiz(courseService, sessionService, optionService, questionService));
+        Quiz quiz = quizService
+                .save(request.toQuiz(quizService, courseService, sessionService, optionService, questionService));
+        log.warn(String.valueOf(quiz.getCourses().iterator().next().getCourse().getId()));
         return GenericResponse.success(quiz.toQuizModel());
 
     }
 
+    @GetMapping("delete")
+    public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestHeader("id") Long id) {
+        quizService.delete(id);
+        return GenericResponse.successWithMessageOnly("delete_successfully");
+
+    }
     @GetMapping("all")
     public ResponseEntity<GenericResponse<Object>> allQuiz() {
         return GenericResponse.success(quizService.findAll().stream().map(e -> e.toQuizModel()));
@@ -70,5 +79,11 @@ public class quizController {
     @GetMapping("quiz_profile_for_student")
     public ResponseEntity<GenericResponse<Object>> getStudentQuiz(@RequestHeader("quiz_id") Long quizId) {
         return GenericResponse.success(quizService.findById(quizId).toStudentQuiz());
+    }
+
+    @GetMapping("correct_quiz")
+    public ResponseEntity<GenericResponse<Object>> correct(@RequestHeader("answer") List<List<String>> answers,
+            @RequestHeader("quiz_id") Long quizId) {
+        return GenericResponse.successWithMessageOnly(quizService.correct(answers, quizId));
     }
 }

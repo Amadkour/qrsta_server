@@ -91,12 +91,16 @@ public class QuizService {
 
     @Transactional(readOnly = true)
     public String correct(List<List<String>> answers, Long quizId) {
-        User u = MyUtils.getCurrentUserSession(authService);
         Quiz q = quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
         List<Question> questions = q.getQuestions().stream().toList();
-        int totalPoints = questions.stream().reduce(0, (a, b) -> a + b.getGrade(), Integer::sum);
+        int totalPoints = questions.stream().mapToInt(e -> e.getGrade()).sum();
         int points = 0;
-        for (int i = 0; i < answers.size(); i++) {
+        log.warn("========================answers");
+        log.warn(String.valueOf(questions.size()));
+        log.warn(String.valueOf(answers.size()));
+        log.warn("========================answers");
+
+        for (int i = 0; i < questions.size(); i++) {
             List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(e -> e.getIsCorrectAnswer())
                     .map(e -> e.getTitle()).toList();
 

@@ -16,6 +16,7 @@ import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OptionService;
 import com.softkour.qrsta_server.service.QuestionService;
+import com.softkour.qrsta_server.service.QuizService;
 import com.softkour.qrsta_server.service.SessionService;
 
 import lombok.Getter;
@@ -38,10 +39,16 @@ public class QuizCreationRequest {
     private Set<QuizCourseSession> courses = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
-    public Quiz toQuiz(CourseService courseService, SessionService sessionService, OptionService optionService,
+    public Quiz toQuiz(QuizService quizService, CourseService courseService, SessionService sessionService,
+            OptionService optionService,
             QuestionService questionService) {
 
-        Quiz quiz = new Quiz();
+        Quiz quiz;
+        if (getId() == null) {
+            quiz = new Quiz();
+        } else {
+            quiz = quizService.findById(getId());
+        }
         quiz.setType(getType());
         quiz.setId(getId());
         quiz.setQuestionsPerStudent(getQuestionsPerStudent());
@@ -51,9 +58,9 @@ public class QuizCreationRequest {
                 getCourses().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
                     @Override
                     public CourseQuiz apply(QuizCourseSession e) {
-                        log.warn(String.valueOf(sessionService.findOne(1).getId()));
                         CourseQuiz courseQuiz = new CourseQuiz();
                         courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
+                        log.warn(String.valueOf(getCourses().iterator().next().getCourseId()));
 
                         e.getSessionsId().stream()
                                 .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));

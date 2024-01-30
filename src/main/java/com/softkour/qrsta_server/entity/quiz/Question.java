@@ -33,7 +33,7 @@ public class Question extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "questions" }, allowSetters = true)
     private Set<Option> options = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "question__quiz", joinColumns = @JoinColumn(name = "question_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id"))
     @JsonIgnoreProperties(value = { "sessions", "quizzes" }, allowSetters = true)
     private Set<Quiz> quizzes = new HashSet<>();
