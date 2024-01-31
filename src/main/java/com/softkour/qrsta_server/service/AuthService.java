@@ -166,14 +166,14 @@ public class AuthService {
 
     public User addChild(AuthService authService, Long childId) {
         User child = authorRepository.findById(childId)
-                .orElseThrow(() -> new ClientException("user", "parent not found"));
+                .orElseThrow(() -> new ClientException("user", "child_not_found"));
         child.setParent(MyUtils.getCurrentUserSession(authService));
         return authorRepository.save(child);
     }
 
     public User verifyParentUser(String otp, String parentPhone, User currentUser) {
         User parentUser = getUserByPhoneNumber(parentPhone);
-        if (parentUser.getOtp().equalsIgnoreCase(otp) && Instant.now().isAfter(parentUser.getExpireOTPDateTime())) {
+        if (parentUser.getOtp().equalsIgnoreCase(otp) && !parentUser.getExpireOTPDateTime().isBefore(Instant.now())) {
             parentUser.setActive(true);
             parentUser = save(parentUser);
             currentUser.setParent(parentUser);

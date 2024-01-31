@@ -147,8 +147,6 @@ public class courseController {
     }
     @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses() {
-        try {
-
             User user = MyUtils.getCurrentUserSession(authService);
             if (user.getType() == UserType.TEACHER) {
                 List<Course> courseList = courseService.getCourses(user.getId());
@@ -159,9 +157,13 @@ public class courseController {
                 return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
             }
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
         }
+
+        @GetMapping("get_child_courses")
+        public ResponseEntity<GenericResponse<Object>> getChildCourses(@RequestHeader("child_phone") String phone) {
+            User student = authService.getUserByPhoneNumber(phone);
+            List<StudentCourse> courseList = student.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
+            return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
     }
 
     @GetMapping("add_my_to_course")

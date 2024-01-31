@@ -104,7 +104,7 @@ public class PublicUserController {
             @RequestHeader("password") String password,
             @RequestHeader("otp") String otp) {
         User user = userRepository.findUserByPhoneNumber(phone);
-        if (user.getOtp().equalsIgnoreCase(otp) && user.getExpireOTPDateTime().isAfter(Instant.now())) {
+        if (user.getOtp().equalsIgnoreCase(otp) && !user.getExpireOTPDateTime().isBefore(Instant.now())) {
                 user.setPassword(new BCryptPasswordEncoder().encode(password));
                 userRepository.save(user);
                 return GenericResponse.successWithMessageOnly("success changed");
