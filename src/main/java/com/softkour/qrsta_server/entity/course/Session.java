@@ -6,10 +6,9 @@ import java.util.Set;
 import java.util.stream.DoubleStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudents;
@@ -34,7 +33,7 @@ public class Session extends AbstractAuditingEntity {
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
         @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
-        private Set<User> students = new HashSet<>();
+        private Set<Student> students = new HashSet<>();
 
         @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
         @JsonIgnoreProperties(value = { "sessions", "quizzes" }, allowSetters = true)
@@ -54,7 +53,7 @@ public class Session extends AbstractAuditingEntity {
         @JsonIgnoreProperties(value = { "sessions", "schedules" }, allowSetters = true)
         private Course course;
 
-        public void setStudents(Set<User> students) {
+        public void setStudents(Set<Student> students) {
                 if (this.students != null) {
                         this.students.forEach(i -> i.removeSession(this));
                 }
@@ -64,13 +63,13 @@ public class Session extends AbstractAuditingEntity {
                 this.students = students;
         }
 
-        public Session addStudent(User student) {
+        public Session addStudent(Student student) {
                 this.students.add(student);
                 student.getSessions().add(this);
                 return this;
         }
 
-        public Session removeStudent(User employee) {
+        public Session removeStudent(Student employee) {
                 this.students.remove(employee);
                 employee.getSessions().remove(this);
                 return this;

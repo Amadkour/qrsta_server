@@ -16,8 +16,9 @@ import com.softkour.qrsta_server.entity.course.Offer;
 import com.softkour.qrsta_server.entity.course.Schedule;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
-import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
@@ -48,12 +49,31 @@ public class startDatabase implements CommandLineRunner {
     public void run(String... args) throws Exception {
         for (int i = 2; i < 5; i++) {
 
-            User user = new User();
+            User user;
+            /// =================course========================///
+            Course course = new Course();
+            course.setCost(10);
+            course.setName("course".concat(String.valueOf(i)));
+            course.setType(CourseType.PUBLIC);
+            course = courseService.save(course);
+            log.warn("==========================================");
+            log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
+            log.warn("==========================================");
+            StudentCourse studentCourse = new StudentCourse();
+            studentCourse.setCourse(course);
+            studentCourse.setLate(0);
+            if (2 == i) {
+                user = new Teacher();
+                course.setTeacher(((Teacher) user));
+
+            } else {
+                user = new Student();
+                studentCourse.setStudent(((Student) user));
+
+            }
+
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
-            if (2 == i)
-                user.setType(UserType.TEACHER);
-            else
-                user.setType(UserType.STUDENT);
+
 
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
@@ -65,20 +85,7 @@ public class startDatabase implements CommandLineRunner {
             user.setLogged(true);
             user = userRepository.save(user);
 
-            /// =================course========================///
-            Course course = new Course();
-            course.setCost(10);
-            course.setName("course".concat(String.valueOf(i)));
-            course.setTeacher(user);
-            course.setType(CourseType.PUBLIC);
-            course = courseService.save(course);
-            log.warn("==========================================");
-            log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
-            log.warn("==========================================");
-            StudentCourse studentCourse = new StudentCourse();
-            studentCourse.setCourse(course);
-            studentCourse.setStudent(user);
-            studentCourse.setLate(0);
+
             // course.addStudent(studentCourse);
             course.addStudent(studentCourse);
             Schedule schedule = new Schedule();
@@ -91,7 +98,8 @@ public class startDatabase implements CommandLineRunner {
                 StudentCourse studentC = new StudentCourse();
                 studentC.setCourse(course);
                 studentC.setActive(true);
-                studentC.setStudent(users.get(u));
+                if (users.get(u) instanceof Student)
+                    studentC.setStudent(((Student) users.get(u)));
                 studentC.setLate(u);
                 course.addStudent(studentC);
             }
@@ -103,7 +111,8 @@ public class startDatabase implements CommandLineRunner {
             session.setStartDate(Instant.now());
             session.setEndDate(Instant.now().plusSeconds(5));
             session = sessionService.save(session);
-            session.addStudent(user);
+            if (user instanceof Student)
+                session.addStudent(((Student) user));
             sessionService.save(session);
             // ==========================offer=====================
             Offer offer = new Offer();

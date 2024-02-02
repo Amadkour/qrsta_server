@@ -8,6 +8,7 @@ import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
@@ -45,7 +46,7 @@ public class Course extends AbstractAuditingEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "quizes", "courses" }, allowSetters = true)
-    private User teacher;
+    private Teacher teacher;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)

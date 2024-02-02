@@ -24,6 +24,8 @@ import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.post.Post;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
 import com.softkour.qrsta_server.payload.request.ScheduleRequest;
@@ -83,7 +85,7 @@ public class courseController {
         course.setSchedules(savedSchedules);
         course.setId(request.getId());
 
-        course.setTeacher(MyUtils.getCurrentUserSession(authService));
+        course.setTeacher(((Teacher) MyUtils.getCurrentUserSession(authService)));
 
         return GenericResponse.success(courseService.save(course).toCourseResponse());
 
@@ -153,7 +155,8 @@ public class courseController {
                 return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
             } else {
-                List<StudentCourse> courseList = user.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
+                List<StudentCourse> courseList = ((Student) user).getCourses().stream().dropWhile(s -> !s.isActive())
+                        .toList();
                 return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
             }
@@ -161,7 +164,7 @@ public class courseController {
 
         @GetMapping("get_child_courses")
         public ResponseEntity<GenericResponse<Object>> getChildCourses(@RequestHeader("child_phone") String phone) {
-            User student = authService.getUserByPhoneNumber(phone);
+            Student student = (Student) authService.getUserByPhoneNumber(phone);
             List<StudentCourse> courseList = student.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
             return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
     }
@@ -170,7 +173,7 @@ public class courseController {
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "course_id") Long courseId) {
         try {
-            User u = MyUtils.getCurrentUserSession(authService);
+            Student u = (Student) MyUtils.getCurrentUserSession(authService);
             courseService.addStudentToCourse(u, courseId);
             return GenericResponse.successWithMessageOnly("add you successfully");
         } catch (Exception e) {
@@ -183,7 +186,7 @@ public class courseController {
             @RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "student_id") Long userId) {
 
         try {
-            User u = authService.getUserById(userId);
+            Student u = (Student) authService.getUserById(userId);
             courseService.addStudentToCourse(u, courseId);
             return GenericResponse.success("add student to course successfully");
         } catch (Exception e) {

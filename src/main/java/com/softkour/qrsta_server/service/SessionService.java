@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.softkour.qrsta_server.entity.course.Session;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.SessionRepository;
 
@@ -51,7 +51,7 @@ public class SessionService {
         sessionRepository.deleteById(id);
     }
 
-    public Session addStudentToSession(User user, Long sessionId) {
+    public Session addStudentToSession(Student user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
@@ -71,7 +71,7 @@ public class SessionService {
         }
     }
 
-    public Session removeStudentToSession(User user, Long sessionId) {
+    public Session removeStudentToSession(Student user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));

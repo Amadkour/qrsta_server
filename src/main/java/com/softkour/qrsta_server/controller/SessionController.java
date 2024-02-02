@@ -1,8 +1,6 @@
 package com.softkour.qrsta_server.controller;
 
 import java.time.Instant;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,25 +16,20 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.SessionObject;
-import com.softkour.qrsta_server.entity.post.Post;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
-import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
-import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionObjectService;
 import com.softkour.qrsta_server.service.SessionService;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Validated
-@Slf4j
 @RequestMapping("/api/session/")
 public class SessionController {
     @Autowired
@@ -74,7 +67,7 @@ public class SessionController {
             @RequestHeader(name = "session_id") Long sessionId) {
 
         try {
-            User u = MyUtils.getCurrentUserSession(authService);
+            Student u = (Student) MyUtils.getCurrentUserSession(authService);
             sessionService.addStudentToSession(u, sessionId);
             return GenericResponse.successWithMessageOnly("take you successfully");
         } catch (Exception e) {
@@ -87,7 +80,7 @@ public class SessionController {
             @RequestHeader(name = "session_id") Long sessionId, @RequestHeader(name = "student_id") Long userId) {
 
         try {
-            User u = authService.getUserById(userId);
+            Student u = (Student) authService.getUserById(userId);
             Session s = sessionService.addStudentToSession(u, sessionId);
             return GenericResponse
                     .success(s.toSessionDetailsStudent().getStudents().stream().filter(e -> e.getId() == userId)
@@ -104,7 +97,7 @@ public class SessionController {
             @RequestHeader(name = "session_id") Long sessionId, @RequestHeader(name = "student_id") Long userId) {
 
         try {
-            User u = authService.getUserById(userId);
+            Student u = (Student) authService.getUserById(userId);
             sessionService.removeStudentToSession(u, sessionId);
             return GenericResponse.success("remove student from session successfully");
         } catch (Exception e) {
