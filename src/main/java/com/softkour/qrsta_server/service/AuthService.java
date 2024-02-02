@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.Parent;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -154,29 +156,29 @@ public class AuthService {
     }
 
     public User getParent(AuthService authService) {
-        log.warn("my phone is:" + MyUtils.getCurrentUserSession(authService).getPhoneNumber());
-        return MyUtils.getCurrentUserSession(authService).getParent();
+        return ((Student) MyUtils.getCurrentUserSession(authService)).getParent();
     }
 
     public User deleteChild(Long childId) {
-        User u = authorRepository.findById(childId).orElseThrow(() -> new ClientException("user", "parent not found"));
+        Student u = (Student) authorRepository.findById(childId)
+                .orElseThrow(() -> new ClientException("user", "parent not found"));
         u.setParent(null);
         return authorRepository.save(u);
     }
 
     public User addChild(AuthService authService, Long childId) {
-        User child = authorRepository.findById(childId)
+        Student child = (Student) authorRepository.findById(childId)
                 .orElseThrow(() -> new ClientException("user", "child_not_found"));
-        child.setParent(MyUtils.getCurrentUserSession(authService));
+        child.setParent((Parent) MyUtils.getCurrentUserSession(authService));
         return authorRepository.save(child);
     }
 
-    public User verifyParentUser(String otp, String parentPhone, User currentUser) {
+    public User verifyParentUser(String otp, String parentPhone, Student currentUser) {
         User parentUser = getUserByPhoneNumber(parentPhone);
         if (parentUser.getOtp().equalsIgnoreCase(otp) && !parentUser.getExpireOTPDateTime().isBefore(Instant.now())) {
             parentUser.setActive(true);
             parentUser = save(parentUser);
-            currentUser.setParent(parentUser);
+            currentUser.setParent((Parent) parentUser);
             save(currentUser);
             return parentUser;
         } else {

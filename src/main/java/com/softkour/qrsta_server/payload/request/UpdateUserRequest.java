@@ -3,6 +3,7 @@ package com.softkour.qrsta_server.payload.request;
 import java.time.LocalDate;
 import org.springframework.validation.annotation.Validated;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,7 @@ public class UpdateUserRequest {
         if (getNationalId() != null)
             user.setNationalId(getNationalId());
         if (getOrganizationName() != null)
-            user.setOrganization(getOrganizationName());
+            ((Teacher) user).setOrganization(getOrganizationName());
         if (getBirthDate() != null)
             user.setDob(LocalDate.parse(getBirthDate()));
         return user;

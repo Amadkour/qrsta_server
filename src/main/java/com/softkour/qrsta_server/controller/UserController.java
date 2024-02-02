@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.firebase.auth.OidcProviderConfig.UpdateRequest;
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
@@ -70,14 +71,15 @@ public class UserController {
     public ResponseEntity<GenericResponse<Object>> verifyOtp(@RequestHeader("parent_otp") String otp,
             @RequestHeader("parent_phone_number") String parentPhone,
             @RequestHeader("parent_phone_number_code") String parentPhoneCode) {
-        userService.verifyParentUser(otp, parentPhone, MyUtils.getCurrentUserSession(userService));
+        userService.verifyParentUser(otp, parentPhone, (Student) MyUtils.getCurrentUserSession(userService));
         return GenericResponse.successWithMessageOnly("Yor parent created Successffly");
     }
 
     @GetMapping("get_children")
     public ResponseEntity<GenericResponse<List<AbstractChild>>> getChildren() {
         return GenericResponse
-                .success(userService.getChildren(userService).stream().map((e) -> e.toAbstractChild()).toList());
+                .success(userService.getChildren(userService).stream().map((e) -> ((Student) e).toAbstractChild())
+                        .toList());
     }
 
     @GetMapping("get_parent")
@@ -96,7 +98,7 @@ public class UserController {
     @GetMapping("add_child")
     public ResponseEntity<GenericResponse<Object>> addChild(@RequestHeader("child_id") Long childId) {
         return GenericResponse
-                .success(userService.addChild(userService, childId).toAbstractChild());
+                .success(((Student) userService.addChild(userService, childId)).toAbstractChild());
     }
 
 }

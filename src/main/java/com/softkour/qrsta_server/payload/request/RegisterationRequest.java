@@ -11,6 +11,9 @@ import org.springframework.validation.annotation.Validated;
 import com.softkour.qrsta_server.config.Constants;
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.Parent;
+import com.softkour.qrsta_server.entity.user.Student;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.service.OTPService;
 
@@ -67,7 +70,16 @@ public class RegisterationRequest {
     private String macAddress;
 
     public User toUser(OTPService otpService) {
-        User user = new User();
+        User user;
+
+        if (getUserType() == UserType.OBSERVER) {
+            user = new Parent();
+        } else if (getUserType() == UserType.TEACHER) {
+            user = new Teacher();
+            ((Teacher) user).setOrganization(getOrganizationName());
+        } else {
+            user = new Student();
+        }
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setName(getName());
         user.setCountryCode(getCountryCode());
@@ -77,8 +89,6 @@ public class RegisterationRequest {
         user.setPassword(new BCryptPasswordEncoder().encode(this.getPassword()));
         user.setOtp(otp.get());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
-        user.setType(getUserType());
-        user.setOrganization(getOrganizationName());
         user.setDob(LocalDate.parse(getBirthDate()));
         return user;
 

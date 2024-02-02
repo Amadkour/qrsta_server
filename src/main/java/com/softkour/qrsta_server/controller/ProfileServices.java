@@ -18,6 +18,7 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.RequstForm;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
@@ -39,7 +40,7 @@ public class ProfileServices {
     public ResponseEntity<GenericResponse<List<Map<String, Object>>>> getAllRequestes() {
         User u = MyUtils.getCurrentUserSession(authService);
         List<Course> courses = courseService.getAllDisableStudentsOfCourses(u.getId());
-        List<User> users = authService.getNeedToReplaceUsers(u.getId());
+        List<Student> users = authService.getNeedToReplaceUsers(u.getId()).stream().map(e -> (Student) e).toList();
 
         List<Map<String, Object>> map = new ArrayList<Map<String, Object>>();
         /// =====================[ course ]================///
@@ -56,7 +57,7 @@ public class ProfileServices {
             }
         }
         /// =====================[ device ]================///
-        for (User user : users) {
+        for (Student user : users) {
             Map<String, Object> item = new HashMap<String, Object>();
             item.put("type", "device");
             item.put("user_id", user.getId());

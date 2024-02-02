@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -32,7 +33,7 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public Course addStudentToCourse(User user, Long courseId) {
+    public Course addStudentToCourse(Student user, Long courseId) {
         if (user.getCourses().stream().anyMatch(e -> e.getCourse().getId().compareTo(courseId) == 0)) {
             throw new ClientException("course", "you are aready joined in this course: ".concat(courseId.toString()));
 
