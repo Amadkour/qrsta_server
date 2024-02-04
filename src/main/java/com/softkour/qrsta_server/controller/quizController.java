@@ -66,9 +66,14 @@ public class quizController {
 
     }
     @GetMapping("all")
-    public ResponseEntity<GenericResponse<Object>> allQuiz() {
-        return GenericResponse.success(quizService.findAll().stream().map(e -> e.toQuizModel()));
+    public ResponseEntity<GenericResponse<Object>> allQuiz(
+            @RequestHeader(required = false, name = "child_phone") String childPhone) {
+        return GenericResponse.success(quizService.findAll(childPhone).stream().map(e -> e.toQuizModel()));
+    }
 
+    @GetMapping("course_score")
+    public ResponseEntity<GenericResponse<Object>> courseScore() {
+        return GenericResponse.success(quizService.findAll(null).stream().map(e -> e.toQuizModel()));
     }
 
     @GetMapping("quiz_profile_for_teacher")

@@ -1,7 +1,10 @@
 package com.softkour.qrsta_server.controller;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
+import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
@@ -59,6 +63,22 @@ public class SessionController {
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
+    }
+
+    @GetMapping("student_session_attendance")
+    public ResponseEntity<GenericResponse<Object>> getStudentSessionAttendance(
+            @RequestHeader(name = "child_id") Long childId,
+            @RequestHeader(name = "course_id") Long courseId) {
+        Course course = courseService.findOne(courseId);
+        Set<Session> sessions = course.getSessions();
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("attendance", sessions.stream()
+                .map(s -> s.getStudents().stream()
+                        .anyMatch(b -> b.getId() == childId))
+                .toList());
+        map.put("date", sessions.stream().map(e -> e.getStartDate()).toList());
+        return GenericResponse.success(map);
+
     }
 
     @GetMapping("session_details")

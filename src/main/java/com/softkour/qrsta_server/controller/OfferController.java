@@ -52,17 +52,19 @@ public class OfferController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<GenericResponse<Object>> getTeacherOffers() {
+    public ResponseEntity<GenericResponse<Object>> getTeacherOffers(
+            @RequestHeader(required = false, name = "child_phone") String childPhone) {
 
-        return GenericResponse.success(offerService.userAvilableOffers()
+        return GenericResponse.success(offerService.userAvilableOffers(childPhone)
                 .stream().map((e) -> e.toOfferResponse()).toList());
 
     }
 
     @GetMapping("subscribed-offers")
-    public ResponseEntity<GenericResponse<Object>> getStudentSubscribedOffers() {
+    public ResponseEntity<GenericResponse<Object>> getStudentSubscribedOffers(
+            @RequestHeader(required = false, name = "child_phone") String childPhone) {
 
-        return GenericResponse.success(offerService.studentSubscribedeOffers()
+        return GenericResponse.success(offerService.studentSubscribedeOffers(childPhone)
                 .stream().map((e) -> e.toOfferResponse()).toList());
 
     }

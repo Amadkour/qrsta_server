@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -188,5 +189,29 @@ public class AuthService {
         return authorRepository.findById(userId)
                 .orElseThrow(
                         () -> new ClientException("student", "student not found id: ".concat(String.valueOf(userId))));
+    }
+
+    public double getUserScore(long userId, Long courseId) {
+        if (authorRepository.findById(userId).get().getQuizzes().isEmpty())
+            return 0.0;
+        else {
+            return authorRepository.getScoreByIdAndQuizzes_quiz_session_course_id(userId, courseId).getQuizzes()
+                    .stream()
+                    .mapToDouble(e -> e.getGrade()).sum();
+        }
+
+    }
+
+    public int getUserLatePayment(long userId, Long courseId) {
+        return authorRepository.getScoreByIdAndCourses_course_id(courseId, courseId).getCourses().iterator().next()
+                .getLate();
+    }
+
+    public List<Boolean> getUserAttendance(long userId, Long courseId) {
+        return authorRepository.getScoreByIdAndCourses_course_id(courseId, courseId).getCourses().iterator().next()
+                .getCourse().getSessions().stream()
+                .map(s -> s.getStudents().stream()
+                        .anyMatch(b -> b.getId() == userId))
+                .toList();
     }
 }

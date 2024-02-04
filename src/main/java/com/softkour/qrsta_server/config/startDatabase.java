@@ -51,7 +51,7 @@ public class startDatabase implements CommandLineRunner {
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
             if (2 == i)
-                user.setType(UserType.TEACHER);
+                user.setType(UserType.OBSERVER);
             else
                 user.setType(UserType.STUDENT);
 
@@ -64,7 +64,10 @@ public class startDatabase implements CommandLineRunner {
             user.setActive(true);
             user.setLogged(true);
             user = userRepository.save(user);
-
+            if (i >= 3) {
+                user.setParent(userRepository.findUserByPhoneNumber("1110672232"));
+                user = userRepository.save(user);
+            }
             /// =================course========================///
             Course course = new Course();
             course.setCost(10);

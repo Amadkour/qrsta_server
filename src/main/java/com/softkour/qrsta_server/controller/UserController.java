@@ -1,6 +1,10 @@
 package com.softkour.qrsta_server.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +101,16 @@ public class UserController {
     public ResponseEntity<GenericResponse<Object>> addChild(@RequestHeader("child_id") Long childId) {
         return GenericResponse
                 .success(userService.addChild(userService, childId).toAbstractChild());
+    }
+
+    @GetMapping("child_statistics")
+    public ResponseEntity<GenericResponse<Object>> getChildStatistics(@RequestHeader("child_id") Long childId,
+            @RequestHeader("course_id") Long courseId) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("attendance", userService.getUserAttendance(childId, courseId));
+        map.put("late", userService.getUserLatePayment(childId, courseId));
+        map.put("score", userService.getUserScore(childId, courseId));
+        return GenericResponse.success(map);
     }
 
 }

@@ -31,8 +31,13 @@ public class OfferService {
         return offerRepo.findById(offerId).orElseThrow(() -> new ClientException("offer", "not found this offer"));
     }
 
-    public List<Offer> userAvilableOffers() {
-        User u = MyUtils.getCurrentUserSession(authService);
+    public List<Offer> userAvilableOffers(String childPhone) {
+        User u;
+        if (childPhone != null) {
+            u = authService.getUserByPhoneNumber(childPhone);
+        } else {
+            u = MyUtils.getCurrentUserSession(authService);
+        }
         if (u.getType() == UserType.TEACHER) {
             return teacherAllOffers(u.getId());
         } else {
@@ -48,9 +53,13 @@ public class OfferService {
         return offerRepo.findBySoldoutAndCourses_students_id(false, studentId);
     }
 
-    public List<Offer> studentSubscribedeOffers() {
-        User u = MyUtils.getCurrentUserSession(authService);
-
+    public List<Offer> studentSubscribedeOffers(String childPhone) {
+        User u;
+        if (childPhone != null) {
+            u = authService.getUserByPhoneNumber(childPhone);
+        } else {
+            u = MyUtils.getCurrentUserSession(authService);
+        }
         return offerRepo.findBySoldoutAndStudents_id(false, u.getId());
     }
 

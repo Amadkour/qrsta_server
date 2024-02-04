@@ -65,8 +65,7 @@ public class Session extends AbstractAuditingEntity {
         }
 
         public Session addStudent(User student) {
-                this.students.add(student);
-                student.getSessions().add(this);
+                students.add(student);
                 return this;
         }
 

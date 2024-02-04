@@ -19,8 +19,6 @@ import com.softkour.qrsta_server.payload.response.AbstractChild;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
-import com.softkour.qrsta_server.payload.response.UserUpdateResponse;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -131,7 +129,6 @@ public class User extends AbstractAuditingEntity {
 
     public Set<Session> addSession(Session session) {
         sessions.add(session);
-        session.getStudents().add(this);
         return sessions;
     }
 
@@ -168,10 +165,6 @@ public class User extends AbstractAuditingEntity {
             if (dInstants.get(i).isBefore(this.getCreatedDate()))
                 firstIndex = i;
         }
-
-        // this.getQuizzes().stream()
-        // .filter(e -> e.getQuiz().getCourses().stream().anyMatch(c -> c.getId() ==
-        // courseId))
         return new StudntInSession(
                 this.getId(),
                 this.getName(),
@@ -182,8 +175,7 @@ public class User extends AbstractAuditingEntity {
                 isPresent,
                 studentCourse.getLate(),
                 studentCourse.isActive(),
-                studentQuizzes
-                        .reduce(0.0, (a, b) -> a + b.getGrade(), Double::sum),
+                studentQuizzes.mapToDouble(e -> e.getGrade()).sum(),
                 firstIndex + 1
 
         );

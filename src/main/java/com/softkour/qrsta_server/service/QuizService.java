@@ -73,8 +73,13 @@ public class QuizService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public List<Quiz> findAll() {
-        User u = MyUtils.getCurrentUserSession(authService);
+    public List<Quiz> findAll(String phone) {
+        User u;
+        if (phone != null) {
+            u = authService.getUserByPhoneNumber(phone);
+        } else {
+            u = MyUtils.getCurrentUserSession(authService);
+        }
         if (u.getType() == UserType.TEACHER) {
             quizRepository.findAllByCourses_course_teacher_id(u.getId());
         } else {

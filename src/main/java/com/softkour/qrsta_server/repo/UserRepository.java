@@ -19,4 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
    public boolean existsByPhoneNumber(String phone);
 
    public boolean existsByNationalId(String nationalId);
+
+   public User getScoreByIdAndQuizzes_quiz_session_course_id(Long userId, Long courseId);
+
+   public User getScoreByIdAndCourses_course_id(Long userId, Long courseId);
 }
