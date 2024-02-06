@@ -23,4 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
    public User getScoreByIdAndQuizzes_quiz_session_course_id(Long userId, Long courseId);
 
    public User getScoreByIdAndCourses_course_id(Long userId, Long courseId);
+
+   public List<User> getStudentByParent_password(String password);
+
+   public List<User> getStudentByCourses_course_teacher_id(Long teacherId);
+
 }

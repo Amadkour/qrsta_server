@@ -24,9 +24,11 @@ import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api/profile/")
-
+@Slf4j
 public class ProfileServices {
     @Autowired
     CourseService courseService;
@@ -104,10 +106,38 @@ public class ProfileServices {
     }
 
     @GetMapping("analysis")
-    public ResponseEntity<GenericResponse<List<StudentCourse>>> getAnalysis() {
+    public ResponseEntity<GenericResponse<Map>> getAnalysis() {
         User u = MyUtils.getCurrentUserSession(authService);
+        log.warn(u.getId() + "");
+        int allStudents = authService.getAllStudent(u.getId());
+        int missingParentStudents = authService.getMissedParents();
+        int misedPaymentStudents = studentCourseRepo
+                .getStudentByCourse_teacher_idAndLate(u.getId(), 1).size();
+        double actalPaymentStudents = studentCourseRepo
+                .getStudentByCourse_teacher_idAndLate(u.getId(), 0).stream()
+                .mapToDouble(e -> e.getCourse().getCost()).sum();
+        double expectedMounthlyProfit = studentCourseRepo
+                .getStudentByCourse_teacher_id(u.getId()).stream().mapToDouble(e -> e.getCourse().getCost())
+                .sum();
 
-        return GenericResponse.success(studentCourseRepo.findAllByCourse_teacher_idAndFinished(u.getId(), false));
+        Map<String, List<Object>> map = new HashMap<String, List<Object>>();
+        List<Object> keys = new ArrayList<Object>();
+        List<Object> values = new ArrayList<Object>();
+        keys.add("all_students");
+        keys.add("missing_parent");
+        keys.add("missing_payment");
+        keys.add("expected_monthly_income");
+        keys.add("actual_monthly_income");
+        /////////
+        values.add(allStudents);
+        values.add(missingParentStudents);
+        values.add(misedPaymentStudents);
+        values.add(expectedMounthlyProfit);
+        values.add(actalPaymentStudents);
+        map.put("keys", keys);
+        map.put("values", values);
+
+        return GenericResponse.success(map);
     }
 
 }

@@ -19,6 +19,7 @@ import com.softkour.qrsta_server.payload.response.AbstractChild;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.StudntInSession;
 import com.softkour.qrsta_server.payload.response.UserLoginResponse;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -121,7 +122,7 @@ public class User extends AbstractAuditingEntity {
         return sessions;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "student", cascade = CascadeType.ALL)
     private Set<StudentCourse> courses = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "student", cascade = CascadeType.ALL)

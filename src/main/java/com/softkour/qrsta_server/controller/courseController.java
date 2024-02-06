@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -145,25 +146,31 @@ public class courseController {
                         .toList());
 
     }
+
     @GetMapping("get_my_courses")
     public ResponseEntity<GenericResponse<Object>> getCourses() {
-            User user = MyUtils.getCurrentUserSession(authService);
-            if (user.getType() == UserType.TEACHER) {
-                List<Course> courseList = courseService.getCourses(user.getId());
-                return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
+        User user = MyUtils.getCurrentUserSession(authService);
+        if (user.getType() == UserType.TEACHER) {
+            List<Course> courseList = courseService.getCourses(user.getId());
+            return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
-            } else {
-                List<StudentCourse> courseList = user.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
-                return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
-
-            }
-        }
-
-        @GetMapping("get_child_courses")
-        public ResponseEntity<GenericResponse<Object>> getChildCourses(@RequestHeader("child_phone") String phone) {
-            User student = authService.getUserByPhoneNumber(phone);
-            List<StudentCourse> courseList = student.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
+        } else {
+            List<StudentCourse> courseList = user.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
             return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
+
+        }
+    }
+
+    @GetMapping("get_child_courses")
+    public ResponseEntity<GenericResponse<Object>> getChildCourses(@RequestHeader("child_phone") String phone) {
+        User student = authService.getUserByPhoneNumber(phone);
+        log.warn(student.getId() + "");
+        // List<StudentCourse> courseList =
+        // studentCourseRepository.findByStudent_idAndActive(student.getId(), true);
+
+        List<StudentCourse> courseList = student.getCourses().stream().takeWhile(e -> e.isActive())
+                .collect(Collectors.toList());
+        return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
     }
 
     @GetMapping("add_my_to_course")

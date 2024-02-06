@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -206,6 +205,23 @@ public class AuthService {
         return authorRepository.getScoreByIdAndCourses_course_id(courseId, courseId).getCourses().iterator().next()
                 .getLate();
     }
+
+    public int getMissedParents() {
+        return authorRepository.getStudentByParent_password(null).size();
+
+    }
+
+    public int getAllStudent(Long teacherId) {
+        return authorRepository.getStudentByCourses_course_teacher_id(teacherId).size();
+
+    }
+
+    // public int getMissedStudentsPayment(Long teacherId) {
+    // return
+    // authorRepository.getStudentByCourses_course_teacher_idAndCourses_lateGreterThan(teacherId,
+    // 1).size();
+    //
+    // }
 
     public List<Boolean> getUserAttendance(long userId, Long courseId) {
         return authorRepository.getScoreByIdAndCourses_course_id(courseId, courseId).getCourses().iterator().next()
