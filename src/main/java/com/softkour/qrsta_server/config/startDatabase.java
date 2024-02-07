@@ -51,7 +51,7 @@ public class startDatabase implements CommandLineRunner {
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
             if (2 == i)
-                user.setType(UserType.OBSERVER);
+                user.setType(UserType.TEACHER);
             else
                 user.setType(UserType.STUDENT);
 

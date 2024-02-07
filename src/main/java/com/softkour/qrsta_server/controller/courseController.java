@@ -31,6 +31,7 @@ import com.softkour.qrsta_server.payload.request.ScheduleRequest;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
+import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.PostService;
@@ -47,6 +48,8 @@ public class courseController {
 
     @Autowired
     CourseService courseService;
+    @Autowired
+    StudentCourseRepository studentCourseRepository;
     @Autowired
     ScheduleService scheduleService;
     @Autowired
@@ -155,7 +158,7 @@ public class courseController {
             return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
         } else {
-            List<StudentCourse> courseList = user.getCourses().stream().dropWhile(s -> !s.isActive()).toList();
+            List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActive(user.getId(), true);
             return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
         }
@@ -165,11 +168,7 @@ public class courseController {
     public ResponseEntity<GenericResponse<Object>> getChildCourses(@RequestHeader("child_phone") String phone) {
         User student = authService.getUserByPhoneNumber(phone);
         log.warn(student.getId() + "");
-        // List<StudentCourse> courseList =
-        // studentCourseRepository.findByStudent_idAndActive(student.getId(), true);
-
-        List<StudentCourse> courseList = student.getCourses().stream().takeWhile(e -> e.isActive())
-                .collect(Collectors.toList());
+        List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActive(student.getId(), true);
         return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
     }
 
