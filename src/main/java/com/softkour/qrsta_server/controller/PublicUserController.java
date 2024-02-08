@@ -21,10 +21,20 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.LoginRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
+import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.OTPService;
-
+import com.twilio.Twilio;
+import com.twilio.rest.verify.v2.service.Verification;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.MessageCreator;
+import com.twilio.rest.pricing.v1.messaging.CountryReader;
+import com.twilio.type.PhoneNumber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,15 +47,17 @@ public class PublicUserController {
     @Autowired
     UserRepository userRepository;
     @Autowired
+    CountryRepo countryRepo;
+    @Autowired
     AuthService authService;
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
     OTPService otpService;
 
-    @GetMapping("dummy")
+    @GetMapping("country")
     public ResponseEntity<GenericResponse<Object>> dummy() {
-        return GenericResponse.successWithMessageOnly("dddd");
+        return GenericResponse.success(countryRepo.findAll().stream().map(e -> e.toCountryResponce()).toList());
     }
 
     @PostMapping("login")
@@ -62,6 +74,17 @@ public class PublicUserController {
         User u = authService.register(registerationRequest);
 
         Map<String, Object> responseMap = new HashMap<>();
+
+        Twilio.init("ACbe5e5fed0c2829d18a709fd66de88ae9", "02e35f1788f444a866d56a2b13e3c008");
+
+        PhoneNumber to = new PhoneNumber("+" + u.getCountryCode() + u.getPhoneNumber());
+        PhoneNumber from = new PhoneNumber("+16593335662");
+        String message = u.getOtp();
+        MessageCreator creator = Message.creator(to, from, message);
+        creator.create();
+
+        System.out.println(u.getCountryCode() + u.getPhoneNumber());
+
         responseMap.put("otp", u.getOtp());
         return GenericResponse.success(responseMap);
 

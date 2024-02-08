@@ -17,8 +17,10 @@ import com.softkour.qrsta_server.entity.course.Schedule;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.public_entity.Country;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.CourseService;
@@ -34,6 +36,8 @@ public class startDatabase implements CommandLineRunner {
     @Autowired
     UserRepository userRepository;
     @Autowired
+    CountryRepo countryRepo;
+    @Autowired
     CourseService courseService;
     @Autowired
     SessionService sessionService;
@@ -46,19 +50,46 @@ public class startDatabase implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        /// =======country==============///
+        Country eg = new Country();
+        eg.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg");
+        eg.setName("egypt");
+        eg.setSidMax("14");
+        eg.setSidMin("14");
+        eg.setPhoneLength("10");
+        eg.setPhoneCode("+20");
+
+        Country saudi = new Country();
+        saudi.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg");
+        saudi.setName("saudi");
+        eg.setSidMax("10");
+        eg.setSidMin("10");
+        eg.setPhoneLength("8");
+        eg.setPhoneCode("966");
+        Country emirate = new Country();
+        emirate.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg");
+        emirate.setName("emirate");
+        eg.setSidMax("10");
+        eg.setSidMin("10");
+        eg.setPhoneLength("10");
+        eg.setPhoneCode("097");
+
+        countryRepo.save(eg);
+        countryRepo.save(emirate);
+        countryRepo.save(saudi);
         for (int i = 2; i < 5; i++) {
 
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
             if (2 == i)
-                user.setType(UserType.TEACHER);
+                user.setType(UserType.OBSERVER);
             else
                 user.setType(UserType.STUDENT);
 
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
             user.setDob(LocalDate.now());
-            user.setPhoneNumber("111067223".concat(String.valueOf(i)));
+            user.setPhoneNumber("111067222".concat(String.valueOf(i)));
             user.setCountryCode("20");
             user.setRegisterMacAddress("aaaa");
             user.setActive(true);
