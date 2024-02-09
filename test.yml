@@ -1,7 +1,7 @@
 config:
   # This is a test server run by team Artillery
   # It's designed to be highly scalable
-  target: http://asciiart.artillery.io:8080
+  target: https://383b-156-203-158-39.ngrok-free.app
   phases:
     - duration: 60
       arrivalRate: 1
@@ -24,16 +24,12 @@ config:
   apdex:
     threshold: 100
   ensure:
-      thresholds:
-        - http.response_time.p99: 100
-        - http.response_time.p95: 75
+    thresholds:
+      - http.response_time.p99: 100
+      - http.response_time.p95: 75
 scenarios:
   - flow:
       - loop:
-        - get:
-            url: "/dino"
-        - get:
-            url: "/pony"
-        - get:
-            url: "/armadillo"
+          - get:
+              url: "/api/auth/country"
         count: 100
