@@ -57,22 +57,24 @@ public class startDatabase implements CommandLineRunner {
         eg.setSidMax("14");
         eg.setSidMin("14");
         eg.setPhoneLength("10");
+        eg.setPhoneStart("3|2");
         eg.setPhoneCode("+20");
 
         Country saudi = new Country();
         saudi.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg");
         saudi.setName("saudi");
-        eg.setSidMax("10");
-        eg.setSidMin("10");
-        eg.setPhoneLength("8");
-        eg.setPhoneCode("966");
+        saudi.setSidMax("10");
+        saudi.setSidMin("10");
+        saudi.setPhoneStart("3|2");
+        saudi.setPhoneLength("8");
+        saudi.setPhoneCode("+966");
         Country emirate = new Country();
         emirate.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg");
         emirate.setName("emirate");
-        eg.setSidMax("10");
-        eg.setSidMin("10");
-        eg.setPhoneLength("10");
-        eg.setPhoneCode("097");
+        emirate.setSidMax("10");
+        emirate.setSidMin("10");
+        emirate.setPhoneLength("8");
+        emirate.setPhoneCode("+097");
 
         countryRepo.save(eg);
         countryRepo.save(emirate);
@@ -82,21 +84,21 @@ public class startDatabase implements CommandLineRunner {
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
             if (2 == i)
-                user.setType(UserType.OBSERVER);
+                user.setType(UserType.TEACHER);
             else
                 user.setType(UserType.STUDENT);
 
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
             user.setDob(LocalDate.now());
-            user.setPhoneNumber("111067222".concat(String.valueOf(i)));
-            user.setCountryCode("20");
+            user.setPhoneNumber("+20111067222".concat(String.valueOf(i)));
+            user.setCountryCode("+20");
             user.setRegisterMacAddress("aaaa");
             user.setActive(true);
             user.setLogged(true);
             user = userRepository.save(user);
             if (i >= 3) {
-                user.setParent(userRepository.findUserByPhoneNumber("1110672232"));
+                user.setParent(userRepository.findUserByPhoneNumber("+201110672222"));
                 user = userRepository.save(user);
             }
             /// =================course========================///

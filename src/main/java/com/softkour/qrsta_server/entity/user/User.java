@@ -58,7 +58,7 @@ public class User extends AbstractAuditingEntity {
 
     @NotNull
     @Column(nullable = false, unique = true)
-    @Size(max = 10, min = 7)
+    @Size(max = 14, min = 10)
     private String phoneNumber;
 
     @Column(nullable = true, unique = true)

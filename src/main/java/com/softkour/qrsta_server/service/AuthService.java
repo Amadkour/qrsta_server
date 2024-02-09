@@ -26,6 +26,10 @@ import com.softkour.qrsta_server.payload.response.UserLoginResponse;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.security.JwtTokenUtil;
 import com.softkour.qrsta_server.security.JwtUserDetailsService;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.MessageCreator;
+import com.twilio.type.PhoneNumber;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +48,7 @@ public class AuthService {
     OTPService otpService;
 
     public User register(RegisterationRequest request) {
-        if (authorRepository.existsByPhoneNumber(request.getPhone())) {
+        if (authorRepository.existsByPhoneNumberAndIsActive(request.getPhone(), false)) {
             throw new ClientException("phone_number", "phone number already exists");
         } else if (authorRepository.existsByNationalId(request.getNationalId())) {
             throw new ClientException("national_id", "national_id number already exists");
@@ -88,7 +92,7 @@ public class AuthService {
     public String createParent(ParentRegisterRequest request) {
         /// link
         if (request.getNationalId() == null) {
-            if (!authorRepository.existsByPhoneNumber(request.getPhone())) {
+            if (!authorRepository.existsByPhoneNumberAndIsActive(request.getPhone(), true)) {
                 throw new ClientException("phone_number", "phone number are invaild");
             } else {
                 User u = authorRepository.findUserByPhoneNumber(request.getPhone());
@@ -103,7 +107,7 @@ public class AuthService {
             }
         } else {
             /// create
-            if (authorRepository.existsByPhoneNumber(request.getPhone())) {
+            if (authorRepository.existsByPhoneNumberAndIsActive(request.getPhone(), true)) {
                 throw new ClientException("phone_number", "phone number already exists");
             }
             User user = authorRepository.save(request.toUser(otpService));
@@ -164,9 +168,8 @@ public class AuthService {
         return authorRepository.save(u);
     }
 
-    public User addChild(AuthService authService, Long childId) {
-        User child = authorRepository.findById(childId)
-                .orElseThrow(() -> new ClientException("user", "child_not_found"));
+    public User addChild(AuthService authService, String childId) {
+        User child = authorRepository.findUserByPhoneNumber(childId);
         child.setParent(MyUtils.getCurrentUserSession(authService));
         return authorRepository.save(child);
     }
@@ -216,6 +219,21 @@ public class AuthService {
 
     }
 
+    public boolean sendMessageToPhone(String phone, String message) {
+
+        try {
+            Twilio.init("ACbe5e5fed0c2829d18a709fd66de88ae9", "02e35f1788f444a866d56a2b13e3c008");
+
+            PhoneNumber to = new PhoneNumber(phone);
+            PhoneNumber from = new PhoneNumber("+16593335662");
+            MessageCreator creator = Message.creator(to, from, message);
+            creator.create();
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
     // public int getMissedStudentsPayment(Long teacherId) {
     // return
     // authorRepository.getStudentByCourses_course_teacher_idAndCourses_lateGreterThan(teacherId,

@@ -19,6 +19,7 @@ public class Country extends AbstractAuditingEntity {
     private String sidMin;
     private String phoneLength;
     private String phoneStart;
+    private String sidStart;
 
     public CountryResponce toCountryResponce() {
         return new CountryResponce(
@@ -28,7 +29,8 @@ public class Country extends AbstractAuditingEntity {
                 getSidMax(),
                 getSidMin(),
                 getPhoneLength(),
-                getPhoneStart());
+                getPhoneStart(),
+                getSidStart());
     }
 
 }

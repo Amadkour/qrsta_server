@@ -63,6 +63,12 @@ public class UserController {
         return GenericResponse.successWithMessageOnly("logout successfully");
     }
 
+    @GetMapping("notifications")
+    public ResponseEntity<GenericResponse<Object>> notifications() {
+        User user = MyUtils.getCurrentUserSession(userService);
+        return GenericResponse.success(new ArrayList());
+    }
+
     @PostMapping("/parent_register")
     public ResponseEntity<GenericResponse<Object>> createParent(
             @RequestBody @Valid ParentRegisterRequest parentRegisterRequest) {
@@ -98,7 +104,7 @@ public class UserController {
     }
 
     @GetMapping("add_child")
-    public ResponseEntity<GenericResponse<Object>> addChild(@RequestHeader("child_id") Long childId) {
+    public ResponseEntity<GenericResponse<Object>> addChild(@RequestHeader("child_id") String childId) {
         return GenericResponse
                 .success(userService.addChild(userService, childId).toAbstractChild());
     }

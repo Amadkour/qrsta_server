@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
    public List<User> findAllChildrenByParent_id(Long parentId);
 
-   public boolean existsByPhoneNumber(String phone);
+   public boolean existsByPhoneNumberAndIsActive(String phone, boolean active);
 
    public boolean existsByNationalId(String nationalId);
 

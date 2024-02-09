@@ -50,7 +50,7 @@ public class RegisterationRequest {
     private String birthDate;
 
     @NotBlank
-    @Size(min = 7, max = 10)
+    @Size(max = 14, min = 10)
     @Unique()
     // @Pattern(regexp = Constants.PHONE_REGEX, message = "must be as 01XXXXXXXXX")
     private String phone;
