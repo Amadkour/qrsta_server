@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -133,7 +134,9 @@ public class AuthService {
             User user = authorRepository.findById((Long.parseLong(acceptRequest.getId())))
                     .orElseThrow(() -> new ClientException("switch_device", "user not fount: " + acceptRequest
                             .getId()));
-            user.setNeedToReplace(false);
+            Student s = user.getStudent();
+            s.setNeedToReplace(false);
+            user.setStudent(s);
             authorRepository.save(user);
         }
         return "cancle request successfully";
@@ -145,7 +148,7 @@ public class AuthService {
     }
 
     public List<User> getNeedToReplaceUsers(Long teacherId) {
-        return authorRepository.findAllUserByNeedToReplaceAndCourses_course_teacherId(false, teacherId);
+        return authorRepository.findAllUserByStudent_needToReplaceAndCourses_course_teacherId(false, teacherId);
     }
 
     public User save(User user) {
@@ -153,13 +156,16 @@ public class AuthService {
     }
 
     public List<User> getChildren(AuthService authService) {
-        return authorRepository.findAllChildrenByParent_id(
+        return authorRepository.findAllChildrenByStudent_parent_id(
                 MyUtils.getCurrentUserSession(authService).getId());
     }
 
     public User getParent(AuthService authService) {
-        log.warn("my phone is:" + MyUtils.getCurrentUserSession(authService).getPhoneNumber());
-        return MyUtils.getCurrentUserSession(authService).getParent();
+        User u = MyUtils.getCurrentUserSession(authService);
+        if (u.getStudent() == null) {
+            throw new ClientException("parent", "this instance not a student");
+        }
+        return u.getStudent().getParent();
     }
 
     public User deleteChild(Long childId) {
@@ -170,7 +176,11 @@ public class AuthService {
 
     public User addChild(AuthService authService, String childId) {
         User child = authorRepository.findUserByPhoneNumber(childId);
-        child.setParent(MyUtils.getCurrentUserSession(authService));
+        if (child.getStudent() == null)
+            throw new ClientException("parent", "this instance not a student");
+        Student s = child.getStudent();
+        s.setParent(MyUtils.getCurrentUserSession(authService));
+        child.setStudent(s);
         return authorRepository.save(child);
     }
 
@@ -179,7 +189,11 @@ public class AuthService {
         if (parentUser.getOtp().equalsIgnoreCase(otp) && !parentUser.getExpireOTPDateTime().isBefore(Instant.now())) {
             parentUser.setActive(true);
             parentUser = save(parentUser);
-            currentUser.setParent(parentUser);
+            if (currentUser.getStudent() == null)
+                throw new ClientException("parent", "this instance not a student");
+            Student s = currentUser.getStudent();
+            s.setParent(parentUser);
+            currentUser.setStudent(s);
             save(currentUser);
             return parentUser;
         } else {
@@ -210,7 +224,7 @@ public class AuthService {
     }
 
     public int getMissedParents() {
-        return authorRepository.getStudentByParent_password(null).size();
+        return authorRepository.getStudentByStudent_parent_password(null).size();
 
     }
 
@@ -222,15 +236,16 @@ public class AuthService {
     public boolean sendMessageToPhone(String phone, String message) {
 
         try {
-            Twilio.init("ACbe5e5fed0c2829d18a709fd66de88ae9", "02e35f1788f444a866d56a2b13e3c008");
+            Twilio.init("ACbe5e5fed0c2829d18a709fd66de88ae9", "ffdfada27c184f64898ac59dfd1236af");
 
             PhoneNumber to = new PhoneNumber(phone);
-            PhoneNumber from = new PhoneNumber("+16593335662");
+            PhoneNumber from = new PhoneNumber("QRSTA");
             MessageCreator creator = Message.creator(to, from, message);
             creator.create();
             return true;
 
         } catch (Exception e) {
+            log.warn(e.toString());
             return false;
         }
     }

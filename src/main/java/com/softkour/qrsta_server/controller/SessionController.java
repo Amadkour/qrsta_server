@@ -92,14 +92,11 @@ public class SessionController {
     @GetMapping("take_attendance")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "session_id") Long sessionId) {
-
-        try {
             User u = MyUtils.getCurrentUserSession(authService);
-            sessionService.addStudentToSession(u, sessionId);
-            return GenericResponse.successWithMessageOnly("take you successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+            ;
+            return GenericResponse.success(
+                    sessionService.addStudentToSession(u, sessionId).toSessionDateAndStudentGradeWithAttendance(true));
+
     }
 
     @GetMapping("add_student_to_attendance")

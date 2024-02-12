@@ -82,7 +82,7 @@ public class PublicUserController {
                     .successWithMessageOnly("send code successfullyto " + u.getPhoneNumber());
         else
             return GenericResponse.errorWithMessageOnly(
-                    "faild to send otp to your phoneto " + u.getPhoneNumber());
+                    "faild to send otp to your phone " + u.getPhoneNumber());
     }
     @PostMapping("verfy_otp")
     public ResponseEntity<GenericResponse<Object>> verifyOtp(@Valid @RequestHeader("user_otp") String otp,

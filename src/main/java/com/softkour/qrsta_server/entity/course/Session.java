@@ -84,7 +84,21 @@ public class Session extends AbstractAuditingEntity {
                                 this.getEndDate(), this.getId(),
                                 this.getStudents().size(),
                                 this.getCourse().getStudents().size(),
-                                grade);
+                                grade,
+                                false);
+        }
+
+        public SessionDateAndStudentGrade toSessionDateAndStudentGradeWithAttendance(Boolean attendance) {
+                double grade = this.getQuizzes().stream().reduce((first, second) -> second)
+                                .orElse(new SessionQuiz(null)).getStudents()
+                                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
+                return new SessionDateAndStudentGrade(
+                                this.getStartDate(),
+                                this.getEndDate(), this.getId(),
+                                this.getStudents().size(),
+                                this.getCourse().getStudents().size(),
+                                grade,
+                                attendance == null ? false : attendance);
         }
 
         public SessionDetailsStudent toSessionDetailsStudent() {

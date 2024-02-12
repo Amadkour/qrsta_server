@@ -18,7 +18,9 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.RequstForm;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
@@ -74,9 +76,22 @@ public class ProfileServices {
     @GetMapping("request_to_change_device")
     public ResponseEntity<GenericResponse<Object>> requestToChangeDevice() {
         User u = MyUtils.getCurrentUserSession(authService);
-        u.setNeedToReplace(true);
-        authService.save(u);
-        return GenericResponse.successWithMessageOnly("request send to your teachers successfully");
+        if (u.getStudent() == null)
+            throw new ClientException("parent", "this instance not a student");
+        if (u.getCourses().stream().allMatch(e -> e.getCourse().getTeacher().getTeacher().isEnableAutoChangeDevice())) {
+            u.setRegisterMacAddress(u.getLoginMacAddress());
+            authService.save(u);
+            return GenericResponse.successWithMessageOnly("update your device successfully");
+
+        } else {
+            Student s = u.getStudent();
+            s.setNeedToReplace(true);
+            u.setStudent(s);
+            authService.save(u);
+            return GenericResponse.successWithMessageOnly("request send to your teachers successfully");
+
+        }
+
     }
 
     @PostMapping("accept")

@@ -16,5 +16,6 @@ public class SessionDateAndStudentGrade {
     private int absence_count;
     private int expected_count;
     private double grade;
+    private boolean isAttendance;
 
 }

@@ -32,8 +32,6 @@ public class UpdateUserRequest {
             user.setAddress(getAddress());
         if (getNationalId() != null)
             user.setNationalId(getNationalId());
-        if (getOrganizationName() != null)
-            user.setOrganization(getOrganizationName());
         if (getBirthDate() != null)
             user.setDob(LocalDate.parse(getBirthDate()));
         return user;

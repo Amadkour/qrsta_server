@@ -175,26 +175,18 @@ public class courseController {
     @GetMapping("add_my_to_course")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "course_id") Long courseId) {
-        try {
             User u = MyUtils.getCurrentUserSession(authService);
             courseService.addStudentToCourse(u, courseId);
             return GenericResponse.successWithMessageOnly("add you successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
     }
 
     @GetMapping("add_student_to_course")
     public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(
             @RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "student_id") Long userId) {
-
-        try {
             User u = authService.getUserById(userId);
             courseService.addStudentToCourse(u, courseId);
             return GenericResponse.success("add student to course successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+
     }
 
     @GetMapping("remove_student_from_course")

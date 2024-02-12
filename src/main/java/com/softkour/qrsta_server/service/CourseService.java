@@ -44,7 +44,7 @@ public class CourseService {
         student.setCourse(course);
         student.setStudent(user);
         student.setLate(0);
-        if (course.getType() == CourseType.PRIVATE) {
+        if (course.getType() == CourseType.PRIVATE && course.getTeacher().getTeacher().isEnableAutojoin() == false) {
             student.setActive(false);
         } else {
             student.setActive(true);
