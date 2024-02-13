@@ -38,11 +38,11 @@ services:
     image: 'redis'
     ports:
       - "6379:6379"
-#  java-service:
-#    build: .
-#    links:
-#      - redis-server
-#      - mongodb
-#      - postgres-db
-#    ports:
-#      - "8081:8081"
+  # springboot-docker-compose-app-container:
+  #   depends_on:
+  #   - redis-server
+  #   - mongodb
+  #   - postgres-db
+  #   build: ./
+  #   ports:
+  #     - "8081:8081"

@@ -39,6 +39,9 @@ public class Quiz extends AbstractAuditingEntity {
     private String questionsPerStudent;
 
     @Column()
+    private String code;
+
+    @Column()
     private String timePerMinutes;
 
     @Enumerated(EnumType.STRING)
@@ -101,6 +104,7 @@ public class Quiz extends AbstractAuditingEntity {
                 getCourses().stream().mapToInt(e -> e.getCourse().getStudents().size()).sum());
         quizResponce.setType(getType());
         quizResponce.setTimePerMinutes(getTimePerMinutes());
+        quizResponce.setCode(getCode());
         return quizResponce;
 
     }

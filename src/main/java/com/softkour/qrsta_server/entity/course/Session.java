@@ -6,13 +6,13 @@ import java.util.Set;
 import java.util.stream.DoubleStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudents;
+import com.softkour.qrsta_server.payload.response.SessionNameAndId;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 
 import jakarta.persistence.Column;
@@ -48,6 +48,8 @@ public class Session extends AbstractAuditingEntity {
         private Instant startDate;
 
         @Column()
+        private String label;
+        @Column()
         private Instant endDate;
 
         @ManyToOne(fetch = FetchType.LAZY)
@@ -55,10 +57,8 @@ public class Session extends AbstractAuditingEntity {
         private Course course;
 
         public void setStudents(Set<User> students) {
-                if (this.students != null) {
-                        this.students.forEach(i -> i.removeSession(this));
-                }
                 if (students != null) {
+                        students.forEach(i -> i.removeSession(this));
                         students.forEach(i -> i.addSession(this));
                 }
                 this.students = students;
@@ -70,44 +70,48 @@ public class Session extends AbstractAuditingEntity {
         }
 
         public Session removeStudent(User employee) {
-                this.students.remove(employee);
+                students.remove(employee);
                 employee.getSessions().remove(this);
                 return this;
         }
 
-        public SessionDateAndStudentGrade toSessionDateAndStudentGrade() {
-                double grade = this.getQuizzes().stream().reduce((first, second) -> second)
+        public SessionDateAndStudentGrade toSessionDateAndStudentGrade(Long studentId) {
+                double grade = getQuizzes().stream().reduce((first, second) -> second)
                                 .orElse(new SessionQuiz(null)).getStudents()
                                 .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
                 return new SessionDateAndStudentGrade(
-                                this.getStartDate(),
-                                this.getEndDate(), this.getId(),
-                                this.getStudents().size(),
-                                this.getCourse().getStudents().size(),
+                                getStartDate(),
+                                getEndDate(), getId(), getLabel(),
+                                getStudents().size(),
+                                getCourse().getStudents().size(),
                                 grade,
-                                false);
+                                getStudents().stream().anyMatch(e -> e.getId() == studentId));
         }
 
         public SessionDateAndStudentGrade toSessionDateAndStudentGradeWithAttendance(Boolean attendance) {
-                double grade = this.getQuizzes().stream().reduce((first, second) -> second)
+                double grade = getQuizzes().stream().reduce((first, second) -> second)
                                 .orElse(new SessionQuiz(null)).getStudents()
                                 .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
                 return new SessionDateAndStudentGrade(
-                                this.getStartDate(),
-                                this.getEndDate(), this.getId(),
-                                this.getStudents().size(),
-                                this.getCourse().getStudents().size(),
+                                getStartDate(),
+                                getEndDate(), getId(), getLabel(),
+                                getStudents().size(),
+                                getCourse().getStudents().size(),
                                 grade,
                                 attendance == null ? false : attendance);
         }
 
+        public SessionNameAndId toSessionNameAndId() {
+                return new SessionNameAndId(getId(), getLabel());
+        }
+
         public SessionDetailsStudent toSessionDetailsStudent() {
 
-                Set<Session> sessions = this.getCourse().getSessions();
-                // this.getStudents().stream().anyMatch(m -> m.getId() ==
+                Set<Session> sessions = getCourse().getSessions();
+                // getStudents().stream().anyMatch(m -> m.getId() ==
                 // e.getStudent().getId())
                 return new SessionDetailsStudent(
-                                this.getCourse().getStudents().stream()
+                                getCourse().getStudents().stream()
                                                 .map((e) -> e.getStudent().toStudntInSession(
                                                                 /// attendance
                                                                 sessions.stream()
@@ -117,11 +121,11 @@ public class Session extends AbstractAuditingEntity {
                                                                                                                 .getId()))
                                                                                 .toList(),
                                                                 /// isPresent in this Session?
-                                                                this.getStudents().stream()
+                                                                getStudents().stream()
                                                                                 .anyMatch(m -> m.getId() == e
                                                                                                 .getStudent().getId()),
                                                                 /// course
-                                                                this.getCourse().getId()))
+                                                                getCourse().getId()))
                                                 .toList());
 
         }
@@ -129,7 +133,7 @@ public class Session extends AbstractAuditingEntity {
         public SessionDetailsWithoutStudents toSessionDetailsWithoutStudents() {
 
                 return new SessionDetailsWithoutStudents(
-                                this.getObjects().stream()
+                                getObjects().stream()
                                                 .map((e) -> new SessionObjectResponse(e.getTitle(),
                                                                 e.getSubItems().stream()
                                                                                 .map((s) -> new SessionObjectResponse(

@@ -13,6 +13,7 @@ public class SessionDateAndStudentGrade {
     private Instant startDate;
     private Instant endDate;
     private long sessionId;
+    private String label;
     private int absence_count;
     private int expected_count;
     private double grade;

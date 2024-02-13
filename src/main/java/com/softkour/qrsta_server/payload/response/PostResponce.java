@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.softkour.qrsta_server.entity.enumeration.CourseType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,10 +16,10 @@ import lombok.Setter;
 public class PostResponce {
     String id;
     String data;
-    SessionDateAndStudentGrade session;
+    SessionNameAndId session;
     long courseId;
     AbstractUser owner;
-    SessionDateAndStudentGrade linkedSession;
+    SessionNameAndId linkedSession;
     Set<String> media = new HashSet<>();
     int likesCount = 0;
     int dislikesCount = 0;
@@ -25,5 +27,6 @@ public class PostResponce {
     List<PostResponce> comments = new ArrayList<>();
     boolean isLiked;
     boolean isDislike;
+    CourseType type;
 
 }

@@ -22,6 +22,8 @@ public class CourseCreationRequest {
     @NotBlank
     private double cost;
     @NotBlank
+    private boolean payment;
+    @NotBlank
     private CourseType courseType;
     @NotBlank
     List<ScheduleRequest> schedules;

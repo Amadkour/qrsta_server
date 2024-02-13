@@ -2,7 +2,6 @@ package com.softkour.qrsta_server.controller;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,17 +20,13 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.SessionObject;
-import com.softkour.qrsta_server.entity.post.Post;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
-import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
-import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
-import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionObjectService;
 import com.softkour.qrsta_server.service.SessionService;
 
@@ -146,13 +141,24 @@ public class SessionController {
         try {
             Session session = new Session();
             Course course = courseService.findOne(sessionCreationRequest.getCourseId());
+            session.setLabel("session" + sessionService.findSessionsOfCourse(course.getId()).size());
             session.setCourse(course);
             session.setStartDate(Instant.parse(sessionCreationRequest.getFromDate()));
             session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()));
             session = sessionService.save(session);
-            return GenericResponse.success(session.toSessionDateAndStudentGrade());
+            return GenericResponse.success(session.toSessionDateAndStudentGrade(-1L));
         } catch (Exception e) {
             return GenericResponse.errorOfException(e);
         }
+    }
+
+    @GetMapping("future_course_sessions")
+    public ResponseEntity<GenericResponse<Object>> getFutureCourseSessions(
+            @RequestHeader(name = "course_id") Long courseId) {
+        return GenericResponse.success(
+                sessionService.findFutureSessionsOfCourse(courseId, Instant.now()).stream()
+                        .map((e) -> e.toSessionNameAndId())
+                        .toList());
+
     }
 }

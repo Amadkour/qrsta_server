@@ -110,6 +110,7 @@ public class startDatabase implements CommandLineRunner {
             /// =================course========================///
             Course course = new Course();
             course.setCost(10);
+            course.setUseOnlinePayment(true);
             course.setName("course".concat(String.valueOf(i)));
             course.setTeacher(user);
             course.setType(CourseType.PUBLIC);
@@ -141,6 +142,7 @@ public class startDatabase implements CommandLineRunner {
             course = courseService.save(course);
             // ===================session=====================//
             Session session = new Session();
+            session.setLabel("session" + sessionService.findSessionsOfCourse(course.getId()).size());
             session.setCourse(course);
             session.setStartDate(Instant.now());
             session.setEndDate(Instant.now().plusSeconds(5));

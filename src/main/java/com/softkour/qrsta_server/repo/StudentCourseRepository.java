@@ -20,6 +20,8 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, Lo
 
     public List<StudentCourse> getStudentByCourse_teacher_idAndLate(Long teacherId, int late);
 
+    public List<StudentCourse> getStudentByCourse_teacher_idAndLateGreaterThan(Long teacherId, int late);
+
     public List<StudentCourse> getStudentByCourse_teacher_id(Long teacherId);
 
 }

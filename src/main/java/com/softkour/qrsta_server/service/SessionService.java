@@ -1,7 +1,9 @@
 package com.softkour.qrsta_server.service;
 
+import java.time.Instant;
 import java.util.List;
 
+import org.apache.logging.log4j.CloseableThreadContext.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,11 @@ public class SessionService {
     @Transactional(readOnly = true)
     public List<Session> findSessionsOfCourse(Long courseId) {
         return sessionRepository.findAllByCourse_Id(courseId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Session> findFutureSessionsOfCourse(Long courseId, Instant date) {
+        return sessionRepository.findAllByCourse_IdAndStartDateAfter(courseId, date);
     }
 
     // @Transactional(readOnly = true)

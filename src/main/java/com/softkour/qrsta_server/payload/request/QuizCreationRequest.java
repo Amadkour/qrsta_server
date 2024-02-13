@@ -14,6 +14,7 @@ import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.service.CourseService;
+import com.softkour.qrsta_server.service.OTPService;
 import com.softkour.qrsta_server.service.OptionService;
 import com.softkour.qrsta_server.service.QuestionService;
 import com.softkour.qrsta_server.service.QuizService;
@@ -41,11 +42,12 @@ public class QuizCreationRequest {
 
     public Quiz toQuiz(QuizService quizService, CourseService courseService, SessionService sessionService,
             OptionService optionService,
-            QuestionService questionService) {
+            QuestionService questionService, OTPService otpService) {
 
         Quiz quiz;
         if (getId() == null) {
             quiz = new Quiz();
+            quiz.setCode(otpService.createRandomOneTimeOTP().get());
         } else {
             quiz = quizService.findById(getId());
         }

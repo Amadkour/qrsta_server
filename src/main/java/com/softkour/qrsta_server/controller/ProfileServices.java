@@ -127,7 +127,7 @@ public class ProfileServices {
         int allStudents = authService.getAllStudent(u.getId());
         int missingParentStudents = authService.getMissedParents();
         int misedPaymentStudents = studentCourseRepo
-                .getStudentByCourse_teacher_idAndLate(u.getId(), 1).size();
+                .getStudentByCourse_teacher_idAndLateGreaterThan(u.getId(), 0).size();
         double actalPaymentStudents = studentCourseRepo
                 .getStudentByCourse_teacher_idAndLate(u.getId(), 0).stream()
                 .mapToDouble(e -> e.getCourse().getCost()).sum();
@@ -140,15 +140,15 @@ public class ProfileServices {
         List<Object> values = new ArrayList<Object>();
         keys.add("all_students");
         keys.add("missing_parent");
-        keys.add("missing_payment");
+        keys.add("missing_payment_student");
         keys.add("expected_monthly_income");
         keys.add("actual_monthly_income");
         /////////
-        values.add(allStudents);
-        values.add(missingParentStudents);
-        values.add(misedPaymentStudents);
-        values.add(expectedMounthlyProfit);
-        values.add(actalPaymentStudents);
+        values.add(allStudents + "");
+        values.add(missingParentStudents + "");
+        values.add(misedPaymentStudents + "");
+        values.add(expectedMounthlyProfit + "");
+        values.add(actalPaymentStudents + "");
         map.put("keys", keys);
         map.put("values", values);
 
