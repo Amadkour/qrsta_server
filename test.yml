@@ -1,39 +1,17 @@
 config:
   # This is a test server run by team Artillery
   # It's designed to be highly scalable
-  target: http://asciiart.artillery.io:8080
+  target: http://localhost:8081
   phases:
-    - duration: 60
-      arrivalRate: 1
-      rampTo: 5
+    - duration: 3
+      arrivalRate: 1000
+      rampTo: 1000
       name: Warm up phase
-    - duration: 60
-      arrivalRate: 5
-      rampTo: 10
-      name: Ramp up load
-    - duration: 30
-      arrivalRate: 10
-      rampTo: 30
-      name: Spike phase
-  # Load & configure a couple of useful plugins
-  # https://docs.art/reference/extensions
-  plugins:
-    ensure: {}
-    apdex: {}
-    metrics-by-endpoint: {}
-  apdex:
-    threshold: 100
-  ensure:
-      thresholds:
-        - http.response_time.p99: 100
-        - http.response_time.p95: 75
 scenarios:
   - flow:
       - loop:
         - get:
-            url: "/dino"
-        - get:
-            url: "/pony"
-        - get:
-            url: "/armadillo"
+            url: "/api/course/get_my_courses"
+            headers:
+              authorization: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwKysyMDExMTA2NzIyMjIiLCJpYXQiOjE3MDc1Njc5MzYsImV4cCI6MTcwNzU4NTkzNn0.IeMzlMZ-Byca4QYLhDaHK97t9i87j2atCSt4igcdbzSyQbi9lAZBm09MIqhVCtnjKIiT4atI60pi0hE4Ejl80w"
         count: 100
