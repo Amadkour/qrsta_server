@@ -210,19 +210,11 @@ public class User extends AbstractAuditingEntity {
                 getType(),
                 getPhoneNumber(),
                 null,
-<<<<<<< HEAD
                 getAddress(),
                 getImageUrl(),
                 (getTeacher() == null) ? null : getTeacher().getOrganization().name(),
                 getNationalId(),
                 getCountryCode(),
-=======
-                this.getAddress(),
-                this.getImageUrl(),
-                (this.getTeacher() == null) ? null : getTeacher().getOrganization().name(),
-                this.getNationalId(),
-                this.getCountryCode(),
->>>>>>> d12b93c0f1f1c0295d0dc80e6c080f01959017b2
                 true,
                 getDob());
     }
