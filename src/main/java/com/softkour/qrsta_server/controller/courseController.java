@@ -82,6 +82,7 @@ public class courseController {
         // ===========[ schedule ]===============//
         Course course = new Course();
         course.setName(request.getName());
+        course.setUseOnlinePayment(request.isPayment());
         course.setType(request.getCourseType());
         course.setCost(request.getCost());
         course.setSchedules(savedSchedules);
@@ -118,12 +119,20 @@ public class courseController {
     @GetMapping("course_sessions_posts")
     public ResponseEntity<GenericResponse<Object>> getCourseSessionsPosts(
             @RequestHeader(name = "course_id") Long courseId) {
-        Set<Session> sessionList = courseService.findOne(courseId).getSessions();
-        log.warn(String.valueOf(sessionList.size()));
+        Course c = courseService.findOne(courseId);
+        User u = MyUtils.getCurrentUserSession(authService);
+        List<Session> sessionList = sessionService.findSessionsOfCourse(courseId);
         List<Post> postslist = postService.posts(courseId);
+
+        if (u.getType() == UserType.STUDENT
+                && u.getCourses().stream().anyMatch(e -> e.getLate() > 1 && e.getCourse().getId() == courseId))
+            return GenericResponse.errorWithCoder("please renewal first", 999);
         return GenericResponse.success(
                 new SessionAndSocialResponce(
-                        sessionList.stream().map((e) -> e.toSessionDateAndStudentGrade()).toList(),
+                        sessionList.stream()
+                                .map((e) -> e.toSessionDateAndStudentGrade(
+                                        MyUtils.getCurrentUserSession(authService).getId()))
+                                .toList(),
                         postslist.stream().map((e) -> e.toPostResponce(sessionService, authService)).toList())
 
         );
@@ -133,19 +142,8 @@ public class courseController {
     @GetMapping("course_sessions")
     public ResponseEntity<GenericResponse<Object>> getCourseSessions(@RequestHeader(name = "course_id") Long courseId) {
         return GenericResponse.success(
-                courseService.findOne(courseId).getSessions().stream().map((e) -> e.toSessionDateAndStudentGrade())
-                        .toList());
-
-    }
-
-    @GetMapping("future_course_sessions")
-    public ResponseEntity<GenericResponse<Object>> getFutureCourseSessions(
-            @RequestHeader(name = "course_id") Long courseId) {
-        Instant now = Instant.now();
-        return GenericResponse.success(
-                courseService.findOne(courseId).getSessions().stream()
-                        // .dropWhile(e -> e.getStartDate().isAfter(now))
-                        .map((e) -> e.toSessionDateAndStudentGrade())
+                courseService.findOne(courseId).getSessions().stream().map(
+                        (e) -> e.toSessionDateAndStudentGrade((MyUtils.getCurrentUserSession(authService).getId())))
                         .toList());
 
     }
@@ -175,26 +173,18 @@ public class courseController {
     @GetMapping("add_my_to_course")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "course_id") Long courseId) {
-        try {
             User u = MyUtils.getCurrentUserSession(authService);
-            courseService.addStudentToCourse(u, courseId);
-            return GenericResponse.successWithMessageOnly("add you successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+            Course c = courseService.addStudentToCourse(u, courseId);
+            return GenericResponse.success(c.toCourseResponse());
     }
 
     @GetMapping("add_student_to_course")
     public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(
             @RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "student_id") Long userId) {
-
-        try {
             User u = authService.getUserById(userId);
             courseService.addStudentToCourse(u, courseId);
             return GenericResponse.success("add student to course successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+
     }
 
     @GetMapping("remove_student_from_course")

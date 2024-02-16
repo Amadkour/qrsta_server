@@ -10,11 +10,14 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class SessionDateAndStudentGrade {
-    private Instant startDate;
-    private Instant endDate;
+    private Long reminderPerMinutes;
+    private Long perioudPerMinutes;
     private long sessionId;
+    private String label;
     private int absence_count;
     private int expected_count;
     private double grade;
+    private boolean finished;
+    private boolean isAttendance;
 
 }

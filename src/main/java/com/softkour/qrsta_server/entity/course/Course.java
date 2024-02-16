@@ -38,7 +38,8 @@ public class Course extends AbstractAuditingEntity {
     @NotNull
     // @Size(max = 4)
     private double cost;
-
+    @Column(columnDefinition = "boolean default false")
+    private boolean useOnlinePayment;
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private CourseType type;
@@ -96,8 +97,7 @@ public class Course extends AbstractAuditingEntity {
     }
 
     public Course addStudent(StudentCourse employee) {
-        if (!this.students.stream().anyMatch(e -> e.getId() == employee.getStudent().getId()))
-            this.students.add(employee);
+        students.add(employee);
         return this;
     }
 

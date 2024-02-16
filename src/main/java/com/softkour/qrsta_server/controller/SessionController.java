@@ -21,17 +21,12 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.SessionObject;
-import com.softkour.qrsta_server.entity.post.Post;
 import com.softkour.qrsta_server.entity.user.User;
-import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
 import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
-import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
-import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.CourseService;
-import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionObjectService;
 import com.softkour.qrsta_server.service.SessionService;
 
@@ -92,44 +87,39 @@ public class SessionController {
     @GetMapping("take_attendance")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "session_id") Long sessionId) {
-
-        try {
             User u = MyUtils.getCurrentUserSession(authService);
-            sessionService.addStudentToSession(u, sessionId);
-            return GenericResponse.successWithMessageOnly("take you successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+            ;
+            return GenericResponse.success(
+                    sessionService.addStudentToSession(u, sessionId).toSessionDateAndStudentGradeWithAttendance(true));
+
     }
 
     @GetMapping("add_student_to_attendance")
     public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(
-            @RequestHeader(name = "session_id") Long sessionId, @RequestHeader(name = "student_id") Long userId) {
+            @RequestHeader(name = "session_id") Long sessionId,
+            @RequestHeader(name = "student_id") List<Long> userIds) {
 
-        try {
-            User u = authService.getUserById(userId);
-            Session s = sessionService.addStudentToSession(u, sessionId);
+        Session s = sessionService.addStudentsToSession(authService, userIds, sessionId);
             return GenericResponse
-                    .success(s.toSessionDetailsStudent().getStudents().stream().filter(e -> e.getId() == userId)
-                            .findFirst().orElseThrow(
-                                    () -> new ClientException("student",
-                                            "student not found id: ".concat(String.valueOf(userId)))));
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+                    .success(s.toSessionDetailsStudent());
+
     }
 
     @GetMapping("remove_student_from_attendance")
     public ResponseEntity<GenericResponse<Object>> removeStudentFromAttendance(
             @RequestHeader(name = "session_id") Long sessionId, @RequestHeader(name = "student_id") Long userId) {
-
-        try {
             User u = authService.getUserById(userId);
             sessionService.removeStudentToSession(u, sessionId);
-            return GenericResponse.success("remove student from session successfully");
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
+            return GenericResponse.successWithMessageOnly("remove student from session successfully");
+
         }
+
+        @GetMapping("delete")
+        public ResponseEntity<GenericResponse<Object>> delete(
+                @RequestHeader(name = "session_id") Long sessionId) {
+            sessionService.delete(sessionId);
+            return GenericResponse.successWithMessageOnly("remove student from session successfully");
+
     }
 
     @PostMapping("add_object")
@@ -138,6 +128,8 @@ public class SessionController {
         SessionObject sessionObject = sessionObjectService.save(objectCreationRequest.getItem(),
                 objectCreationRequest.getType(),
                 objectCreationRequest.getParentId(), sessionService.findOne(objectCreationRequest.getSessionId()));
+
+
         return GenericResponse.success(new SessionObjectResponse(sessionObject.getTitle(), null,
                 sessionObject.getType(), sessionObject.getCreatedDate(), sessionObject.getId()));
 
@@ -146,16 +138,49 @@ public class SessionController {
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> createSession(
             @RequestBody @Valid SessionCreationRequest sessionCreationRequest) {
-        try {
             Session session = new Session();
             Course course = courseService.findOne(sessionCreationRequest.getCourseId());
+            session.setLabel("session" + sessionService.findSessionsOfCourse(course.getId()).size());
             session.setCourse(course);
-            session.setStartDate(Instant.parse(sessionCreationRequest.getFromDate()));
-            session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()));
+            Instant serverTime = Instant.now();
+            log.warn(sessionCreationRequest.getCurrentDate());
+            Instant clientTime = Instant.parse(sessionCreationRequest.getCurrentDate());
+            Long diff = serverTime.toEpochMilli() - clientTime.toEpochMilli();
+            log.warn(serverTime.toString());
+            log.warn(clientTime.toString());
+            log.warn(diff + "");
+            if (diff < 0) {
+                session.setStartDate(Instant.parse(sessionCreationRequest.getFromDate()).plusMillis(diff));
+                session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()).plusMillis(diff));
+            } else {
+                session.setStartDate(Instant.parse(sessionCreationRequest.getFromDate()).minusMillis(diff));
+                session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()).minusMillis(diff));
+            }
+
+            log.warn("start afet maintance:==>" + session.getStartDate());
+            log.warn("end afet maintance:==>" + session.getEndDate());
             session = sessionService.save(session);
-            return GenericResponse.success(session.toSessionDateAndStudentGrade());
-        } catch (Exception e) {
-            return GenericResponse.errorOfException(e);
-        }
+            return GenericResponse.success(session.toSessionDateAndStudentGrade(-1L));
+
+    }
+
+    @GetMapping("future_course_sessions")
+    public ResponseEntity<GenericResponse<Object>> getFutureCourseSessions(
+            @RequestHeader(name = "course_id") Long courseId) {
+        return GenericResponse.success(
+                sessionService.findFutureSessionsOfCourse(courseId, Instant.now()).stream()
+                        .map((e) -> e.toSessionNameAndId())
+                        .toList());
+
+}
+
+@GetMapping("old_course_sessions")
+public ResponseEntity<GenericResponse<Object>> getOldCourseSessions(
+                @RequestHeader(name = "course_id") Long courseId) {
+        return GenericResponse.success(
+                        sessionService.findOldSessionsOfCourse(courseId, Instant.now()).stream()
+                                        .map((e) -> e.toSessionNameAndId())
+                                        .toList());
+
     }
 }

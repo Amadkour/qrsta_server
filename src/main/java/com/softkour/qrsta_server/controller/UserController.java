@@ -20,12 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.firebase.auth.OidcProviderConfig.UpdateRequest;
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.public_entity.MyNotification;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.ParentRegisterRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
 import com.softkour.qrsta_server.payload.request.UpdateUserRequest;
 import com.softkour.qrsta_server.payload.response.AbstractChild;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
+import com.softkour.qrsta_server.repo.NotificationRepo;
 import com.softkour.qrsta_server.security.JwtRequestFilter;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.OTPService;
@@ -44,6 +46,9 @@ public class UserController {
     AuthService userService;
     @Autowired
     JwtRequestFilter jwtRequestFilter;
+
+    @Autowired
+    NotificationRepo notificationRepo;
 
     @PostMapping("update")
     public ResponseEntity<GenericResponse<Object>> saveUser(
@@ -66,7 +71,7 @@ public class UserController {
     @GetMapping("notifications")
     public ResponseEntity<GenericResponse<Object>> notifications() {
         User user = MyUtils.getCurrentUserSession(userService);
-        return GenericResponse.success(new ArrayList());
+        return GenericResponse.success(notificationRepo.findAllByUser_id(user.getId()));
     }
 
     @PostMapping("/parent_register")

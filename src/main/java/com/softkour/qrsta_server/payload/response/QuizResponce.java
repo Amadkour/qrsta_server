@@ -18,8 +18,9 @@ public class QuizResponce {
     private QuizType type;
     private Instant startDate;
     private String timePerMinutes;
+    private String code;
     private int studentCount;
-    private int questionCount;
+    private String questionCount;
     private int points;
 
 }

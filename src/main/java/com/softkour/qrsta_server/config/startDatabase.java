@@ -19,6 +19,8 @@ import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.public_entity.Country;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
@@ -74,7 +76,7 @@ public class startDatabase implements CommandLineRunner {
         emirate.setSidMax("10");
         emirate.setSidMin("10");
         emirate.setPhoneLength("8");
-        emirate.setPhoneCode("+097");
+        emirate.setPhoneCode("+971");
 
         countryRepo.save(eg);
         countryRepo.save(emirate);
@@ -83,11 +85,13 @@ public class startDatabase implements CommandLineRunner {
 
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
-            if (2 == i)
+            if (2 == i) {
                 user.setType(UserType.TEACHER);
-            else
+                user.setTeacher(new Teacher());
+            } else {
                 user.setType(UserType.STUDENT);
-
+                user.setStudent(new Student());
+            }
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
             user.setDob(LocalDate.now());
@@ -98,12 +102,15 @@ public class startDatabase implements CommandLineRunner {
             user.setLogged(true);
             user = userRepository.save(user);
             if (i >= 3) {
-                user.setParent(userRepository.findUserByPhoneNumber("+201110672222"));
+                Student s = user.getStudent();
+                s.setParent(userRepository.findUserByPhoneNumber("+201110672222"));
+                user.setStudent(s);
                 user = userRepository.save(user);
             }
             /// =================course========================///
             Course course = new Course();
             course.setCost(10);
+            course.setUseOnlinePayment(true);
             course.setName("course".concat(String.valueOf(i)));
             course.setTeacher(user);
             course.setType(CourseType.PUBLIC);
@@ -128,19 +135,21 @@ public class startDatabase implements CommandLineRunner {
                 studentC.setCourse(course);
                 studentC.setActive(true);
                 studentC.setStudent(users.get(u));
-                studentC.setLate(u);
+                studentC.setLate(1);
                 course.addStudent(studentC);
             }
 
             course = courseService.save(course);
             // ===================session=====================//
-            Session session = new Session();
-            session.setCourse(course);
-            session.setStartDate(Instant.now());
-            session.setEndDate(Instant.now().plusSeconds(5));
-            session = sessionService.save(session);
-            session.addStudent(user);
-            sessionService.save(session);
+            // Session session = new Session();
+            // session.setLabel("session" +
+            // sessionService.findSessionsOfCourse(course.getId()).size());
+            // session.setCourse(course);
+            // session.setStartDate(Instant.now());
+            // session.setEndDate(Instant.now().plusSeconds(5));
+            // session = sessionService.save(session);
+            // session.addStudent(user);
+            // sessionService.save(session);
             // ==========================offer=====================
             Offer offer = new Offer();
             Set<Course> cs = new HashSet<Course>();

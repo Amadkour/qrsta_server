@@ -29,6 +29,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -44,6 +45,16 @@ import lombok.Setter;
 @Getter
 @Table(name = "qrsta_user")
 public class User extends AbstractAuditingEntity {
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = {}, allowSetters = true)
+    private Student student;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = {}, allowSetters = true)
+    private Parent parent;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = {}, allowSetters = true)
+    private Teacher teacher;
+
     @NotNull
     @Column(nullable = false)
     private String name;
@@ -52,9 +63,6 @@ public class User extends AbstractAuditingEntity {
     @Column()
     private UserType type;
 
-    @Enumerated(EnumType.STRING)
-    @Column()
-    private OrganizationType organization;
 
     @NotNull
     @Column(nullable = false, unique = true)
@@ -85,12 +93,10 @@ public class User extends AbstractAuditingEntity {
 
     @Column(columnDefinition = "boolean default false")
     private boolean isActive;
-    @Column(columnDefinition = "boolean default false")
-    private boolean usePayment;
-    @Column(columnDefinition = "boolean default true")
-    private boolean needToReplace;
+
     @Column(columnDefinition = "boolean default false")
     private boolean isLogged;
+
     @Column(columnDefinition = "integer default 0")
     private int logoutTimes;
     @Column()
@@ -100,9 +106,7 @@ public class User extends AbstractAuditingEntity {
     @Column()
     private DeviceType deviceType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "parent", "sessions", "courses" }, allowSetters = true)
-    private User parent;
+
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
@@ -184,30 +188,33 @@ public class User extends AbstractAuditingEntity {
 
     public UserLoginResponse toUserLoginResponse() {
         return new UserLoginResponse(
-                this.getName(),
-                this.getType(),
-                this.getPhoneNumber(),
+                getId(),
+                getName(),
+                getType(),
+                getPhoneNumber(),
                 "token",
-                this.getAddress(),
-                this.getImageUrl(),
-                (this.getOrganization() == null) ? null : this.getOrganization().name(),
-                this.getNationalId(),
-                this.getCountryCode(),
+                getAddress(),
+                getImageUrl(),
+                (getTeacher() == null) ? null
+                        : (getTeacher().getOrganization() == null) ? null : getTeacher().getOrganization().name(),
+                getNationalId(),
+                getCountryCode(),
                 getLoginMacAddress().equalsIgnoreCase(getRegisterMacAddress()),
                 getDob());
     }
 
     public UserLoginResponse toUpdateResponse() {
         return new UserLoginResponse(
-                this.getName(),
-                this.getType(),
-                this.getPhoneNumber(),
+                getId(),
+                getName(),
+                getType(),
+                getPhoneNumber(),
                 null,
-                this.getAddress(),
-                this.getImageUrl(),
-                (this.getOrganization() == null) ? null : this.getOrganization().name(),
-                this.getNationalId(),
-                this.getCountryCode(),
+                getAddress(),
+                getImageUrl(),
+                (getTeacher() == null) ? null : getTeacher().getOrganization().name(),
+                getNationalId(),
+                getCountryCode(),
                 true,
                 getDob());
     }

@@ -18,7 +18,9 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.RequstForm;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
@@ -74,9 +76,22 @@ public class ProfileServices {
     @GetMapping("request_to_change_device")
     public ResponseEntity<GenericResponse<Object>> requestToChangeDevice() {
         User u = MyUtils.getCurrentUserSession(authService);
-        u.setNeedToReplace(true);
-        authService.save(u);
-        return GenericResponse.successWithMessageOnly("request send to your teachers successfully");
+        if (u.getStudent() == null)
+            throw new ClientException("parent", "this instance not a student");
+        if (u.getCourses().stream().allMatch(e -> e.getCourse().getTeacher().getTeacher().isEnableAutoChangeDevice())) {
+            u.setRegisterMacAddress(u.getLoginMacAddress());
+            authService.save(u);
+            return GenericResponse.successWithMessageOnly("update your device successfully");
+
+        } else {
+            Student s = u.getStudent();
+            s.setNeedToReplace(true);
+            u.setStudent(s);
+            authService.save(u);
+            return GenericResponse.successWithMessageOnly("request send to your teachers successfully");
+
+        }
+
     }
 
     @PostMapping("accept")
@@ -112,7 +127,7 @@ public class ProfileServices {
         int allStudents = authService.getAllStudent(u.getId());
         int missingParentStudents = authService.getMissedParents();
         int misedPaymentStudents = studentCourseRepo
-                .getStudentByCourse_teacher_idAndLate(u.getId(), 1).size();
+                .getStudentByCourse_teacher_idAndLateGreaterThan(u.getId(), 0).size();
         double actalPaymentStudents = studentCourseRepo
                 .getStudentByCourse_teacher_idAndLate(u.getId(), 0).stream()
                 .mapToDouble(e -> e.getCourse().getCost()).sum();
@@ -125,15 +140,15 @@ public class ProfileServices {
         List<Object> values = new ArrayList<Object>();
         keys.add("all_students");
         keys.add("missing_parent");
-        keys.add("missing_payment");
+        keys.add("missing_payment_student");
         keys.add("expected_monthly_income");
         keys.add("actual_monthly_income");
         /////////
-        values.add(allStudents);
-        values.add(missingParentStudents);
-        values.add(misedPaymentStudents);
-        values.add(expectedMounthlyProfit);
-        values.add(actalPaymentStudents);
+        values.add(allStudents + "");
+        values.add(missingParentStudents + "");
+        values.add(misedPaymentStudents + "");
+        values.add(expectedMounthlyProfit + "");
+        values.add(actalPaymentStudents + "");
         map.put("keys", keys);
         map.put("values", values);
 

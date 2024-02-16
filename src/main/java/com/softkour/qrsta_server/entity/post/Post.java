@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
+import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
 import com.softkour.qrsta_server.payload.response.PostResponce;
 import com.softkour.qrsta_server.service.AuthService;
@@ -60,6 +61,10 @@ public class Post {
     public PostResponce toPostResponce(SessionService sessionService, AuthService authService) {
         AbstractUser currentUser = MyUtils.getCurrentUserSession(authService).toAbstractUser();
         PostResponce response = new PostResponce();
+        if (currentUser.getType() == UserType.TEACHER)
+            response.setType(CourseType.PUBLIC);
+        else
+            response.setType(getType());
         response.setComments(
                 this.getComments().stream().map((comment) -> comment.toPostResponce(sessionService, authService))
                         .toList());
@@ -73,11 +78,13 @@ public class Post {
         response.setLiked(this.getLikes().stream().anyMatch((e) -> e.getId() == currentUser.getId()));
         response.setDislike(this.getDislikes().stream().anyMatch((e) -> e.getId() == currentUser.getId()));
         try {
-            response.setLinkedSession(sessionService.findOne(this.getLinkedSessionId()).toSessionDateAndStudentGrade());
+            response.setLinkedSession(sessionService.findOne(this.getLinkedSessionId())
+                    .toSessionNameAndId());
         } catch (Exception e) {
         }
         try {
-            response.setSession(sessionService.findOne(this.getSessionId()).toSessionDateAndStudentGrade());
+            response.setSession(
+                    sessionService.findOne(this.getSessionId()).toSessionNameAndId());
         } catch (Exception e) {
         }
 

@@ -39,6 +39,9 @@ public class Quiz extends AbstractAuditingEntity {
     private String questionsPerStudent;
 
     @Column()
+    private String code;
+
+    @Column()
     private String timePerMinutes;
 
     @Enumerated(EnumType.STRING)
@@ -48,6 +51,10 @@ public class Quiz extends AbstractAuditingEntity {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
     private Set<CourseQuiz> courses = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
+    private Set<CourseQuiz> coveredCourses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes", cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
@@ -81,7 +88,6 @@ public class Quiz extends AbstractAuditingEntity {
         if (getType() == QuizType.ONLINE) {
             quizResponce.setStartDate(getStartDate());
         } else {
-            log.warn(String.valueOf(getCourses().iterator().next().getSessions().size()));
             if (getType() == QuizType.BEGIN) {
                 quizResponce.setStartDate(
                         getCourses().iterator().next().getSessions().stream()
@@ -96,11 +102,12 @@ public class Quiz extends AbstractAuditingEntity {
         }
         quizResponce.setPoints(getQuestions().stream().mapToInt(e -> e.getGrade()).sum());
         quizResponce.setId(getId());
-        quizResponce.setQuestionCount(getQuestions().size());
+        quizResponce.setQuestionCount(getQuestionsPerStudent());
         quizResponce.setStudentCount(
                 getCourses().stream().mapToInt(e -> e.getCourse().getStudents().size()).sum());
         quizResponce.setType(getType());
         quizResponce.setTimePerMinutes(getTimePerMinutes());
+        quizResponce.setCode(getCode());
         return quizResponce;
 
     }
@@ -116,6 +123,9 @@ public class Quiz extends AbstractAuditingEntity {
     public QuizCreationRequest toTeacherQuiz() {
         QuizCreationRequest quiz = new QuizCreationRequest();
         quiz.setCourses(getCourses().stream().map(e -> new QuizCourseSession(
+                e.getCourse().getId(), e.getSessions().stream().map(s -> s.getSession().getId()).toList()))
+                .collect(Collectors.toSet()));
+        quiz.setCoveredCourses(getCoveredCourses().stream().map(e -> new QuizCourseSession(
                 e.getCourse().getId(), e.getSessions().stream().map(s -> s.getSession().getId()).toList()))
                 .collect(Collectors.toSet()));
         quiz.setQuestions(

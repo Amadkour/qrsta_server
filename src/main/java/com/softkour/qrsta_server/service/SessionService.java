@@ -1,11 +1,14 @@
 package com.softkour.qrsta_server.service;
 
+import java.time.Instant;
 import java.util.List;
 
+import org.apache.logging.log4j.CloseableThreadContext.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
@@ -36,6 +39,16 @@ public class SessionService {
         return sessionRepository.findAllByCourse_Id(courseId);
     }
 
+    @Transactional(readOnly = true)
+    public List<Session> findFutureSessionsOfCourse(Long courseId, Instant date) {
+        return sessionRepository.findAllByCourse_IdAndStartDateAfter(courseId, date);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Session> findOldSessionsOfCourse(Long courseId, Instant date) {
+        return sessionRepository.findAllByCourse_IdAndStartDateBefore(courseId, date);
+    }
+
     // @Transactional(readOnly = true)
     public Session findOne(long id) {
         return sessionRepository.findById(id)
@@ -55,21 +68,34 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
-        /// check user join this course
-        log.warn("=================student courses================");
-        log.warn(user.getCourses().stream().map(e -> e.getCourse().getId()).toList().toString());
-        log.warn(session.getCourse().getId().toString());
-        log.warn("============================================");
-
         if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
             session.addStudent(user);
-            log.warn(session.getStudents().stream().map(e -> e.getId()).toList().toString());
             return sessionRepository.save(session);
         } else {
             throw new ClientException("student",
                     "this student not joint to this course: user id=".concat(user.getId().toString()));
         }
     }
+
+    public Session addStudentsToSession(AuthService authService, List<Long> userIds, Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(
+                        () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
+        for (int i = 0; i < userIds.size(); i++) {
+            User user = authService.getUserById(userIds.get(i));
+            /// check user join this course
+        if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
+            session.addStudent(user);
+            sessionRepository.save(session);
+        } else {
+            throw new ClientException("student",
+                    "this student not joint to this course: user id=".concat(user.getId().toString()));
+        }
+    }
+    return sessionRepository.findById(sessionId)
+            .orElseThrow(
+                    () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
+}
 
     public Session removeStudentToSession(User user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)

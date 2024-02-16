@@ -14,6 +14,7 @@ import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.service.CourseService;
+import com.softkour.qrsta_server.service.OTPService;
 import com.softkour.qrsta_server.service.OptionService;
 import com.softkour.qrsta_server.service.QuestionService;
 import com.softkour.qrsta_server.service.QuizService;
@@ -37,15 +38,17 @@ public class QuizCreationRequest {
     private QuizType type;
     @NotNull
     private Set<QuizCourseSession> courses = new HashSet<>();
+    private Set<QuizCourseSession> coveredCourses = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
     public Quiz toQuiz(QuizService quizService, CourseService courseService, SessionService sessionService,
             OptionService optionService,
-            QuestionService questionService) {
+            QuestionService questionService, OTPService otpService) {
 
         Quiz quiz;
         if (getId() == null) {
             quiz = new Quiz();
+            quiz.setCode(otpService.createRandomOneTimeOTP().get());
         } else {
             quiz = quizService.findById(getId());
         }
@@ -60,8 +63,19 @@ public class QuizCreationRequest {
                     public CourseQuiz apply(QuizCourseSession e) {
                         CourseQuiz courseQuiz = new CourseQuiz();
                         courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
-                        log.warn(String.valueOf(getCourses().iterator().next().getCourseId()));
+                        e.getSessionsId().stream()
+                                .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
 
+                        return courseQuiz;
+                    }
+                })
+                        .collect(Collectors.toSet()));
+        quiz.setCoveredCourses(
+                getCoveredCourses().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
+                    @Override
+                    public CourseQuiz apply(QuizCourseSession e) {
+                        CourseQuiz courseQuiz = new CourseQuiz();
+                        courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
                         e.getSessionsId().stream()
                                 .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
 

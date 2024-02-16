@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class UserLoginResponse {
+    private long id;
     private String name;
     private UserType type;
     private String phoneNumber;
