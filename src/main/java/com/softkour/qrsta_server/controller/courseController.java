@@ -1,10 +1,8 @@
 package com.softkour.qrsta_server.controller;
 
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -156,7 +154,7 @@ public class courseController {
             return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
         } else {
-            List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActive(user.getId(), true);
+            List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActive(user.getId(), false);
             return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
         }
@@ -173,17 +171,17 @@ public class courseController {
     @GetMapping("add_my_to_course")
     public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
             @RequestHeader(name = "course_id") Long courseId) {
-            User u = MyUtils.getCurrentUserSession(authService);
-            Course c = courseService.addStudentToCourse(u, courseId);
-            return GenericResponse.success(c.toCourseResponse());
+        User u = MyUtils.getCurrentUserSession(authService);
+        Course c = courseService.addStudentToCourse(u, courseId);
+        return GenericResponse.success(c.toCourseResponse());
     }
 
     @GetMapping("add_student_to_course")
     public ResponseEntity<GenericResponse<Object>> addStudentToAttendance(
             @RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "student_id") Long userId) {
-            User u = authService.getUserById(userId);
-            courseService.addStudentToCourse(u, courseId);
-            return GenericResponse.success("add student to course successfully");
+        User u = authService.getUserById(userId);
+        courseService.addStudentToCourse(u, courseId);
+        return GenericResponse.success("add student to course successfully");
 
     }
 

@@ -11,7 +11,7 @@ import com.softkour.qrsta_server.entity.course.Course;
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> getCourseByTeacherId(Long teacherId);
 
-    List<Course> getCourseByTeacherIdAndStudents_active(Long teacherId, boolean active);
+    List<Course> getCourseByTeacher_idAndStudents_active(Long teacherId, boolean active);
 
     Course getCourseByIdAndStudents_active(Long courseId, boolean active);
 }

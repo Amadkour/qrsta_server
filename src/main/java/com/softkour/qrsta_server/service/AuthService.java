@@ -148,7 +148,7 @@ public class AuthService {
     }
 
     public List<User> getNeedToReplaceUsers(Long teacherId) {
-        return authorRepository.findAllUserByStudent_needToReplaceAndCourses_course_teacherId(false, teacherId);
+        return authorRepository.findAllUserByStudent_needToReplaceAndCourses_course_teacher_id(false, teacherId);
     }
 
     public User save(User user) {
