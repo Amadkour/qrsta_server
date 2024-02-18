@@ -154,7 +154,7 @@ public class courseController {
             return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
         } else {
-            List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActive(user.getId(), false);
+            List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActive(user.getId(), true);
             return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
         }

@@ -1,7 +1,9 @@
 package com.softkour.qrsta_server.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -12,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.entity.public_entity.StudentSchedual;
+import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
 import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.quiz.Quiz;
@@ -105,6 +107,7 @@ public class QuizService {
     public String correct(List<List<String>> answers, Long quizId) {
         Quiz q = quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
         List<Question> questions = q.getQuestions().stream().toList();
+        List<Question> wrongQuestions = new ArrayList<>();
         User u = MyUtils.getCurrentUserSession(authService);
 
         int totalPoints = questions.stream().mapToInt(e -> e.getGrade()).sum();
@@ -121,6 +124,8 @@ public class QuizService {
             if (answers.get(i).stream().allMatch(e -> correctAnswer.contains(e))
                     && answers.get(i).size() == correctAnswer.size()) {
                 points += questions.get(i).getGrade();
+            } else {
+                wrongQuestions.add(questions.get(i));
             }
         }
         ////
@@ -134,12 +139,13 @@ public class QuizService {
                         .findFirst().orElseThrow(() -> new ClientException("course", "user unjoint"));
                 List<SessionQuiz> sessions = c.getSessions().stream().collect(Collectors.toList());
                 for (int j = 0; j < sessions.size(); j++) {
-                    StudentSchedual item = new StudentSchedual();
+                    StudentSchedule item = new StudentSchedule();
                     item.setDone(false);
                     item.setRead(false);
                     item.setCourse(c.getCourse());
                     item.setSession(sessions.get(j).getSession());
                     item.setUser(u);
+                    item.setQuestion(wrongQuestions.get((new Random()).nextInt(wrongQuestions.size())));
                     scheduleRepo.save(item);
                 }
             }

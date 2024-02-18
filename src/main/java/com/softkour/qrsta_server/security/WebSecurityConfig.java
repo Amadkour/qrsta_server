@@ -57,7 +57,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                         exception -> exception.authenticationEntryPoint((request, response, authException) -> {
                             Map<String, Object> responseMap = new HashMap<>();
                             ObjectMapper mapper = new ObjectMapper();
-                            response.setStatus(401);
+                            response.setStatus(400);
                             responseMap.put("error", true);
                             responseMap.put("message", "Unauthorized");
                             response.setHeader("content-type", "application/json");

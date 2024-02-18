@@ -6,11 +6,11 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.softkour.qrsta_server.entity.public_entity.StudentSchedual;
+import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
 
 @Repository
-public interface StudentScheduleRepo extends JpaRepository<StudentSchedual, Long> {
+public interface StudentScheduleRepo extends JpaRepository<StudentSchedule, Long> {
 
-    List<StudentSchedual> getScheduleByUser_idAndCreatedDateAfter(Long studentId, Instant Date);
+    List<StudentSchedule> getScheduleByUser_idAndCreatedDateAfter(Long studentId, Instant Date);
 
 }

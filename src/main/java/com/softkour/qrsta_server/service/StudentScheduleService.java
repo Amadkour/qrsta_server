@@ -1,5 +1,7 @@
 package com.softkour.qrsta_server.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,8 @@ public class StudentScheduleService {
     StudentScheduleRepo scheduleRepo;
 
     public List<StudentSchedualResponse> getUserSchedule(Long userId) {
-        return scheduleRepo.getScheduleByUser_idAndCreatedDateAfter(userId, null).stream()
+        return scheduleRepo.getScheduleByUser_idAndCreatedDateAfter(userId, Instant.now().minus(3, ChronoUnit.DAYS))
+                .stream()
                 .map(e -> e.toStudentSchedualResponse()).toList();
     }
 

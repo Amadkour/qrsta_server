@@ -22,7 +22,7 @@ import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.SessionObject;
-import com.softkour.qrsta_server.entity.public_entity.StudentSchedual;
+import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
 import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.request.ObjectCreationRequest;
@@ -169,15 +169,18 @@ public class SessionController {
                 session = sessionService.save(session);
                 /// add it in student schedual
                 List<StudentCourse> students = session.getCourse().getStudents().stream().collect(Collectors.toList());
+                log.warn(students.stream().map(e -> e.getStudent().getPhoneNumber()).toList() + "");
                 for (int i = 0; i < students.size(); i++) {
-                        StudentSchedual item = new StudentSchedual();
+                        StudentSchedule item = new StudentSchedule();
                         item.setDone(false);
                         item.setRead(false);
                         item.setSession(session);
                         item.setCourse(course);
                         item.setUser(students.get(i).getStudent());
                         scheduleRepo.save(item);
+
                 }
+                log.warn(scheduleRepo.count() + "");
                 return GenericResponse.success(session.toSessionDateAndStudentGrade(-1L));
 
         }

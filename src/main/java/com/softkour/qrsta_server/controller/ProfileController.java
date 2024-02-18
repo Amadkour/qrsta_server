@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/profile/")
 @Slf4j
-public class ProfileServices {
+public class ProfileController {
     @Autowired
     CourseService courseService;
     @Autowired
