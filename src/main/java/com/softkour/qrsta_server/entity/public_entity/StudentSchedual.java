@@ -1,6 +1,9 @@
 package com.softkour.qrsta_server.entity.public_entity;
 
-import com.softkour.qrsta_server.entity.course.SessionObject;
+import java.time.Instant;
+
+import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.StudentSchedualResponse;
@@ -18,18 +21,29 @@ import lombok.Setter;
 @Getter
 public class StudentSchedual extends AbstractAuditingEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private SessionObject object;
+    private Session session;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Course course;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
-    @Column
+    @Column(name = "due_date", updatable = false)
+    private Instant due_date = Instant.now().plusSeconds(60 * 60 * 24 * 7);
+    @Column(columnDefinition = "boolean default false")
     private boolean read;
     @Column
+    private int weight;
+    @Column(columnDefinition = "boolean default false")
     private boolean done;
+    @Column(columnDefinition = "boolean default true")
+    private boolean active;
 
     public StudentSchedualResponse toStudentSchedualResponse() {
         return new StudentSchedualResponse(
                 getId(),
-                getObject().getTitle(),
+                getDue_date(),
+                getWeight(),
+                getCourse().getName(),
+                getSession().getLabel(),
                 isRead(),
                 isDone(),
                 getCreatedDate());
