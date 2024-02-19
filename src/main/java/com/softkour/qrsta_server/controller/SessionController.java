@@ -178,7 +178,6 @@ public class SessionController {
                         item.setCourse(course);
                         item.setUser(students.get(i).getStudent());
                         scheduleRepo.save(item);
-
                 }
                 log.warn(scheduleRepo.count() + "");
                 return GenericResponse.success(session.toSessionDateAndStudentGrade(-1L));
