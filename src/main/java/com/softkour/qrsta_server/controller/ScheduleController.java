@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.StudentSchedualResponse;
 import com.softkour.qrsta_server.service.AuthService;
@@ -30,13 +31,20 @@ public class ScheduleController {
             @RequestHeader(name = "child_phone", required = false) String childPhone) {
         User u;
         if (childPhone != null) {
+
             u = authService.getUserByPhoneNumber(childPhone);
+            return GenericResponse.success(scheduleService.getUserSchedule(u.getId()));
 
         } else {
             u = MyUtils.getCurrentUserSession(authService);
-        }
+            if (u.getType() == UserType.TEACHER) {
+                return GenericResponse.success(scheduleService.getTeacherSchedule(u.getId()));
 
-        return GenericResponse.success(scheduleService.getUserSchedule(u.getId()));
+            } else {
+                return GenericResponse.success(scheduleService.getUserSchedule(u.getId()));
+
+            }
+        }
 
     }
 

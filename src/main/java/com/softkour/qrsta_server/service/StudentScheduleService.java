@@ -16,7 +16,15 @@ public class StudentScheduleService {
     StudentScheduleRepo scheduleRepo;
 
     public List<StudentSchedualResponse> getUserSchedule(Long userId) {
-        return scheduleRepo.getScheduleByUser_idAndCreatedDateAfter(userId, Instant.now().minus(3, ChronoUnit.DAYS))
+        return scheduleRepo
+                .getScheduleByUser_idAndCreatedDateAfterOrderByCreatedDateDesc(userId,
+                        Instant.now().minus(3, ChronoUnit.DAYS))
+                .stream()
+                .map(e -> e.toStudentSchedualResponse()).toList();
+    }
+
+    public List<StudentSchedualResponse> getTeacherSchedule(Long userId) {
+        return scheduleRepo.getScheduleByCourse_teacher_idAndQuestionNotNullOrderByCreatedDateDesc(userId)
                 .stream()
                 .map(e -> e.toStudentSchedualResponse()).toList();
     }
