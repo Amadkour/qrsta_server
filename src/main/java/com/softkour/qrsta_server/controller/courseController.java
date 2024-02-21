@@ -31,10 +31,10 @@ import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
-import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.ScheduleService;
 import com.softkour.qrsta_server.service.SessionService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.extern.slf4j.Slf4j;
 

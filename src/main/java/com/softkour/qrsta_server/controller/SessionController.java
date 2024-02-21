@@ -30,9 +30,9 @@ import com.softkour.qrsta_server.payload.request.SessionCreationRequest;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 import com.softkour.qrsta_server.repo.StudentScheduleRepo;
 import com.softkour.qrsta_server.service.AuthService;
-import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.SessionObjectService;
 import com.softkour.qrsta_server.service.SessionService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

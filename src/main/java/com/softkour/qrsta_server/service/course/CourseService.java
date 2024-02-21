@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.service;
+package com.softkour.qrsta_server.service.course;
 
 import java.util.List;
 import java.util.Optional;

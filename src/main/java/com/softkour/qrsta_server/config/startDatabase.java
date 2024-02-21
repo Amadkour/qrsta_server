@@ -25,10 +25,10 @@ import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
-import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OfferService;
 import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.extern.slf4j.Slf4j;
 

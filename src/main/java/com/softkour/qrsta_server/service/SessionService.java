@@ -13,6 +13,7 @@ import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.SessionRepository;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -13,12 +13,12 @@ import com.softkour.qrsta_server.entity.quiz.Option;
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.quiz.Quiz;
 import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
-import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OTPService;
 import com.softkour.qrsta_server.service.OptionService;
 import com.softkour.qrsta_server.service.QuestionService;
 import com.softkour.qrsta_server.service.QuizService;
 import com.softkour.qrsta_server.service.SessionService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.Getter;
 import lombok.Setter;
