@@ -33,16 +33,20 @@ public class ScheduleController {
         if (childPhone != null) {
 
             u = authService.getUserByPhoneNumber(childPhone);
-            return GenericResponse.success(scheduleService.getUserSchedule(u.getId()));
+            return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
+                    .map(e -> e.toStudentSchedualResponse()).toList());
 
         } else {
             u = MyUtils.getCurrentUserSession(authService);
             if (u.getType() == UserType.TEACHER) {
-                return GenericResponse.success(scheduleService.getTeacherSchedule(u.getId()));
+                return GenericResponse.success(scheduleService.getTeacherSchedule(u.getId()).stream()
+                        .map(e -> e.toStudentSchedualResponse()).toList());
+            }
 
         return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
                 .map(e -> e.toStudentSchedualResponse()).toList());
 
     }
 
+}
 }
