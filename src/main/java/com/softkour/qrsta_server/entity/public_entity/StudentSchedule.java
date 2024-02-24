@@ -1,12 +1,15 @@
 package com.softkour.qrsta_server.entity.public_entity;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.payload.request.OptionCreationRequest;
+import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
 import com.softkour.qrsta_server.payload.response.StudentSchedualResponse;
 
 import jakarta.persistence.CascadeType;
@@ -41,7 +44,8 @@ public class StudentSchedule extends AbstractAuditingEntity {
     private boolean active;
 
     public StudentSchedualResponse toStudentSchedualResponse() {
-        return new StudentSchedualResponse(
+
+        StudentSchedualResponse response = new StudentSchedualResponse(
                 getId(),
                 getDue_date(),
                 getWeight(),
@@ -50,7 +54,16 @@ public class StudentSchedule extends AbstractAuditingEntity {
                 isRead(),
                 isDone(),
                 getCreatedDate(),
-                getQuestion());
+                                        null);
+                                if (getQuestion() != null) {
+                                    response.setQuestion(new QuestionCreationRequest(getQuestion().getId(),
+                                            getQuestion().getTitle(), getQuestion().getGrade(),
+                                            getQuestion().getOptions().stream()
+                                                    .map(o -> new OptionCreationRequest(o.getTitle(),
+                                                            o.getIsCorrectAnswer()))
+                                                    .collect(Collectors.toSet())));
+                                }
+                                return response;
     }
 
 }

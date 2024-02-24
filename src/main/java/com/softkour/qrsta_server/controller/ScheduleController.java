@@ -36,7 +36,8 @@ public class ScheduleController {
             u = MyUtils.getCurrentUserSession(authService);
         }
 
-        return GenericResponse.success(scheduleService.getUserSchedule(u.getId()));
+        return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
+                .map(e -> e.toStudentSchedualResponse()).toList());
 
     }
 

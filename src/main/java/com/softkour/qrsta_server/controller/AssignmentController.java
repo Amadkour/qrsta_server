@@ -37,7 +37,7 @@ public class AssignmentController {
     CourseService courseService;
 
     @GetMapping("creat")
-    public void create(
+    public ResponseEntity<GenericResponse<AssignmentResponse>> create(
             @RequestHeader("due_date") String dueString,
             @RequestHeader("course_id") Long courseId,
             @RequestHeader("max_count") int maxCount,
@@ -52,7 +52,7 @@ public class AssignmentController {
         assignment.setTitle(title);
         assignment.setCourse(courseService.findOne(courseId));
         assignment.setDescription(description);
-        assignmentService.save(assignment);
+        return GenericResponse.success(assignmentService.save(assignment).toAssignmentResponse());
 
     }
 
@@ -113,7 +113,9 @@ public class AssignmentController {
     @GetMapping("add_group")
     public ResponseEntity<GenericResponse<AssignmentResponse>> addGroup(
             @RequestHeader(name = "assignment_id") Long assignmentId,
-            @RequestHeader(name = "students") List<Long> studentIds) {
+            @RequestHeader(name = "students") List<Long> studentIds,
+            @RequestHeader(name = "title", required = false) String title,
+            @RequestHeader(name = "description", required = false) String description) {
 
         Assignment assignment = assignmentService.findById(assignmentId);
         if (assignment.getMax_count() < studentIds.size())

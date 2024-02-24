@@ -3,6 +3,7 @@ package com.softkour.qrsta_server.payload.response;
 import java.time.Instant;
 
 import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,6 @@ public class StudentSchedualResponse {
     private boolean isRead;
     private boolean done;
     private Instant date;
-    private Question question;
+    private QuestionCreationRequest question;
 
 }

@@ -103,7 +103,6 @@ public class QuizService {
         return quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
     }
 
-    @Transactional(readOnly = true)
     public String correct(List<List<String>> answers, Long quizId) {
         Quiz q = quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
         List<Question> questions = q.getQuestions().stream().toList();
@@ -112,15 +111,9 @@ public class QuizService {
 
         int totalPoints = questions.stream().mapToInt(e -> e.getGrade()).sum();
         int points = 0;
-        log.warn("========================answers");
-        log.warn(String.valueOf(questions.size()));
-        log.warn(String.valueOf(answers.size()));
-        log.warn("========================answers");
-
         for (int i = 0; i < questions.size(); i++) {
             List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(e -> e.getIsCorrectAnswer())
                     .map(e -> e.getTitle()).toList();
-
             if (answers.get(i).stream().allMatch(e -> correctAnswer.contains(e))
                     && answers.get(i).size() == correctAnswer.size()) {
                 points += questions.get(i).getGrade();
@@ -130,15 +123,19 @@ public class QuizService {
         }
         ////
         /// add it in student schedual
-
-        if (points / totalPoints < 0.5) {
+        log.warn("total score is:" + (points / totalPoints));
+        log.warn("total of wrong answers:" + wrongQuestions.size());
+        if ((points / totalPoints) < 0.5) {
             List<CourseQuiz> courses = q.getCoveredCourses().stream().collect(Collectors.toList());
             for (int i = 0; i < q.getCoveredCourses().size(); i++) {
+                log.warn("kkkkkkkkkkkkkkkkkkkkkkkk");
                 CourseQuiz c = courses.stream()
                         .takeWhile(e -> e.getCourse().getStudents().stream().anyMatch(s -> s.getId() == u.getId()))
                         .findFirst().orElseThrow(() -> new ClientException("course", "user unjoint"));
                 List<SessionQuiz> sessions = c.getSessions().stream().collect(Collectors.toList());
                 for (int j = 0; j < sessions.size(); j++) {
+                    log.warn("add to students" + u.getPhoneNumber());
+
                     StudentSchedule item = new StudentSchedule();
                     item.setDone(false);
                     item.setRead(false);

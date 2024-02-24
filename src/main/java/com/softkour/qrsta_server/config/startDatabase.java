@@ -53,120 +53,120 @@ public class startDatabase implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         /// =======country==============///
-        Country eg = new Country();
-        eg.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg");
-        eg.setName("egypt");
-        eg.setSidMax("14");
-        eg.setSidMin("14");
-        eg.setPhoneLength("10");
-        eg.setPhoneStart("3|2");
-        eg.setPhoneCode("+20");
+        // Country eg = new Country();
+        // eg.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg");
+        // eg.setName("egypt");
+        // eg.setSidMax("14");
+        // eg.setSidMin("14");
+        // eg.setPhoneLength("10");
+        // eg.setPhoneStart("3|2");
+        // eg.setPhoneCode("+20");
 
-        Country saudi = new Country();
-        saudi.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg");
-        saudi.setName("saudi");
-        saudi.setSidMax("10");
-        saudi.setSidMin("10");
-        saudi.setPhoneStart("3|2");
-        saudi.setPhoneLength("8");
-        saudi.setPhoneCode("+966");
-        Country emirate = new Country();
-        emirate.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg");
-        emirate.setName("emirate");
-        emirate.setSidMax("10");
-        emirate.setSidMin("10");
-        emirate.setPhoneLength("8");
-        emirate.setPhoneCode("+971");
+        // Country saudi = new Country();
+        // saudi.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg");
+        // saudi.setName("saudi");
+        // saudi.setSidMax("10");
+        // saudi.setSidMin("10");
+        // saudi.setPhoneStart("3|2");
+        // saudi.setPhoneLength("8");
+        // saudi.setPhoneCode("+966");
+        // Country emirate = new Country();
+        // emirate.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg");
+        // emirate.setName("emirate");
+        // emirate.setSidMax("10");
+        // emirate.setSidMin("10");
+        // emirate.setPhoneLength("8");
+        // emirate.setPhoneCode("+971");
 
-        countryRepo.save(eg);
-        countryRepo.save(emirate);
-        countryRepo.save(saudi);
-        for (int i = 2; i < 5; i++) {
+        // countryRepo.save(eg);
+        // countryRepo.save(emirate);
+        // countryRepo.save(saudi);
+        // for (int i = 2; i < 5; i++) {
 
-            User user = new User();
-            user.setNationalId("1231231231231".concat(String.valueOf(i)));
-            if (2 == i) {
-                user.setType(UserType.TEACHER);
-                user.setTeacher(new Teacher());
-            } else {
-                user.setType(UserType.STUDENT);
-                user.setStudent(new Student());
-            }
-            user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
-            user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
-            user.setDob(LocalDate.now());
-            user.setPhoneNumber("+20111067222".concat(String.valueOf(i)));
-            user.setCountryCode("+20");
-            user.setRegisterMacAddress("aaaa");
-            user.setActive(true);
-            user.setLogged(true);
-            user = userRepository.save(user);
-            if (i >= 3) {
-                Student s = user.getStudent();
-                s.setParent(userRepository.findUserByPhoneNumber("+201110672222"));
-                user.setStudent(s);
-                user = userRepository.save(user);
-            }
-            /// =================course========================///
-            Course course = new Course();
-            course.setCost(10);
-            course.setUseOnlinePayment(true);
-            course.setName("course".concat(String.valueOf(i)));
-            course.setTeacher(user);
-            course.setType(CourseType.PUBLIC);
-            course = courseService.save(course);
-            log.warn("==========================================");
-            log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
-            log.warn("==========================================");
-            StudentCourse studentCourse = new StudentCourse();
-            studentCourse.setCourse(course);
-            studentCourse.setStudent(user);
-            studentCourse.setLate(0);
-            // course.addStudent(studentCourse);
-            course.addStudent(studentCourse);
-            Schedule schedule = new Schedule();
-            schedule.setDay("monday");
-            schedule.setFromTime("02:00 PM");
-            schedule.setToTime("04:00 PM");
-            course.addSchedule(schedule);
-            List<User> users = userRepository.findAll();
-            for (int u = 0; u < users.size(); u++) {
-                StudentCourse studentC = new StudentCourse();
-                studentC.setCourse(course);
-                studentC.setActive(true);
-                studentC.setStudent(users.get(u));
-                studentC.setLate(1);
-                course.addStudent(studentC);
-            }
+        // User user = new User();
+        // user.setNationalId("1231231231231".concat(String.valueOf(i)));
+        // if (2 == i) {
+        // user.setType(UserType.TEACHER);
+        // user.setTeacher(new Teacher());
+        // } else {
+        // user.setType(UserType.STUDENT);
+        // user.setStudent(new Student());
+        // }
+        // user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
+        // user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
+        // user.setDob(LocalDate.now());
+        // user.setPhoneNumber("+20111067222".concat(String.valueOf(i)));
+        // user.setCountryCode("+20");
+        // user.setRegisterMacAddress("aaaa");
+        // user.setActive(true);
+        // user.setLogged(true);
+        // user = userRepository.save(user);
+        // if (i >= 3) {
+        // Student s = user.getStudent();
+        // s.setParent(userRepository.findUserByPhoneNumber("+201110672222"));
+        // user.setStudent(s);
+        // user = userRepository.save(user);
+        // }
+        // /// =================course========================///
+        // Course course = new Course();
+        // course.setCost(10);
+        // course.setUseOnlinePayment(true);
+        // course.setName("course".concat(String.valueOf(i)));
+        // course.setTeacher(user);
+        // course.setType(CourseType.PUBLIC);
+        // course = courseService.save(course);
+        // log.warn("==========================================");
+        // log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
+        // log.warn("==========================================");
+        // StudentCourse studentCourse = new StudentCourse();
+        // studentCourse.setCourse(course);
+        // studentCourse.setStudent(user);
+        // studentCourse.setLate(0);
+        // // course.addStudent(studentCourse);
+        // course.addStudent(studentCourse);
+        // Schedule schedule = new Schedule();
+        // schedule.setDay("monday");
+        // schedule.setFromTime("02:00 PM");
+        // schedule.setToTime("04:00 PM");
+        // course.addSchedule(schedule);
+        // List<User> users = userRepository.findAll();
+        // for (int u = 0; u < users.size(); u++) {
+        // StudentCourse studentC = new StudentCourse();
+        // studentC.setCourse(course);
+        // studentC.setActive(true);
+        // studentC.setStudent(users.get(u));
+        // studentC.setLate(1);
+        // course.addStudent(studentC);
+        // }
 
-            course = courseService.save(course);
-            // ===================session=====================//
-            // Session session = new Session();
-            // session.setLabel("session" +
-            // sessionService.findSessionsOfCourse(course.getId()).size());
-            // session.setCourse(course);
-            // session.setStartDate(Instant.now());
-            // session.setEndDate(Instant.now().plusSeconds(5));
-            // session = sessionService.save(session);
-            // session.addStudent(user);
-            // sessionService.save(session);
-            // ==========================offer=====================
-            Offer offer = new Offer();
-            Set<Course> cs = new HashSet<Course>();
-            cs.add(course);
-            offer.setCost("100");
-            offer.setEndDate(Instant.now());
-            offer.setCourses(cs);
-            offer.setMonths(3);
-            offerService.save(offer);
-            // =======================[post]==================
-            // Post post = new Post();
-            // post.setData("first Post");
-            // post.setOwner(user.toAbstractUser());
-            // post.setSession(session);
-            // postService.addPost(post);
+        // course = courseService.save(course);
+        // // ===================session=====================//
+        // // Session session = new Session();
+        // // session.setLabel("session" +
+        // // sessionService.findSessionsOfCourse(course.getId()).size());
+        // // session.setCourse(course);
+        // // session.setStartDate(Instant.now());
+        // // session.setEndDate(Instant.now().plusSeconds(5));
+        // // session = sessionService.save(session);
+        // // session.addStudent(user);
+        // // sessionService.save(session);
+        // // ==========================offer=====================
+        // Offer offer = new Offer();
+        // Set<Course> cs = new HashSet<Course>();
+        // cs.add(course);
+        // offer.setCost("100");
+        // offer.setEndDate(Instant.now());
+        // offer.setCourses(cs);
+        // offer.setMonths(3);
+        // offerService.save(offer);
+        // // =======================[post]==================
+        // // Post post = new Post();
+        // // post.setData("first Post");
+        // // post.setOwner(user.toAbstractUser());
+        // // post.setSession(session);
+        // // postService.addPost(post);
 
-        }
+        // }
 
     }
 }
