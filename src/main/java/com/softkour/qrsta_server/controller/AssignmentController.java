@@ -2,7 +2,6 @@ package com.softkour.qrsta_server.controller;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,7 +110,7 @@ public class AssignmentController {
     }
 
     @GetMapping("add_group")
-    public ResponseEntity<GenericResponse<AssignmentResponse>> addGroup(
+    public ResponseEntity<GenericResponse<GroupAssignmentResponse>> addGroup(
             @RequestHeader(name = "assignment_id") Long assignmentId,
             @RequestHeader(name = "students") List<Long> studentIds,
             @RequestHeader(name = "title", required = false) String title,
@@ -125,8 +124,12 @@ public class AssignmentController {
         GroupAssignment group = new GroupAssignment();
         group.setStudents(studentIds.stream().map(e -> authService.getUserById(e)).collect(Collectors.toSet()));
         group.setAssignment(assignment);
-        groupAssignmentService.save(group);
-        return GenericResponse.success(assignment.toAssignmentResponse());
+        group.setTitle(title);
+        group.setDescription(description);
+        group = groupAssignmentService.save(group);
+        assignment.addGroup(group);
+        assignmentService.save(assignment);
+        return GenericResponse.success(group.toGroupResponse());
     }
 
     @GetMapping("add_student")
