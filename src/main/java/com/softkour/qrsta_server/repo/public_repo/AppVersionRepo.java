@@ -8,6 +8,6 @@ import com.softkour.qrsta_server.entity.public_entity.AppVersion;
 @Repository
 public interface AppVersionRepo extends JpaRepository<AppVersion, Long> {
 
-    AppVersion getAppVersionByIOSAndAvailableIsTrue(boolean ios);
+    AppVersion getAppVersionByIosAndAvailableIsTrue(boolean ios);
 
 }

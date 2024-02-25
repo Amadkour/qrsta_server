@@ -1,5 +1,6 @@
 package com.softkour.qrsta_server.entity.user;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +13,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Parent extends AbstractAuditingEntity {
+    @Column
+    private int late = 0;
 
 }

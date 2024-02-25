@@ -1,8 +1,11 @@
 package com.softkour.qrsta_server.security;
 
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.public_repo.AppVersionRepo;
+import com.softkour.qrsta_server.service.AuthService;
 
 import jdk.jshell.execution.Util;
 import org.apache.commons.lang3.StringUtils;
@@ -31,20 +34,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     JwtTokenUtil jwtTokenUtil;
     @Autowired
     AppVersionRepo appVersion;
+    @Autowired
+    AuthService authService;
    public static String username;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         final String requestTokenHeader = request.getHeader("Authorization");
-        final String version = request.getHeader("version");
-        final boolean isIos = request.getHeader("is_ios") == "true";
-        if ((appVersion.getAppVersionByIOSAndAvailableIsTrue(isIos).getVersion() + "") != version) {
-            throw new ClientException("app_version", "please update your version", 998);
-        }
+        checkVersion(request);
+
         if (StringUtils.startsWith(requestTokenHeader, "Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+
+                checkPayment(jwtToken);
+
                 if (StringUtils.isNotEmpty(username)
                         && null == SecurityContextHolder.getContext().getAuthentication()) {
                     UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(MyUtils.getUserPhone(username));
@@ -68,6 +73,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             logger.warn("JWT Token does not begin with Bearer String");
         }
         chain.doFilter(request, response);
+    }
+
+    public void checkVersion(HttpServletRequest request) {
+        final String version = request.getHeader("version");
+        final boolean isIos = request.getHeader("is_ios") == "true";
+        if ((appVersion.getAppVersionByIosAndAvailableIsTrue(isIos).getVersion() + "") != version) {
+            throw new ClientException("app_version", "please update your version", 998);
+        }
+    }
+
+    public void checkPayment(String userPhone) {
+        User u = authService.getUserByPhoneNumber(userPhone);
+        if (u.getType() == UserType.OBSERVER && u.getParent().getLate() > 0) {
+            throw new ClientException("payment", (u.getParent().getLate() * -1 + ""), 999);
+        }
     }
 
 }

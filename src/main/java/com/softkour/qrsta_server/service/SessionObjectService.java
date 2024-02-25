@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.SessionObject;
+import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
 import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
-import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.SessionObjectRepo;
 import com.softkour.qrsta_server.repo.StudentScheduleRepo;
