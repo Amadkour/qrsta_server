@@ -15,8 +15,6 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, Lo
 
     double getCourseCostByCourse_teacher_idAndFinishedFalseAndLate(Long teacherId, int late);
 
-    StudentCourse getCourseByCourse_idAndFinishedFalse(Long courseId);
-
     List<StudentCourse> getStudentsByCourse_teacher_idAndStudent_parent_idAndActiveAndFinished(
             Long teacherId, Long parentId, boolean active, boolean finished);
 

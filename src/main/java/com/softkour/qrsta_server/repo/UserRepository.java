@@ -1,6 +1,7 @@
 package com.softkour.qrsta_server.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import com.softkour.qrsta_server.entity.user.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-      public User findUserByPhoneNumber(String phone);
+      public Optional<User> findUserByPhoneNumber(String phone);
 
       public List<User> findAllUserByStudent_needToReplaceAndCourses_course_teacher_id(boolean needToReplace,
                   Long teacherId);

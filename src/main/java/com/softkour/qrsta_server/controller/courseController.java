@@ -122,7 +122,8 @@ public class courseController {
         User u = MyUtils.getCurrentUserSession(authService);
         List<Session> sessionList = sessionService.findSessionsOfCourse(courseId);
         List<Post> postslist = postService.posts(courseId);
-        int late = studentCourseRepository.getCourseByCourse_idAndFinishedFalse(courseId).getLate();
+        int late = studentCourseRepository.findById(courseId)
+                .orElseThrow(() -> new ClientException("course", "not found this corse")).getLate();
         if (u.getType() == UserType.STUDENT && late > 0)
             throw new ClientException("payment", (late * -1) + "", 999);
 

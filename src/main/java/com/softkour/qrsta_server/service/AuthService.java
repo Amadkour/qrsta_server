@@ -58,7 +58,8 @@ public class AuthService {
     }
 
     public User update(UpdateUserRequest request) {
-        User user = authorRepository.findUserByPhoneNumber(request.getPhoneNumber());
+        User user = authorRepository.findUserByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
         User updateUser = request.toUser(user);
         return authorRepository.save(updateUser);
     }
@@ -67,7 +68,8 @@ public class AuthService {
         try {
             Authentication auth = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getPhone(), request.getPassword()));
-            User user = authorRepository.findUserByPhoneNumber(request.getPhone());
+            User user = authorRepository.findUserByPhoneNumber(request.getPhone())
+                    .orElseThrow(() -> new ClientException("use", "ser Not Found"));
 
             if (user == null) {
                 throw new ClientException("user", "user does not exist");
@@ -96,7 +98,8 @@ public class AuthService {
             if (!authorRepository.existsByPhoneNumberAndIsActive(request.getPhone(), true)) {
                 throw new ClientException("phone_number", "phone number are invaild");
             } else {
-                User u = authorRepository.findUserByPhoneNumber(request.getPhone());
+                User u = authorRepository.findUserByPhoneNumber(request.getPhone())
+                        .orElseThrow(() -> new ClientException("use", "ser Not Found"));
                 if (u.getType() == UserType.STUDENT) {
                     throw new ClientException("phone_number", "linked account must be a parent");
                 }
@@ -144,7 +147,8 @@ public class AuthService {
     }
 
     public User getUserByPhoneNumber(String phoneNumber) {
-        return authorRepository.findUserByPhoneNumber(phoneNumber);
+        return authorRepository.findUserByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
     }
 
     public List<User> getNeedToReplaceUsers(Long teacherId) {
@@ -175,7 +179,8 @@ public class AuthService {
     }
 
     public User addChild(AuthService authService, String childId) {
-        User child = authorRepository.findUserByPhoneNumber(childId);
+        User child = authorRepository.findUserByPhoneNumber(childId)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
         if (child.getStudent() == null)
             throw new ClientException("parent", "this instance not a student");
         Student s = child.getStudent();

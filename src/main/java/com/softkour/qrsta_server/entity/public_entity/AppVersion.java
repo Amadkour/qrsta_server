@@ -1,14 +1,9 @@
 package com.softkour.qrsta_server.entity.public_entity;
 
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
-import com.softkour.qrsta_server.entity.user.User;
-import com.softkour.qrsta_server.payload.response.MyNotificationResponse;
-import jakarta.persistence.CascadeType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +12,7 @@ import lombok.Setter;
 @Getter
 public class AppVersion extends AbstractAuditingEntity {
     @Column
-    private int version;
+    private String version;
     @Column
     private String appRelease;
 
