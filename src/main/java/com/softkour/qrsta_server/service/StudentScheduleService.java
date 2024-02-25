@@ -25,4 +25,9 @@ public class StudentScheduleService {
         return scheduleRepo.getScheduleByCourse_teacher_idAndQuestionNotNullOrderByCreatedDateDesc(userId);
     }
 
+    public boolean correct(String scheduleId, String correctAnswer) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'correct'");
+    }
+
 }

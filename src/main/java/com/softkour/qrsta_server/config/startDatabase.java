@@ -1,30 +1,12 @@
 package com.softkour.qrsta_server.config;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import com.softkour.qrsta_server.entity.course.Course;
-import com.softkour.qrsta_server.entity.course.Offer;
-import com.softkour.qrsta_server.entity.course.Schedule;
-import com.softkour.qrsta_server.entity.course.Session;
-import com.softkour.qrsta_server.entity.enumeration.CourseType;
-import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.entity.public_entity.Country;
-import com.softkour.qrsta_server.entity.quiz.StudentCourse;
-import com.softkour.qrsta_server.entity.user.Student;
-import com.softkour.qrsta_server.entity.user.Teacher;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.public_entity.AppVersion;
 import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
-import com.softkour.qrsta_server.repo.UserRepository;
+import com.softkour.qrsta_server.repo.public_repo.AppVersionRepo;
 import com.softkour.qrsta_server.service.OfferService;
 import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionService;
@@ -35,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @Slf4j
 public class startDatabase implements CommandLineRunner {
-    @Autowired
-    UserRepository userRepository;
+    // @Autowired
+    // UserRepository userRepository;
     @Autowired
     CountryRepo countryRepo;
     @Autowired
@@ -49,9 +31,23 @@ public class startDatabase implements CommandLineRunner {
     PostService postService;
     @Autowired
     StudentCourseRepository studentCourseRepo;
+    @Autowired
+    AppVersionRepo appVersionRepo;
 
     @Override
     public void run(String... args) throws Exception {
+        AppVersion ios = new AppVersion();
+        ios.setAppRelease("this App first App");
+        ios.setAvailable(true);
+        ios.setIos(true);
+        ios.setVersion(1);
+        appVersionRepo.save(ios);
+        AppVersion android = new AppVersion();
+        android.setAppRelease("this App first App");
+        android.setAvailable(true);
+        android.setIos(false);
+        android.setVersion(1);
+        appVersionRepo.save(android);
         /// =======country==============///
         // Country eg = new Country();
         // eg.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg");

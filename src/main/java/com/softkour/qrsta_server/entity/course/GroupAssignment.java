@@ -59,4 +59,8 @@ public class GroupAssignment extends AbstractAuditingEntity {
     public void addStudent(User user) {
         students.add(user);
     }
+
+    public void deleteStudentById(Long studentId) {
+        students.removeIf(e -> e.getId() == studentId);
+    }
 }

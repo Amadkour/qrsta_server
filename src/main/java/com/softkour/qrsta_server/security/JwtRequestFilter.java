@@ -1,6 +1,9 @@
 package com.softkour.qrsta_server.security;
 
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.exception.ClientException;
+import com.softkour.qrsta_server.repo.public_repo.AppVersionRepo;
+
 import jdk.jshell.execution.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +29,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    AppVersionRepo appVersion;
    public static String username;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         final String requestTokenHeader = request.getHeader("Authorization");
+        final String version = request.getHeader("version");
+        final boolean isIos = request.getHeader("is_ios") == "true";
+        if ((appVersion.getAppVersionByIOSAndAvailableIsTrue(isIos).getVersion() + "") != version) {
+            throw new ClientException("app_version", "please update your version", 998);
+        }
         if (StringUtils.startsWith(requestTokenHeader, "Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                logger.warn(MyUtils.getUserPhone(JwtRequestFilter.username));
-
                 if (StringUtils.isNotEmpty(username)
                         && null == SecurityContextHolder.getContext().getAuthentication()) {
                     UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(MyUtils.getUserPhone(username));

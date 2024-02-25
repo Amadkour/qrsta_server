@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softkour.qrsta_server.exception.ClientException;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true) // by default
@@ -63,6 +64,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                             response.setHeader("content-type", "application/json");
                             String responseMsg = mapper.writeValueAsString(responseMap);
                             response.getWriter().write(responseMsg);
+                            // throw new ClientException("Authontecation", "unauth", 400);
+
                         }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(

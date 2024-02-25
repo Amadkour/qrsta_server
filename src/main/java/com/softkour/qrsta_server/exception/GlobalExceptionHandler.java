@@ -83,8 +83,9 @@ public class GlobalExceptionHandler {
             ClientException exception) {
 
         Map<String, Object> errMap = new HashMap<String, Object>();
-        log.warn("================================================" + exception.key);
-        log.warn("================================================" + exception.getLocalizedMessage());
+        if (exception.code != null) {
+            return GenericResponse.errorWithCoder("update app version", exception.code);
+        }
         errMap.put(exception.key, exception.getLocalizedMessage());
         return GenericResponse.errorOfMap(errMap);
     }

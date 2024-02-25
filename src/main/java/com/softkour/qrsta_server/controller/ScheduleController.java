@@ -49,4 +49,14 @@ public class ScheduleController {
     }
 
 }
+
+@GetMapping("correct")
+public ResponseEntity<GenericResponse<Object>> correctQuestion(@RequestHeader(name = "schedule_id") String scheduleId,
+        @RequestHeader(name = "correct_answer") String correctAnswer) {
+    boolean result = scheduleService.correct(scheduleId, correctAnswer);
+    if (result)
+        return GenericResponse.successWithMessageOnly("your answer is corrected");
+    else
+        return GenericResponse.errorWithMessageOnly("your answer is wrong");
+}
 }

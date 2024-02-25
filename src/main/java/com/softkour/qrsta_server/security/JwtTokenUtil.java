@@ -35,6 +35,7 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
+    @SuppressWarnings("deprecation")
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
@@ -44,6 +45,7 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
+    @SuppressWarnings("deprecation")
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername())

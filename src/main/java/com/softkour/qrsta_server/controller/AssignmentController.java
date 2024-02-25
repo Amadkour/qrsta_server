@@ -132,6 +132,27 @@ public class AssignmentController {
         return GenericResponse.success(group.toGroupResponse());
     }
 
+    @GetMapping("delete_group")
+    public ResponseEntity<GenericResponse<Object>> deleteGroup(@RequestHeader("group_id") Long groupId) {
+        groupAssignmentService.deleteGroup(groupId);
+        return GenericResponse.successWithMessageOnly("delete_group_successfully");
+    }
+
+    @GetMapping("delete_assignment")
+    public ResponseEntity<GenericResponse<Object>> deleteAssignment(@RequestHeader("assignment_id") Long assignmentId) {
+        assignmentService.deleteAssignment(assignmentId);
+        return GenericResponse.successWithMessageOnly("delete_assignment_successfully");
+    }
+
+    @GetMapping("delete_student")
+    public ResponseEntity<GenericResponse<Object>> deleteStudent(@RequestHeader("group_id") Long groupId,
+            @RequestHeader("student_id") Long studentId) {
+        GroupAssignment groupAssignment = groupAssignmentService.findById(groupId);
+        groupAssignment.deleteStudentById(studentId);
+        groupAssignmentService.save(groupAssignment);
+        return GenericResponse.successWithMessageOnly("delete_student_successfully");
+    }
+
     @GetMapping("add_student")
     public ResponseEntity<GenericResponse<GroupAssignmentResponse>> addStudent(
             @RequestHeader(name = "assignment_id") Long assignmentId,
