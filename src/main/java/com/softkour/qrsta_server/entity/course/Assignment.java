@@ -8,12 +8,11 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.payload.response.AssignmentResponse;
-import jakarta.persistence.CascadeType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
@@ -43,7 +42,8 @@ public class Assignment extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
     private Course course;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "GroupAssignment_id")
     @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
     private Set<GroupAssignment> groups = new HashSet<>();
 

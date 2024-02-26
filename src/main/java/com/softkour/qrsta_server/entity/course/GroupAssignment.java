@@ -39,7 +39,7 @@ public class GroupAssignment extends AbstractAuditingEntity {
     private boolean active = false;
     @Column
     private boolean finished = false;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
     private Assignment assignment;
 
@@ -53,7 +53,8 @@ public class GroupAssignment extends AbstractAuditingEntity {
                 getId(),
                 getStudents().stream().map(e -> e.toAbstractUser()).toList(),
                 getDegrees(),
-                getMediaUrls());
+                getMediaUrls(),
+                isActive());
     }
 
     public void addStudent(User user) {
