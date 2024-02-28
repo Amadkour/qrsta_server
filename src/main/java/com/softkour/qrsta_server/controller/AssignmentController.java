@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
+import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Assignment;
 import com.softkour.qrsta_server.entity.course.GroupAssignment;
+import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.response.AssignmentResponse;
 import com.softkour.qrsta_server.payload.response.GroupAssignmentResponse;
@@ -42,7 +45,7 @@ public class AssignmentController {
             @RequestHeader("max_count") int maxCount,
             @RequestHeader("min_count") int minCount,
             @RequestHeader("title") String title,
-            @RequestHeader("description") String description) {
+            @RequestHeader(name = "description", required = false) String description) {
 
         Assignment assignment = new Assignment();
         assignment.setDueDate(Instant.parse(dueString));
@@ -126,6 +129,9 @@ public class AssignmentController {
         group.setAssignment(assignment);
         group.setTitle(title);
         group.setDescription(description);
+        User u = MyUtils.getCurrentUserSession(authService);
+        if (u.getType() == UserType.TEACHER && assignment.getCourse().getTeacher().getId() == u.getId())
+            group.setActive(true);
         group = groupAssignmentService.save(group);
         assignment.addGroup(group);
         assignmentService.save(assignment);

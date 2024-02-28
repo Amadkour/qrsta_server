@@ -38,6 +38,29 @@ services:
     image: 'redis'
     ports:
       - "6379:6379"
+  # web:
+  #   build: ./qrsta_server.jar
+  #   ports:
+  #     - "8080:8080"
+  app:
+    image: 'docker-spring-boot-postgres:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - mongodb
+      - postgres-db
+      - redis-server
+    # environment:
+    #   - POSTGRES_USER=$YOUR_USERNAME
+    #   - POSTGRES_PASSWORD=$YOUR_PASSWORD
+    #   - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/$YOUR_DB_NAME
+    #   - SPRING_DATASOURCE_USERNAME=$YOUR_USERNAME
+    #   - SPRING_DATASOURCE_PASSWORD=$YOUR_PASSWORD
+    #   - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+    ports:
+      - "8080:8080"
   # springboot-docker-compose-app-container:
   #   links:
   #   - redis-server

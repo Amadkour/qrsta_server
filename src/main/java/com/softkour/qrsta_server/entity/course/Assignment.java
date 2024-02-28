@@ -24,9 +24,9 @@ import lombok.Setter;
 public class Assignment extends AbstractAuditingEntity {
     @Column
     private String title;
-    @Column
+    @Column(nullable = true)
     private String description;
-    @Column
+    @Column(nullable = true)
     private List<String> mediaUrls;
     @Column
     private Instant dueDate;
@@ -54,6 +54,7 @@ public class Assignment extends AbstractAuditingEntity {
                 getTitle(),
                 getDescription(),
                 getDueDate(),
+                !isFinished(),
                 getMediaUrls());
     }
 

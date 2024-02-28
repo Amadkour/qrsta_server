@@ -27,13 +27,17 @@ import lombok.Setter;
 public class GroupAssignment extends AbstractAuditingEntity {
     @Column
     private List<Double> degrees;
-    @Column
+    @Column(nullable = true)
+
     private String title;
-    @Column
+    @Column(nullable = true)
+
     private String description;
-    @Column
+    @Column(nullable = true)
+
     private List<String> mediaUrls;
-    @Column
+    @Column(nullable = true)
+
     private Instant dueDate;
     @Column
     private boolean active = false;
@@ -54,7 +58,9 @@ public class GroupAssignment extends AbstractAuditingEntity {
                 getStudents().stream().map(e -> e.toAbstractUser()).toList(),
                 getDegrees(),
                 getMediaUrls(),
-                isActive());
+                isActive(),
+                getTitle(),
+                getDescription());
     }
 
     public void addStudent(User user) {

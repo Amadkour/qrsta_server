@@ -15,6 +15,7 @@ public class AssignmentResponse {
     private String title;
     private String description;
     private Instant dueDate;
+    private boolean finish;
     private List<String> mediaUrls;
 
 }
