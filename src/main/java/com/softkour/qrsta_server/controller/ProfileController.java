@@ -17,21 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Course;
-import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.RequstForm;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
-import com.softkour.qrsta_server.service.CourseService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/profile/")
 @Slf4j
-public class ProfileServices {
+public class ProfileController {
     @Autowired
     CourseService courseService;
     @Autowired

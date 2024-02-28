@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.UserRepository;
 
 @Service
@@ -17,9 +19,15 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
+    public User findUserByPhoneNumber(String phone) {
+        return userRepository.findUserByPhoneNumber(phone)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
+    }
+
     @Override
     public UserDetails loadUserByUsername(String phone) {
-        com.softkour.qrsta_server.entity.user.User user = userRepository.findUserByPhoneNumber(phone);
+        com.softkour.qrsta_server.entity.user.User user = userRepository.findUserByPhoneNumber(phone)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority(user.getType().name()));
         return new org.springframework.security.core.userdetails.User(

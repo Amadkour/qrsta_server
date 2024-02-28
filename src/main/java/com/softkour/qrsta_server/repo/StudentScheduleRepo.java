@@ -1,12 +1,18 @@
 package com.softkour.qrsta_server.repo;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.softkour.qrsta_server.entity.public_entity.StudentSchedual;
+import org.springframework.stereotype.Repository;
 
-public interface StudentScheduleRepo extends JpaRepository<StudentSchedual, Long> {
+import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
 
-    List<StudentSchedual> getScheduleByUser_id(Long studentId);
+@Repository
+public interface StudentScheduleRepo extends JpaRepository<StudentSchedule, Long> {
+
+    List<StudentSchedule> getScheduleByUser_idAndCreatedDateAfterOrderByCreatedDateDesc(Long studentId, Instant Date);
+
+    List<StudentSchedule> getScheduleByCourse_teacher_idAndQuestionNotNullOrderByCreatedDateDesc(Long teacherId);
 
 }

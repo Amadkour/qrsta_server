@@ -3,16 +3,15 @@ package com.softkour.qrsta_server.service;
 import java.time.Instant;
 import java.util.List;
 
-import org.apache.logging.log4j.CloseableThreadContext.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.SessionRepository;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,18 +83,18 @@ public class SessionService {
         for (int i = 0; i < userIds.size(); i++) {
             User user = authService.getUserById(userIds.get(i));
             /// check user join this course
-        if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
-            session.addStudent(user);
-            sessionRepository.save(session);
-        } else {
-            throw new ClientException("student",
-                    "this student not joint to this course: user id=".concat(user.getId().toString()));
+            if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
+                session.addStudent(user);
+                sessionRepository.save(session);
+            } else {
+                throw new ClientException("student",
+                        "this student not joint to this course: user id=".concat(user.getId().toString()));
+            }
         }
+        return sessionRepository.findById(sessionId)
+                .orElseThrow(
+                        () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
     }
-    return sessionRepository.findById(sessionId)
-            .orElseThrow(
-                    () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
-}
 
     public Session removeStudentToSession(User user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)

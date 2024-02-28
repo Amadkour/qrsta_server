@@ -1,7 +1,10 @@
 package com.softkour.qrsta_server.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
+import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
+import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.quiz.Quiz;
+import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.QuizRepository;
+import com.softkour.qrsta_server.repo.StudentScheduleRepo;
 
 @Service
 @Transactional
@@ -23,6 +30,8 @@ public class QuizService {
 
     @Autowired
     AuthService authService;
+    @Autowired
+    StudentScheduleRepo scheduleRepo;
 
     private final Logger log = LoggerFactory.getLogger(QuizService.class);
 
@@ -94,27 +103,50 @@ public class QuizService {
         return quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
     }
 
-    @Transactional(readOnly = true)
     public String correct(List<List<String>> answers, Long quizId) {
         Quiz q = quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
         List<Question> questions = q.getQuestions().stream().toList();
+        List<Question> wrongQuestions = new ArrayList<>();
+        User u = MyUtils.getCurrentUserSession(authService);
+
         int totalPoints = questions.stream().mapToInt(e -> e.getGrade()).sum();
         int points = 0;
-        log.warn("========================answers");
-        log.warn(String.valueOf(questions.size()));
-        log.warn(String.valueOf(answers.size()));
-        log.warn("========================answers");
-
         for (int i = 0; i < questions.size(); i++) {
             List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(e -> e.getIsCorrectAnswer())
                     .map(e -> e.getTitle()).toList();
-
             if (answers.get(i).stream().allMatch(e -> correctAnswer.contains(e))
                     && answers.get(i).size() == correctAnswer.size()) {
                 points += questions.get(i).getGrade();
+            } else {
+                wrongQuestions.add(questions.get(i));
             }
         }
+        ////
+        /// add it in student schedual
+        log.warn("total score is:" + (points / totalPoints));
+        log.warn("total of wrong answers:" + wrongQuestions.size());
+        if ((points / totalPoints) < 0.5) {
+            List<CourseQuiz> courses = q.getCoveredCourses().stream().collect(Collectors.toList());
+            for (int i = 0; i < q.getCoveredCourses().size(); i++) {
+                log.warn("kkkkkkkkkkkkkkkkkkkkkkkk");
+                CourseQuiz c = courses.stream()
+                        .takeWhile(e -> e.getCourse().getStudents().stream().anyMatch(s -> s.getId() == u.getId()))
+                        .findFirst().orElseThrow(() -> new ClientException("course", "user unjoint"));
+                List<SessionQuiz> sessions = c.getSessions().stream().collect(Collectors.toList());
+                for (int j = 0; j < sessions.size(); j++) {
+                    log.warn("add to students" + u.getPhoneNumber());
 
+                    StudentSchedule item = new StudentSchedule();
+                    item.setDone(false);
+                    item.setRead(false);
+                    item.setCourse(c.getCourse());
+                    item.setSession(sessions.get(j).getSession());
+                    item.setUser(u);
+                    item.setQuestion(wrongQuestions.get((new Random()).nextInt(wrongQuestions.size())));
+                    scheduleRepo.save(item);
+                }
+            }
+        }
         return String.valueOf(points) + '/' + String.valueOf(totalPoints);
 
     }

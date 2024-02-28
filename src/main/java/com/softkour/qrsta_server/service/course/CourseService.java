@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.service;
+package com.softkour.qrsta_server.service.course;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
-import com.softkour.qrsta_server.entity.quiz.StudentCourse;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
@@ -37,24 +37,25 @@ public class CourseService {
             throw new ClientException("course", "you are aready joined in this course: ".concat(courseId.toString()));
 
         } else {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(
-                        () -> new ClientException("course", "course not found id: ".concat(courseId.toString())));
-        StudentCourse student = new StudentCourse();
-        student.setCourse(course);
-        student.setStudent(user);
-        student.setLate(0);
-        if (course.getType() == CourseType.PRIVATE && course.getTeacher().getTeacher().isEnableAutojoin() == false) {
-            student.setActive(false);
-        } else {
-            student.setActive(true);
+            Course course = courseRepository.findById(courseId)
+                    .orElseThrow(
+                            () -> new ClientException("course", "course not found id: ".concat(courseId.toString())));
+            StudentCourse student = new StudentCourse();
+            student.setCourse(course);
+            student.setStudent(user);
+            student.setLate(0);
+            if (course.getType() == CourseType.PRIVATE
+                    && course.getTeacher().getTeacher().isEnableAutojoin() == false) {
+                student.setActive(false);
+            } else {
+                student.setActive(true);
 
+            }
+
+            course.addStudent(student);
+            return courseRepository.save(course);
         }
-
-        course.addStudent(student);
-        return courseRepository.save(course);
     }
-}
 
     public Course removeStudentFromCourse(User user, Long courseId) {
         Course course = courseRepository.findById(courseId)
@@ -102,7 +103,6 @@ public class CourseService {
      * @param id the id of the entity.
      */
     public void delete(Long id) {
-        log.debug("Request to delete Course : {}", id);
         courseRepository.deleteById(id);
     }
 
@@ -111,7 +111,7 @@ public class CourseService {
     }
 
     public List<Course> getAllDisableStudentsOfCourses(Long teacherId) {
-        return courseRepository.getCourseByTeacherIdAndStudents_active(teacherId, false);
+        return courseRepository.getCourseByTeacher_idAndStudents_active(teacherId, false);
     }
 
     // public Course getActiveCourse(Long courseId) {
@@ -123,8 +123,12 @@ public class CourseService {
             StudentCourse user = studentCourseRepository.findById(Long.parseLong(request.getId())).orElseThrow(
                     () -> new ClientException("course",
                             "this course not found id: ".concat(String.valueOf(request.getId()))));
+            log.warn(user.isActive() + "");
             user.setActive(true);
             studentCourseRepository.save(user);
+            log.warn(user.getStudent().getPhoneNumber());
+            log.warn(user.isActive() + "");
+
         }
         return "accept to join successfully";
 

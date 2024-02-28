@@ -1,10 +1,7 @@
 package com.softkour.qrsta_server.config;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,23 +9,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.softkour.qrsta_server.entity.course.Course;
-import com.softkour.qrsta_server.entity.course.Offer;
 import com.softkour.qrsta_server.entity.course.Schedule;
-import com.softkour.qrsta_server.entity.course.Session;
+import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
-import com.softkour.qrsta_server.entity.public_entity.Country;
-import com.softkour.qrsta_server.entity.quiz.StudentCourse;
+import com.softkour.qrsta_server.entity.public_entity.AppVersion;
 import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
-import com.softkour.qrsta_server.service.CourseService;
+import com.softkour.qrsta_server.repo.public_repo.AppVersionRepo;
 import com.softkour.qrsta_server.service.OfferService;
 import com.softkour.qrsta_server.service.PostService;
 import com.softkour.qrsta_server.service.SessionService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,38 +46,52 @@ public class startDatabase implements CommandLineRunner {
     PostService postService;
     @Autowired
     StudentCourseRepository studentCourseRepo;
+    @Autowired
+    AppVersionRepo appVersionRepo;
 
     @Override
     public void run(String... args) throws Exception {
+        AppVersion ios = new AppVersion();
+        ios.setAppRelease("this App first App");
+        ios.setAvailable(true);
+        ios.setIos(true);
+        ios.setVersion("1");
+        appVersionRepo.save(ios);
+        AppVersion android = new AppVersion();
+        android.setAppRelease("this App first App");
+        android.setAvailable(true);
+        android.setIos(false);
+        android.setVersion("1");
+        appVersionRepo.save(android);
         /// =======country==============///
-        Country eg = new Country();
-        eg.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg");
-        eg.setName("egypt");
-        eg.setSidMax("14");
-        eg.setSidMin("14");
-        eg.setPhoneLength("10");
-        eg.setPhoneStart("3|2");
-        eg.setPhoneCode("+20");
+        // Country eg = new Country();
+        // eg.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg");
+        // eg.setName("egypt");
+        // eg.setSidMax("14");
+        // eg.setSidMin("14");
+        // eg.setPhoneLength("10");
+        // eg.setPhoneStart("3|2");
+        // eg.setPhoneCode("+20");
 
-        Country saudi = new Country();
-        saudi.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg");
-        saudi.setName("saudi");
-        saudi.setSidMax("10");
-        saudi.setSidMin("10");
-        saudi.setPhoneStart("3|2");
-        saudi.setPhoneLength("8");
-        saudi.setPhoneCode("+966");
-        Country emirate = new Country();
-        emirate.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg");
-        emirate.setName("emirate");
-        emirate.setSidMax("10");
-        emirate.setSidMin("10");
-        emirate.setPhoneLength("8");
-        emirate.setPhoneCode("+971");
+        // Country saudi = new Country();
+        // saudi.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg");
+        // saudi.setName("saudi");
+        // saudi.setSidMax("10");
+        // saudi.setSidMin("10");
+        // saudi.setPhoneStart("3|2");
+        // saudi.setPhoneLength("8");
+        // saudi.setPhoneCode("+966");
+        // Country emirate = new Country();
+        // emirate.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg");
+        // emirate.setName("emirate");
+        // emirate.setSidMax("10");
+        // emirate.setSidMin("10");
+        // emirate.setPhoneLength("8");
+        // emirate.setPhoneCode("+971");
 
-        countryRepo.save(eg);
-        countryRepo.save(emirate);
-        countryRepo.save(saudi);
+        // countryRepo.save(eg);
+        // countryRepo.save(emirate);
+        // countryRepo.save(saudi);
         for (int i = 2; i < 5; i++) {
 
             User user = new User();
@@ -103,7 +114,8 @@ public class startDatabase implements CommandLineRunner {
             user = userRepository.save(user);
             if (i >= 3) {
                 Student s = user.getStudent();
-                s.setParent(userRepository.findUserByPhoneNumber("+201110672222"));
+                s.setParent(userRepository.findUserByPhoneNumber("+201110672222")
+                        .orElseThrow(() -> new ClientException("use", "ser Not Found")));
                 user.setStudent(s);
                 user = userRepository.save(user);
             }
@@ -151,14 +163,14 @@ public class startDatabase implements CommandLineRunner {
             // session.addStudent(user);
             // sessionService.save(session);
             // ==========================offer=====================
-            Offer offer = new Offer();
-            Set<Course> cs = new HashSet<Course>();
-            cs.add(course);
-            offer.setCost("100");
-            offer.setEndDate(Instant.now());
-            offer.setCourses(cs);
-            offer.setMonths(3);
-            offerService.save(offer);
+            // Offer offer = new Offer();
+            // Set<Course> cs = new HashSet<Course>();
+            // cs.add(course);
+            // offer.setCost("100");
+            // offer.setEndDate(Instant.now());
+            // offer.setCourses(cs);
+            // offer.setMonths(3);
+            // offerService.save(offer);
             // =======================[post]==================
             // Post post = new Post();
             // post.setData("first Post");
@@ -166,7 +178,8 @@ public class startDatabase implements CommandLineRunner {
             // post.setSession(session);
             // postService.addPost(post);
 
-        }
+            // }
 
+        }
     }
 }

@@ -17,8 +17,8 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.entity.course.Offer;
 import com.softkour.qrsta_server.payload.request.OfferCreationRequest;
 import com.softkour.qrsta_server.service.AuthService;
-import com.softkour.qrsta_server.service.CourseService;
 import com.softkour.qrsta_server.service.OfferService;
+import com.softkour.qrsta_server.service.course.CourseService;
 
 import jakarta.validation.Valid;
 
