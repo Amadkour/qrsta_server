@@ -33,16 +33,30 @@ public class ScheduleController {
         if (childPhone != null) {
 
             u = authService.getUserByPhoneNumber(childPhone);
-            return GenericResponse.success(scheduleService.getUserSchedule(u.getId()));
+            return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
+                    .map(e -> e.toStudentSchedualResponse()).toList());
 
         } else {
             u = MyUtils.getCurrentUserSession(authService);
             if (u.getType() == UserType.TEACHER) {
-                return GenericResponse.success(scheduleService.getTeacherSchedule(u.getId()));
+                return GenericResponse.success(scheduleService.getTeacherSchedule(u.getId()).stream()
+                        .map(e -> e.toStudentSchedualResponse()).toList());
+            }
 
         return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
                 .map(e -> e.toStudentSchedualResponse()).toList());
 
     }
 
+}
+
+@GetMapping("correct")
+public ResponseEntity<GenericResponse<Object>> correctQuestion(@RequestHeader(name = "schedule_id") String scheduleId,
+        @RequestHeader(name = "correct_answer") String correctAnswer) {
+    boolean result = scheduleService.correct(scheduleId, correctAnswer);
+    if (result)
+        return GenericResponse.successWithMessageOnly("your answer is corrected");
+    else
+        return GenericResponse.errorWithMessageOnly("your answer is wrong");
+}
 }

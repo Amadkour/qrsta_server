@@ -27,4 +27,8 @@ public class AssignmentService {
     public List<Assignment> findByCourseId(Long id) {
         return assignmentRepo.findAllByCourseId(id);
     }
+
+    public void deleteAssignment(Long assignmentId) {
+        assignmentRepo.deleteById(assignmentId);
+    }
 }

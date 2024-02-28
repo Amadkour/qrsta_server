@@ -20,7 +20,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
+@Slf4j
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
@@ -29,6 +32,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
+    @Autowired
+    private AfterSecurityFilter afterSecurityFilter;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -59,10 +64,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                             ObjectMapper mapper = new ObjectMapper();
                             response.setStatus(400);
                             responseMap.put("error", true);
+                            responseMap.put("success", false);
                             responseMap.put("message", "Unauthorized");
+                            responseMap.put("details", authException.getLocalizedMessage());
                             response.setHeader("content-type", "application/json");
                             String responseMsg = mapper.writeValueAsString(responseMap);
+
                             response.getWriter().write(responseMsg);
+
                         }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
@@ -71,10 +80,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
                                 .anyRequest().authenticated());
 
-        http.authenticationProvider(authenticationProvider());
-
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(afterSecurityFilter, JwtRequestFilter.class);
+        ;
         return http.build();
     }
 }

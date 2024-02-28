@@ -17,7 +17,17 @@ public class StudentScheduleService {
     StudentScheduleRepo scheduleRepo;
 
     public List<StudentSchedule> getUserSchedule(Long userId) {
-        return scheduleRepo.getScheduleByUser_idAndCreatedDateAfter(userId, Instant.now().minus(3, ChronoUnit.DAYS));
+        return scheduleRepo.getScheduleByUser_idAndCreatedDateAfterOrderByCreatedDateDesc(userId,
+                Instant.now().minus(3, ChronoUnit.DAYS));
+    }
+
+    public List<StudentSchedule> getTeacherSchedule(Long userId) {
+        return scheduleRepo.getScheduleByCourse_teacher_idAndQuestionNotNullOrderByCreatedDateDesc(userId);
+    }
+
+    public boolean correct(String scheduleId, String correctAnswer) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'correct'");
     }
 
 }

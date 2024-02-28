@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.LoginRequest;
 import com.softkour.qrsta_server.payload.request.RegisterationRequest;
 import com.softkour.qrsta_server.repo.CountryRepo;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.OTPService;
+
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,10 +86,12 @@ public class PublicUserController {
             return GenericResponse.errorWithMessageOnly(
                     "faild to send otp to your phone " + u.getPhoneNumber());
     }
+
     @PostMapping("verfy_otp")
     public ResponseEntity<GenericResponse<Object>> verifyOtp(@Valid @RequestHeader("user_otp") String otp,
             @Valid @RequestHeader("phone") String phone) {
-        User user = userRepository.findUserByPhoneNumber(phone);
+        User user = userRepository.findUserByPhoneNumber(phone)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
         Map<String, Object> responseMap = new HashMap<>();
         if (user.getOtp().equalsIgnoreCase(otp)) {
             // user.setOtp(null);
@@ -105,7 +109,8 @@ public class PublicUserController {
     @GetMapping("forget_password")
     public ResponseEntity<GenericResponse<Map<String, Object>>> forgetPassword(@RequestHeader("phone") String phone,
             @RequestHeader("phone_code") String phoneCode) {
-        User user = userRepository.findUserByPhoneNumber(phone);
+        User user = userRepository.findUserByPhoneNumber(phone)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
         Supplier<String> otp = otpService.createRandomOneTimeOTP();
         user.setOtp(otp.get());
         user.setExpireOTPDateTime(Instant.now().plusSeconds(60));
@@ -120,16 +125,17 @@ public class PublicUserController {
             @RequestHeader("phone_code") String phoneCode,
             @RequestHeader("password") String password,
             @RequestHeader("otp") String otp) {
-        User user = userRepository.findUserByPhoneNumber(phone);
+        User user = userRepository.findUserByPhoneNumber(phone)
+                .orElseThrow(() -> new ClientException("use", "ser Not Found"));
         if (user.getOtp().equalsIgnoreCase(otp) && !user.getExpireOTPDateTime().isBefore(Instant.now())) {
-                user.setPassword(new BCryptPasswordEncoder().encode(password));
-                userRepository.save(user);
-                return GenericResponse.successWithMessageOnly("success changed");
+            user.setPassword(new BCryptPasswordEncoder().encode(password));
+            userRepository.save(user);
+            return GenericResponse.successWithMessageOnly("success changed");
 
-            }
-            log.warn(user.getOtp());
-            log.warn(String.valueOf(user.getExpireOTPDateTime().isBefore(Instant.now())));
-            return GenericResponse.errorWithMessageOnly("error in update");
+        }
+        log.warn(user.getOtp());
+        log.warn(String.valueOf(user.getExpireOTPDateTime().isBefore(Instant.now())));
+        return GenericResponse.errorWithMessageOnly("error in update");
 
     }
 }

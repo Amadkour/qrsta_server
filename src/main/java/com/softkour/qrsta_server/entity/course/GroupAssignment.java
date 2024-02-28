@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.payload.response.GroupAssignmentResponse;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,10 +53,15 @@ public class GroupAssignment extends AbstractAuditingEntity {
                 getId(),
                 getStudents().stream().map(e -> e.toAbstractUser()).toList(),
                 getDegrees(),
-                getMediaUrls());
+                getMediaUrls(),
+                isActive());
     }
 
     public void addStudent(User user) {
         students.add(user);
+    }
+
+    public void deleteStudentById(Long studentId) {
+        students.removeIf(e -> e.getId() == studentId);
     }
 }

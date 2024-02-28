@@ -2,7 +2,6 @@ package com.softkour.qrsta_server.controller;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,7 +110,7 @@ public class AssignmentController {
     }
 
     @GetMapping("add_group")
-    public ResponseEntity<GenericResponse<AssignmentResponse>> addGroup(
+    public ResponseEntity<GenericResponse<GroupAssignmentResponse>> addGroup(
             @RequestHeader(name = "assignment_id") Long assignmentId,
             @RequestHeader(name = "students") List<Long> studentIds,
             @RequestHeader(name = "title", required = false) String title,
@@ -125,8 +124,33 @@ public class AssignmentController {
         GroupAssignment group = new GroupAssignment();
         group.setStudents(studentIds.stream().map(e -> authService.getUserById(e)).collect(Collectors.toSet()));
         group.setAssignment(assignment);
-        groupAssignmentService.save(group);
-        return GenericResponse.success(assignment.toAssignmentResponse());
+        group.setTitle(title);
+        group.setDescription(description);
+        group = groupAssignmentService.save(group);
+        assignment.addGroup(group);
+        assignmentService.save(assignment);
+        return GenericResponse.success(group.toGroupResponse());
+    }
+
+    @GetMapping("delete_group")
+    public ResponseEntity<GenericResponse<Object>> deleteGroup(@RequestHeader("group_id") Long groupId) {
+        groupAssignmentService.deleteGroup(groupId);
+        return GenericResponse.successWithMessageOnly("delete_group_successfully");
+    }
+
+    @GetMapping("delete_assignment")
+    public ResponseEntity<GenericResponse<Object>> deleteAssignment(@RequestHeader("assignment_id") Long assignmentId) {
+        assignmentService.deleteAssignment(assignmentId);
+        return GenericResponse.successWithMessageOnly("delete_assignment_successfully");
+    }
+
+    @GetMapping("delete_student")
+    public ResponseEntity<GenericResponse<Object>> deleteStudent(@RequestHeader("group_id") Long groupId,
+            @RequestHeader("student_id") Long studentId) {
+        GroupAssignment groupAssignment = groupAssignmentService.findById(groupId);
+        groupAssignment.deleteStudentById(studentId);
+        groupAssignmentService.save(groupAssignment);
+        return GenericResponse.successWithMessageOnly("delete_student_successfully");
     }
 
     @GetMapping("add_student")
