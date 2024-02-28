@@ -129,6 +129,8 @@ public class AssignmentController {
         group.setAssignment(assignment);
         group.setTitle(title);
         group.setDescription(description);
+        group.setTitle(title);
+        group.setDescription(description);
         User u = MyUtils.getCurrentUserSession(authService);
         if (u.getType() == UserType.TEACHER && assignment.getCourse().getTeacher().getId() == u.getId())
             group.setActive(true);

@@ -14,8 +14,8 @@ public class GroupAssignmentResponse {
     private List<AbstractUser> students;
     private List<Double> degrees;
     private List<String> mediaUrls;
-    private boolean active = false;
-    private String title;
+    private boolean active = false;    priate String title;
     private String description;
-
 }
+
+    
