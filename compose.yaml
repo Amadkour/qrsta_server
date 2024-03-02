@@ -33,11 +33,11 @@ services:
       POSTGRES_PASSWORD: my_password
       POSTGRES_DB: my-project-db
 
-  redis-server:
-    container_name: redis
-    image: 'redis'
-    ports:
-      - "6379:6379"
+  # redis-server:
+  #   container_name: redis
+  #   image: 'redis'
+  #   ports:
+  #     - "6379:6379"
   # web:
   #   build: ./qrsta_server.jar
   #   ports:
