@@ -15,7 +15,7 @@
 #       - 'POSTGRES_PASSWORD=secret'
 #     ports:
 #       - '5432:5432'
-version: '5'
+version: '1.0'
 services:
   mongodb:
     image: mongo:latest
