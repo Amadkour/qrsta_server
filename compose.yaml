@@ -22,6 +22,8 @@ services:
     container_name: "mongodb"
     ports:
       - "27070:27017"
+    volumes:
+      - dbdata6:/data/db
   postgres-db:
     container_name: postgres-db
     image: postgres:latest
@@ -31,8 +33,9 @@ services:
     environment:
       POSTGRES_USER: my_user
       POSTGRES_PASSWORD: my_password
+     
       POSTGRES_DB: my-project-db
-
+  
   # redis-server:
   #   container_name: redis
   #   image: 'redis'
@@ -69,3 +72,5 @@ services:
   #   build: ./qrsta_server.jar
   #   ports:
   #     - "8081:8081"
+volumes:
+  dbdata6:
