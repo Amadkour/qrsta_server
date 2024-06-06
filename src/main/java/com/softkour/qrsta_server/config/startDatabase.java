@@ -97,8 +97,10 @@ public class startDatabase implements CommandLineRunner {
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
             if (2 == i) {
+                user.setType(UserType.OBSERVER);
+            } else  if (3 == i) {
                 user.setType(UserType.TEACHER);
-                user.setTeacher(new Teacher());
+                user.setStudent(new Student());
             } else {
                 user.setType(UserType.STUDENT);
                 user.setStudent(new Student());
@@ -112,13 +114,14 @@ public class startDatabase implements CommandLineRunner {
             user.setActive(true);
             user.setLogged(true);
             user = userRepository.save(user);
-            if (i >= 3) {
+            if(i>=4) {
                 Student s = user.getStudent();
-                s.setParent(userRepository.findUserByPhoneNumber("+201110672222")
+                s.setParent(userRepository.findUserByPhoneNumber("+201110672223")
                         .orElseThrow(() -> new ClientException("use", "ser Not Found")));
                 user.setStudent(s);
                 user = userRepository.save(user);
             }
+
             /// =================course========================///
             Course course = new Course();
             course.setCost(10);
@@ -142,12 +145,12 @@ public class startDatabase implements CommandLineRunner {
             schedule.setToTime("04:00 PM");
             course.addSchedule(schedule);
             List<User> users = userRepository.findAll();
-            for (int u = 0; u < users.size(); u++) {
+            for (User value : users) {
                 StudentCourse studentC = new StudentCourse();
                 studentC.setCourse(course);
                 studentC.setActive(true);
-                studentC.setStudent(users.get(u));
-                studentC.setLate(1);
+                studentC.setStudent(value);
+                studentC.setLate(0);
                 course.addStudent(studentC);
             }
 
