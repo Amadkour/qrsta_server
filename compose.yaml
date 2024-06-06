@@ -15,7 +15,7 @@
 #       - 'POSTGRES_PASSWORD=secret'
 #     ports:
 #       - '5432:5432'
-version: '3'
+version: '5'
 services:
   mongodb:
     image: mongo:latest
@@ -42,15 +42,15 @@ services:
   #   build: ./qrsta_server.jar
   #   ports:
   #     - "8080:8080"
-  app:
-    image: 'docker-spring-boot-postgres:latest'
-    build:
-      context: .
-    container_name: app
-    depends_on:
-      - mongodb
-      - postgres-db
-      - redis-server
+  # app:
+  #   image: 'docker-spring-boot-postgres:latest'
+  #   build:
+  #     context: .
+  #   container_name: app
+  #   depends_on:
+  #     - mongodb
+  #     - postgres-db
+  #     - redis-server
     # environment:
     #   - POSTGRES_USER=$YOUR_USERNAME
     #   - POSTGRES_PASSWORD=$YOUR_PASSWORD
@@ -59,8 +59,8 @@ services:
     #   - SPRING_DATASOURCE_PASSWORD=$YOUR_PASSWORD
     #   - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
   # springboot-docker-compose-app-container:
   #   links:
   #   - redis-server
