@@ -123,5 +123,4 @@ public class UserController {
         map.put("score", userService.getUserScore(childId, courseId));
         return GenericResponse.success(map);
     }
-
 }
