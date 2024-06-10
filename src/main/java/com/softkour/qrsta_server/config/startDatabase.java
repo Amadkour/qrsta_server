@@ -1,7 +1,6 @@
 package com.softkour.qrsta_server.config;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,11 +13,12 @@ import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.public_entity.AppVersion;
-import com.softkour.qrsta_server.entity.user.Student;
+import com.softkour.qrsta_server.entity.user.Parent;
 import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.CountryRepo;
+import com.softkour.qrsta_server.repo.ParentReppo;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
 import com.softkour.qrsta_server.repo.UserRepository;
 import com.softkour.qrsta_server.repo.public_repo.AppVersionRepo;
@@ -34,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 public class startDatabase implements CommandLineRunner {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ParentReppo parentRepository;
     @Autowired
     CountryRepo countryRepo;
     @Autowired
@@ -96,14 +98,17 @@ public class startDatabase implements CommandLineRunner {
 
             User user = new User();
             user.setNationalId("1231231231231".concat(String.valueOf(i)));
-            if (2 == i) {
-                user.setType(UserType.OBSERVER);
-            } else  if (3 == i) {
-                user.setType(UserType.TEACHER);
-                user.setStudent(new Student());
-            } else {
+            if (i == 4) {
                 user.setType(UserType.STUDENT);
-                user.setStudent(new Student());
+                // user.setStudent(new Student());
+            } else if (3 == i) {
+                user.setType(UserType.TEACHER);
+                Teacher teacher = new Teacher();
+                user.setTeacher(teacher);
+                ;
+            } else {
+                parentRepository.save(new Parent());
+                user.setType(UserType.OBSERVER);
             }
             user.setName("Ahmed Madkour ".concat(String.valueOf(i)));
             user.setPassword(new BCryptPasswordEncoder().encode("Aa@12345"));
@@ -114,47 +119,49 @@ public class startDatabase implements CommandLineRunner {
             user.setActive(true);
             user.setLogged(true);
             user = userRepository.save(user);
-            if(i>=4) {
-                Student s = user.getStudent();
-                s.setParent(userRepository.findUserByPhoneNumber("+201110672223")
-                        .orElseThrow(() -> new ClientException("use", "ser Not Found")));
-                user.setStudent(s);
-                user = userRepository.save(user);
+
+            if (i == 4) {
+                User parent = userRepository.findUserByPhoneNumber("+201110672222")
+                        .orElseThrow(() -> new ClientException("use", "ser Not Found"));
+                user.setParent(parent.getParent());
+                parent.setStudent(user.getStudent());
+
+                userRepository.save(user);
+                userRepository.save(parent);
+                /// =================course========================///
+                User teacher = userRepository.findUserByPhoneNumber("+201110672223")
+                        .orElseThrow(() -> new ClientException("use", "ser Not Found"));
+                Course course = new Course();
+                course.setCost(10);
+                course.setUseOnlinePayment(true);
+                course.setName("course".concat(String.valueOf(i)));
+                course.setTeacher(teacher);
+                course.setType(CourseType.PUBLIC);
+                course = courseService.save(course);
+
+                StudentCourse studentCourse = new StudentCourse();
+                studentCourse.setCourse(course);
+                studentCourse.setStudent(user);
+                studentCourse.setLate(0);
+                studentCourse.setActive(true);
+                course.addStudent(studentCourse);
+                Schedule schedule = new Schedule();
+                schedule.setDay("monday");
+                schedule.setFromTime("02:00 PM");
+                schedule.setToTime("04:00 PM");
+                course.addSchedule(schedule);
+                // List<User> users = userRepository.findAll();
+                // for (User value : users) {
+                // StudentCourse studentC = new StudentCourse();
+                // studentC.setCourse(course);
+                // studentC.setActive(true);
+                // studentC.setStudent(value);
+                // studentC.setLate(0);
+                // course.addStudent(studentC);
+                // }
+                course = courseService.save(course);
             }
 
-            /// =================course========================///
-            Course course = new Course();
-            course.setCost(10);
-            course.setUseOnlinePayment(true);
-            course.setName("course".concat(String.valueOf(i)));
-            course.setTeacher(user);
-            course.setType(CourseType.PUBLIC);
-            course = courseService.save(course);
-            log.warn("==========================================");
-            log.warn(userRepository.findAll().stream().map(User::getName).toList().toString());
-            log.warn("==========================================");
-            StudentCourse studentCourse = new StudentCourse();
-            studentCourse.setCourse(course);
-            studentCourse.setStudent(user);
-            studentCourse.setLate(0);
-            // course.addStudent(studentCourse);
-            course.addStudent(studentCourse);
-            Schedule schedule = new Schedule();
-            schedule.setDay("monday");
-            schedule.setFromTime("02:00 PM");
-            schedule.setToTime("04:00 PM");
-            course.addSchedule(schedule);
-            List<User> users = userRepository.findAll();
-            for (User value : users) {
-                StudentCourse studentC = new StudentCourse();
-                studentC.setCourse(course);
-                studentC.setActive(true);
-                studentC.setStudent(value);
-                studentC.setLate(0);
-                course.addStudent(studentC);
-            }
-
-            course = courseService.save(course);
             // ===================session=====================//
             // Session session = new Session();
             // session.setLabel("session" +
@@ -184,5 +191,6 @@ public class startDatabase implements CommandLineRunner {
             // }
 
         }
+        System.out.println("============[done all]");
     }
 }

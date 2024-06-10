@@ -1,6 +1,7 @@
 package com.softkour.qrsta_server.entity.user;
 
 import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +17,12 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Teacher extends AbstractAuditingEntity {
+    public Teacher() {
+        this.enableAbsence = true;
+        this.enableAutojoin = true;
+        this.enableAutoChangeDevice = true;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column()
     private OrganizationType organization;

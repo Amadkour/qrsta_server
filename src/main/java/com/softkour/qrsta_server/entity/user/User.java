@@ -12,7 +12,6 @@ import com.softkour.qrsta_server.entity.course.Offer;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.DeviceType;
-import com.softkour.qrsta_server.entity.enumeration.OrganizationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.quiz.StudentQuiz;
 import com.softkour.qrsta_server.payload.response.AbstractChild;
@@ -27,7 +26,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -62,7 +60,6 @@ public class User extends AbstractAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column()
     private UserType type;
-
 
     @NotNull
     @Column(nullable = false, unique = true)
@@ -105,8 +102,6 @@ public class User extends AbstractAuditingEntity {
     private String fcmToken;
     @Column()
     private DeviceType deviceType;
-
-
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
