@@ -1,7 +1,10 @@
 package com.softkour.qrsta_server.service.course;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.softkour.qrsta_server.entity.course.GroupAssignment;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
@@ -22,6 +25,16 @@ public class GroupAssignmentService {
 
     public GroupAssignment findById(Long id) {
         return assignmentRepo.findById(id)
+                .orElseThrow(() -> new ClientException("assignment_group", "assignment group not found"));
+    }
+
+    public List<GroupAssignment> findByAssignmentId(Long id) {
+        return assignmentRepo.findAllByAssignment_id(id)
+                .orElseThrow(() -> new ClientException("assignment_group", "assignment group not found"));
+    }
+
+    public List<GroupAssignment> findByAssignmentIdAndOnlyForMy(Long id, Long userId) {
+        return assignmentRepo.findAllByAssignment_idAndStudents_id(id, userId)
                 .orElseThrow(() -> new ClientException("assignment_group", "assignment group not found"));
     }
 

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 
@@ -34,18 +34,27 @@ public class Course extends AbstractAuditingEntity {
 
     @NotNull
     private String name;
+
+    @Column(columnDefinition = "boolean default true")
+    private boolean useOnlinePayment;
+    @Column(columnDefinition = "boolean default true")
+    private boolean enableAbsence;
+    @Column(columnDefinition = "boolean default true")
+    private boolean enableAutojoin;
+    @Column(columnDefinition = "boolean default true")
+    private boolean enableAutoChangeDevice;
+
     @NotNull
     // @Size(max = 4)
     private double cost;
-    @Column(columnDefinition = "boolean default false")
-    private boolean useOnlinePayment;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private CourseType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "students", "quizes", "courses" }, allowSetters = true)
-    private User teacher;
+    private Teacher teacher;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
@@ -55,7 +64,7 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
     private Set<CourseQuiz> quizzes = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "course", cascade = CascadeType.ALL)
     private Set<StudentCourse> students = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
@@ -140,20 +149,25 @@ public class Course extends AbstractAuditingEntity {
         log.warn(String.valueOf(sessions.size()));
         log.warn(String.valueOf(getStudents().size()));
         return new SessionDetailsStudent(
-                getStudents().stream().map(e -> e.getStudent().toStudntInSession(
-                        sessions.stream()
-                                .map(s -> s.getStudents().stream().anyMatch(b -> b.getId() == e.getStudent().getId()))
-                                .toList(),
-                        true, getId())).toList());
+                getStudents().stream().map(e -> e.getStudent().getUser()
+                        .toStudntInSession(
+                                sessions.stream()
+                                        .map(s -> s.getStudents().stream()
+                                                .anyMatch(b -> b.getId() == e.getStudent().getId()))
+                                        .toList(),
+                                true, getId()))
+                        .toList());
     }
 
     public CourseResponse toCourseResponse() {
-        return new CourseResponse(this.getId(),
-                this.getName(),
-                this.getStudents().stream().dropWhile(e -> !e.isActive()).toList().size(),
-                this.getSessions().size(),
-                this.getCost(),
-                this.getType(),
-                this.getSchedules().stream().map(s -> s.toScheduleResponse()).toList());
+        return new CourseResponse(
+                getId(),
+                getName(),
+                getStudents().stream().dropWhile(e -> !e.isActive()).toList().size(),
+                getSessions().size(),
+                useOnlinePayment,
+                getCost(),
+                getType(),
+                getSchedules().stream().map(s -> s.toScheduleResponse()).toList());
     }
 }

@@ -1,7 +1,6 @@
 package com.softkour.qrsta_server.service.course;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +31,20 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
+    public Integer getAppPayment(Long userId, Long courseId) {
+        return courseRepository
+                .getCourseByIdAndStudents_student_user_id(courseId, userId)
+                .getStudents().iterator().next().getAppPaymentLate();
+    }
+
+    public Integer getCoursePayment(Long userId, Long courseId) {
+        return courseRepository
+                .getCourseByIdAndStudents_student_user_id(courseId, userId)
+                .getStudents().iterator().next().getCoursePaymentLate();
+    }
+
     public Course addStudentToCourse(User user, Long courseId) {
-        if (user.getCourses().stream().anyMatch(e -> e.getCourse().getId().compareTo(courseId) == 0)) {
+        if (user.getStudent().getCourses().stream().anyMatch(e -> e.getCourse().getId().compareTo(courseId) == 0)) {
             throw new ClientException("course", "you are aready joined in this course: ".concat(courseId.toString()));
 
         } else {
@@ -42,10 +53,11 @@ public class CourseService {
                             () -> new ClientException("course", "course not found id: ".concat(courseId.toString())));
             StudentCourse student = new StudentCourse();
             student.setCourse(course);
-            student.setStudent(user);
-            student.setLate(0);
+            student.setStudent(user.getStudent());
+            student.setAppPaymentLate(1);
+            student.setCoursePaymentLate(1);
             if (course.getType() == CourseType.PRIVATE
-                    && course.getTeacher().getTeacher().isEnableAutojoin() == false) {
+                    && course.isEnableAutojoin() == false) {
                 student.setActive(false);
             } else {
                 student.setActive(true);
@@ -63,27 +75,6 @@ public class CourseService {
                         () -> new ClientException("session", "session not found id: ".concat(courseId.toString())));
         // course.removeStudent(user);
         return courseRepository.save(course);
-    }
-
-    public Optional<Course> partialUpdate(Course course) {
-        log.debug("Request to partially update Course : {}", course);
-
-        return courseRepository
-                .findById(course.getId())
-                .map(existingCourse -> {
-                    if (course.getId() != null) {
-                        existingCourse.setId(course.getId());
-                    }
-                    if (course.getName() != null) {
-                        existingCourse.setName(course.getName());
-                    }
-                    if (course.getType() != null) {
-                        existingCourse.setType(course.getType());
-                    }
-
-                    return existingCourse;
-                })
-                .map(courseRepository::save);
     }
 
     public Page<Course> findAll(Pageable pageable) {
@@ -107,7 +98,7 @@ public class CourseService {
     }
 
     public List<Course> getCourses(Long teacherId) {
-        return courseRepository.getCourseByTeacherId(teacherId);
+        return courseRepository.getCourseByTeacher_user_id(teacherId);
     }
 
     public List<Course> getAllDisableStudentsOfCourses(Long teacherId) {
@@ -126,9 +117,6 @@ public class CourseService {
             log.warn(user.isActive() + "");
             user.setActive(true);
             studentCourseRepository.save(user);
-            log.warn(user.getStudent().getPhoneNumber());
-            log.warn(user.isActive() + "");
-
         }
         return "accept to join successfully";
 

@@ -17,5 +17,6 @@ public class QuestionCreationRequest {
     private String title;
     private int grade;
     private Set<OptionCreationRequest> options = new HashSet<>();
+    private Set<QuizCourseSession> coveredSessions = new HashSet<>();
 
 }

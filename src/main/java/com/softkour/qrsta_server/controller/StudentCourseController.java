@@ -21,6 +21,8 @@ public class StudentCourseController {
     public ResponseEntity<GenericResponse<List<String>>> getAll() {
         return GenericResponse
                 .success(studentCourseRepo.findAll().stream()
-                        .map((e) -> e.getStudent().getName().concat(" ").concat(e.getCourse().getName())).toList());
+                        .map((e) -> e.getStudent().getUser()
+                                .getName().concat(" ").concat(e.getCourse().getName()))
+                        .toList());
     }
 }

@@ -43,20 +43,25 @@ public class ScheduleController {
                         .map(e -> e.toStudentSchedualResponse()).toList());
             }
 
-        return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
-                .map(e -> e.toStudentSchedualResponse()).toList());
+            return GenericResponse.success(scheduleService.getUserSchedule(u.getId()).stream()
+                    .map(e -> e.toStudentSchedualResponse()).toList());
+
+        }
 
     }
 
-}
+    @GetMapping("done")
+    ResponseEntity<GenericResponse<Object>> done(
+            @RequestHeader(name = "item_id", required = true) Long itemId) {
+        return GenericResponse.success(scheduleService.done(itemId).toStudentSchedualResponse());
 
-@GetMapping("correct")
-public ResponseEntity<GenericResponse<Object>> correctQuestion(@RequestHeader(name = "schedule_id") String scheduleId,
-        @RequestHeader(name = "correct_answer") String correctAnswer) {
-    boolean result = scheduleService.correct(scheduleId, correctAnswer);
-    if (result)
-        return GenericResponse.successWithMessageOnly("your answer is corrected");
-    else
-        return GenericResponse.errorWithMessageOnly("your answer is wrong");
-}
+    }
+
+    @GetMapping("correct")
+    public ResponseEntity<GenericResponse<Object>> correctQuestion(
+            @RequestHeader(name = "item_id") Long scheduleId,
+            @RequestHeader(name = "correct_answer") List<String> correctAnswer) {
+        return GenericResponse.success(scheduleService.correct(scheduleId, correctAnswer).toStudentSchedualResponse());
+
+    }
 }

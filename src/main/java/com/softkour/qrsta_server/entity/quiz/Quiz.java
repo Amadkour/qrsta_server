@@ -24,12 +24,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Setter
 @Getter
-@Slf4j
 public class Quiz extends AbstractAuditingEntity {
 
     @Column()
@@ -51,10 +49,6 @@ public class Quiz extends AbstractAuditingEntity {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
     private Set<CourseQuiz> courses = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
-    private Set<CourseQuiz> coveredCourses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes", cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = { "options", "quizzes" }, allowSetters = true)
@@ -114,8 +108,17 @@ public class Quiz extends AbstractAuditingEntity {
 
     public List<QuestionCreationRequest> toStudentQuiz() {
         return getQuestions().stream()
-                .map(e -> new QuestionCreationRequest(e.getId(), e.getTitle(), e.getGrade(), e.getOptions().stream()
-                        .map(o -> new OptionCreationRequest(o.getTitle(), false)).collect(Collectors.toSet())))
+                .map(e -> new QuestionCreationRequest(
+                        e.getId(),
+                        e.getTitle(),
+                        e.getGrade(),
+                        e.getOptions().stream()
+                                .map(o -> new OptionCreationRequest(o.getTitle(), false)).collect(Collectors.toSet()),
+                        e.getCoveredSessions().stream().map(s -> new QuizCourseSession(
+                                s.getCourse().getId(),
+                                s.getSessions().stream().map(s2 -> s2.getSession().getId()).toList()))
+                                .collect(Collectors
+                                        .toSet())))
                 .toList();
 
     }
@@ -125,14 +128,16 @@ public class Quiz extends AbstractAuditingEntity {
         quiz.setCourses(getCourses().stream().map(e -> new QuizCourseSession(
                 e.getCourse().getId(), e.getSessions().stream().map(s -> s.getSession().getId()).toList()))
                 .collect(Collectors.toSet()));
-        quiz.setCoveredCourses(getCoveredCourses().stream().map(e -> new QuizCourseSession(
-                e.getCourse().getId(), e.getSessions().stream().map(s -> s.getSession().getId()).toList()))
-                .collect(Collectors.toSet()));
         quiz.setQuestions(
                 getQuestions().stream().map(e -> new QuestionCreationRequest(e.getId(), e.getTitle(), e.getGrade(),
                         e.getOptions().stream()
                                 .map(o -> new OptionCreationRequest(o.getTitle(), o.getIsCorrectAnswer()))
-                                .collect(Collectors.toSet())))
+                                .collect(Collectors.toSet()),
+                        e.getCoveredSessions().stream().map(s -> new QuizCourseSession(
+                                s.getCourse().getId(),
+                                s.getSessions().stream().map(s2 -> s2.getSession().getId()).toList()))
+                                .collect(Collectors
+                                        .toSet())))
                         .collect(Collectors.toSet()));
         return quiz;
     }

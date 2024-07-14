@@ -24,46 +24,48 @@ import lombok.Setter;
 @Setter
 @Getter
 public class StudentSchedule extends AbstractAuditingEntity {
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Session session;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Course course;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Question question;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private User user;
-    @Column(name = "due_date", updatable = false)
-    private Instant due_date = Instant.now().plusSeconds(60 * 60 * 24 * 7);
-    @Column(columnDefinition = "boolean default false")
-    private boolean read;
-    @Column
-    private int weight;
-    @Column(columnDefinition = "boolean default false")
-    private boolean done;
-    @Column(columnDefinition = "boolean default true")
-    private boolean active;
+        @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+        private Session session;
+        @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        private Course course;
+        @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        private Question question;
+        @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        private User user;
+        @Column(name = "due_date", updatable = false)
+        private Instant due_date = Instant.now().plusSeconds(60 * 60 * 24 * 7);
+        @Column(columnDefinition = "boolean default false")
+        private boolean read;
+        @Column
+        private int weight;
+        @Column(columnDefinition = "boolean default false")
+        private boolean done;
+        @Column(columnDefinition = "boolean default true")
+        private boolean active;
 
-    public StudentSchedualResponse toStudentSchedualResponse() {
+        public StudentSchedualResponse toStudentSchedualResponse() {
 
-        StudentSchedualResponse response = new StudentSchedualResponse(
-                getId(),
-                getDue_date(),
-                getWeight(),
-                getSession().toSessionDateAndStudentGrade(user.getId()),
-                getCourse().getName(),
-                isRead(),
-                isDone(),
-                getCreatedDate(),
-                                        null);
-                                if (getQuestion() != null) {
-                                    response.setQuestion(new QuestionCreationRequest(getQuestion().getId(),
-                                            getQuestion().getTitle(), getQuestion().getGrade(),
-                                            getQuestion().getOptions().stream()
-                                                    .map(o -> new OptionCreationRequest(o.getTitle(),
-                                                            o.getIsCorrectAnswer()))
-                                                    .collect(Collectors.toSet())));
-                                }
-                                return response;
-    }
+                StudentSchedualResponse response = new StudentSchedualResponse(
+                                getId(),
+                                getDue_date(),
+                                getWeight(),
+                                getSession().toSessionDateAndStudentGrade(user.getId()),
+                                getCourse().getName(),
+                                isRead(),
+                                isDone(),
+                                getCreatedDate(),
+                                null);
+                if (getQuestion() != null) {
+                        response.setQuestion(new QuestionCreationRequest(
+                                        getQuestion().getId(),
+                                        getQuestion().getTitle(), getQuestion().getGrade(),
+                                        getQuestion().getOptions().stream()
+                                                        .map(o -> new OptionCreationRequest(o.getTitle(),
+                                                                        o.getIsCorrectAnswer()))
+                                                        .collect(Collectors.toSet()),
+                                        null));
+                }
+                return response;
+        }
 
 }

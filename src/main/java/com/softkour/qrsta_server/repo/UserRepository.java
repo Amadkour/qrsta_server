@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
       public Optional<User> findUserByPhoneNumber(String phone);
 
-      public List<User> findAllUserByStudent_needToReplaceAndCourses_course_teacher_id(boolean needToReplace,
+      public List<User> findAllUserByStudent_needToReplaceAndAndStudent_courses_course_teacher_id(boolean needToReplace,
                   Long teacherId);
 
       public List<User> findAllChildrenByStudent_parent_id(Long parentId);
@@ -22,12 +22,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
       public boolean existsByNationalId(String nationalId);
 
-      public User getScoreByIdAndQuizzes_quiz_session_course_id(Long userId, Long courseId);
+      // public User getScoreByIdAndCourses_course_id(Long userId, Long courseId);
 
-      public User getScoreByIdAndCourses_course_id(Long userId, Long courseId);
+      public User getScoreByStudent_idAndStudent_courses_course_id(Long userId, Long courseId);
 
       public List<User> getStudentByStudent_parent_password(String password);
 
-      public List<User> getStudentByCourses_course_teacher_id(Long teacherId);
+      public List<User> getStudentByStudent_courses_course_teacher_id(Long teacherId);
 
 }

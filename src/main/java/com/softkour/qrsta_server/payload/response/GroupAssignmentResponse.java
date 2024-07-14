@@ -1,5 +1,6 @@
 package com.softkour.qrsta_server.payload.response;
 
+import java.time.Instant;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -17,5 +18,6 @@ public class GroupAssignmentResponse {
     private boolean active = false;
     private String title;
     private String description;
+    private Instant createdAt;
 
 }

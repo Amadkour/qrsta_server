@@ -1,7 +1,6 @@
 package com.softkour.qrsta_server.entity.quiz;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,12 +8,8 @@ import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -40,6 +35,7 @@ public class CourseQuiz extends AbstractAuditingEntity {
         sessions.add(sessionQuiz);
         sessionQuiz.setQuiz(this);
     }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "courses", "sessions", "students" }, allowSetters = true)
     private Quiz quiz;

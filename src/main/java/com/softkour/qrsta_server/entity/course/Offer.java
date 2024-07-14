@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.payload.response.OfferResponse;
 
 import jakarta.persistence.CascadeType;
@@ -40,14 +40,14 @@ public class Offer extends AbstractAuditingEntity {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "user__offer", joinColumns = @JoinColumn(name = "offer_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
     @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
-    private Set<User> students = new HashSet<>();
+    private Set<Student> students = new HashSet<>();
 
     public OfferResponse toOfferResponse() {
         return new OfferResponse(getId(), getCourses().stream().map(e -> e.toCourseResponse()).toList(), getMonths(),
                 getCost(), getEndDate(), isSoldout());
     }
 
-    public void addStudent(User user) {
+    public void addStudent(Student user) {
         students.add(user);
     }
 }

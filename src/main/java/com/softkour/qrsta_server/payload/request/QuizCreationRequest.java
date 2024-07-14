@@ -22,11 +22,9 @@ import com.softkour.qrsta_server.service.course.CourseService;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 @Setter
 @Getter
-@Slf4j
 public class QuizCreationRequest {
     private Long id;
     private Instant startDate;
@@ -38,7 +36,6 @@ public class QuizCreationRequest {
     private QuizType type;
     @NotNull
     private Set<QuizCourseSession> courses = new HashSet<>();
-    private Set<QuizCourseSession> coveredCourses = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
     public Quiz toQuiz(QuizService quizService, CourseService courseService, SessionService sessionService,
@@ -70,22 +67,25 @@ public class QuizCreationRequest {
                     }
                 })
                         .collect(Collectors.toSet()));
-        quiz.setCoveredCourses(
-                getCoveredCourses().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
-                    @Override
-                    public CourseQuiz apply(QuizCourseSession e) {
-                        CourseQuiz courseQuiz = new CourseQuiz();
-                        courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
-                        e.getSessionsId().stream()
-                                .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
-
-                        return courseQuiz;
-                    }
-                })
-                        .collect(Collectors.toSet()));
         /// questions
+        System.out.println("==============[question]==============");
+        System.out.println(getQuestions().stream().map(e -> e.getCoveredSessions()).toList());
         quiz.setQuestions(getQuestions().stream().map(q -> {
             Question question = new Question();
+            /// coverd session
+            question.setCoveredSessions(
+                    q.getCoveredSessions().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
+                        @Override
+                        public CourseQuiz apply(QuizCourseSession e) {
+                            CourseQuiz courseQuiz = new CourseQuiz();
+                            courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
+                            e.getSessionsId().stream()
+                                    .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
+
+                            return courseQuiz;
+                        }
+                    })
+                            .collect(Collectors.toSet()));
             /// options
             question.setOptions(q.getOptions().stream().map(o -> {
                 Option option = new Option();

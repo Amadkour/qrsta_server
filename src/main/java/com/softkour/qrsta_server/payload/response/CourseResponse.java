@@ -16,6 +16,7 @@ public class CourseResponse {
     private String name;
     private int studentsCount;
     private int sessionsCount;
+    private Boolean useOnlinePayment;
     private double cost;
     private CourseType type;
     private List<ScheduleResponse> schedules;

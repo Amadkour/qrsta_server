@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
-import com.softkour.qrsta_server.entity.quiz.Quiz;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -16,6 +16,7 @@ import com.softkour.qrsta_server.config.GenericResponse;
 import com.softkour.qrsta_server.config.MyUtils;
 import com.softkour.qrsta_server.entity.course.Assignment;
 import com.softkour.qrsta_server.entity.course.GroupAssignment;
+import com.softkour.qrsta_server.entity.enumeration.AssignmentType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
@@ -45,13 +46,19 @@ public class AssignmentController {
             @RequestHeader("max_count") int maxCount,
             @RequestHeader("min_count") int minCount,
             @RequestHeader("title") String title,
-            @RequestHeader(name = "description", required = false) String description) {
+            @RequestHeader("type") AssignmentType type,
+            @RequestHeader(name = "description", required = false) String description,
+            @RequestHeader(name = "showForAll", required = false) boolean showForAll,
+            @RequestHeader(name = "mustApprove", required = false) boolean mustApprove) {
 
         Assignment assignment = new Assignment();
         assignment.setDueDate(Instant.parse(dueString));
         assignment.setMax_count(maxCount);
         assignment.setMin_count(minCount);
         assignment.setTitle(title);
+        assignment.setType(type);
+        assignment.setMustApprove(mustApprove);
+        assignment.setShowForAll(showForAll);
         assignment.setCourse(courseService.findOne(courseId));
         assignment.setDescription(description);
         return GenericResponse.success(assignmentService.save(assignment).toAssignmentResponse());
@@ -65,7 +72,12 @@ public class AssignmentController {
             @RequestHeader(name = "max_count", required = false) Integer maxCount,
             @RequestHeader(name = "min_count", required = false) Integer minCount,
             @RequestHeader(name = "title", required = false) String title,
-            @RequestHeader(name = "description", required = false) String description) {
+            @RequestHeader(name = "description", required = false) String description,
+            @RequestHeader(name = "type", required = false) AssignmentType type,
+            @RequestHeader(name = "showForAll", required = false) boolean showForAll,
+            @RequestHeader(name = "mustApprove", required = false) boolean mustApprove
+
+    ) {
 
         Assignment assignment = assignmentService.findById(id);
         if (dueString != null)
@@ -73,6 +85,12 @@ public class AssignmentController {
 
         if (maxCount != null)
             assignment.setMax_count(maxCount);
+
+        if (maxCount != null)
+            assignment.setMax_count(maxCount);
+
+        if (type != null)
+            assignment.setType(type);
 
         if (minCount != null)
             assignment.setMin_count(minCount);
@@ -82,6 +100,7 @@ public class AssignmentController {
 
         if (description != null)
             assignment.setDescription(description);
+
         assignmentService.save(assignment);
     }
 
@@ -103,6 +122,24 @@ public class AssignmentController {
         return GenericResponse.success(assignment.toAssignmentResponse());
     }
 
+    @GetMapping("groups")
+    public ResponseEntity<GenericResponse<List<GroupAssignmentResponse>>> getGroups(
+            @RequestHeader(name = "id") Long id) {
+
+        Assignment assignment = assignmentService.findById(id);
+        if (assignment.showForAll) {
+            return GenericResponse.success(
+                    groupAssignmentService.findByAssignmentId(id).stream().map(e -> e.toGroupResponse()).toList());
+        } else {
+            return GenericResponse.success(groupAssignmentService.findByAssignmentIdAndOnlyForMy(id,
+                    MyUtils.getCurrentUserSession(
+                            authService).getId())
+                    .stream()
+                    .map(e -> e.toGroupResponse()).toList());
+
+        }
+    }
+
     @GetMapping("accept")
     public ResponseEntity<GenericResponse<GroupAssignmentResponse>> accept(
             @RequestHeader(name = "id") Long id) {
@@ -117,23 +154,67 @@ public class AssignmentController {
             @RequestHeader(name = "assignment_id") Long assignmentId,
             @RequestHeader(name = "students") List<Long> studentIds,
             @RequestHeader(name = "title", required = false) String title,
-            @RequestHeader(name = "description", required = false) String description) {
+            @RequestHeader(name = "description", required = false) String description,
+            @RequestHeader(name = "media", required = false) List<String> media
+
+    ) {
 
         Assignment assignment = assignmentService.findById(assignmentId);
         if (assignment.getMax_count() < studentIds.size())
             throw new ClientException("group", "group excedded max count");
-        if (assignment.getMin_count() < studentIds.size())
+        if (assignment.getMin_count() > studentIds.size())
             throw new ClientException("group", "group must be more than or equal" + assignment.getMin_count());
         GroupAssignment group = new GroupAssignment();
         group.setStudents(studentIds.stream().map(e -> authService.getUserById(e)).collect(Collectors.toSet()));
         group.setAssignment(assignment);
         group.setTitle(title);
         group.setDescription(description);
+        group.setMediaUrls(media);
+
         User u = MyUtils.getCurrentUserSession(authService);
-        if (u.getType() == UserType.TEACHER && assignment.getCourse().getTeacher().getId() == u.getId())
+        if ((u.getType() == UserType.TEACHER && assignment.getCourse()
+                .getTeacher().getId() == u.getTeacher().getId()) || !assignment.mustApprove) {
             group.setActive(true);
+        } else {
+            group.setActive(false);
+
+        }
         group = groupAssignmentService.save(group);
         assignment.addGroup(group);
+        assignmentService.save(assignment);
+        return GenericResponse.success(group.toGroupResponse());
+    }
+
+    @GetMapping("update_group")
+    public ResponseEntity<GenericResponse<GroupAssignmentResponse>> updateGroup(
+            @RequestHeader(name = "assignment_id") Long assignmentId,
+            @RequestHeader(name = "group_id") Long groupId,
+            @RequestHeader(name = "students") List<Long> studentIds,
+            @RequestHeader(name = "title", required = false) String title,
+            @RequestHeader(name = "description", required = false) String description,
+            @RequestHeader(name = "media", required = false) List<String> media) {
+
+        Assignment assignment = assignmentService.findById(assignmentId);
+        if (assignment.getMax_count() < studentIds.size())
+            throw new ClientException("group", "group excedded max count");
+        if (assignment.getMin_count() > studentIds.size())
+            throw new ClientException("group", "group must be more than or equal" + assignment.getMin_count());
+        GroupAssignment group = groupAssignmentService.findById(groupId);
+        group.setStudents(studentIds.stream().map(e -> authService.getUserById(e)).collect(Collectors.toSet()));
+        group.setAssignment(assignment);
+        group.setTitle(title);
+        group.setDescription(description);
+        group.setMediaUrls(media);
+        User u = MyUtils.getCurrentUserSession(authService);
+        if ((u.getType() == UserType.TEACHER && assignment.getCourse()
+                .getTeacher().getId() == u.getTeacher().getId()) || !assignment.mustApprove) {
+            group.setActive(true);
+        } else {
+            group.setActive(false);
+
+        }
+        group = groupAssignmentService.save(group);
+        assignment.update(group);
         assignmentService.save(assignment);
         return GenericResponse.success(group.toGroupResponse());
     }

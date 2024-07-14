@@ -33,8 +33,8 @@ public class GroupAssignment extends AbstractAuditingEntity {
     @Column(nullable = true)
 
     private String description;
-    @Column(nullable = true)
 
+    @Column(nullable = true)
     private List<String> mediaUrls;
     @Column(nullable = true)
 
@@ -60,7 +60,8 @@ public class GroupAssignment extends AbstractAuditingEntity {
                 getMediaUrls(),
                 isActive(),
                 getTitle(),
-                getDescription());
+                getDescription(),
+                getCreatedDate());
     }
 
     public void addStudent(User user) {

@@ -27,5 +27,5 @@ public class LoginRequest {
     @NotBlank
     private DeviceType deviceType;
     @NotBlank
-    private String fvmToken;
+    private String fcmToken;
 }

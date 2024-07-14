@@ -12,12 +12,10 @@ import com.softkour.qrsta_server.exception.GlobalExceptionHandler;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Builder
 @AllArgsConstructor
-@Slf4j
 public class GenericResponse<T> {
         private boolean success;
         private Object messages;
@@ -80,7 +78,6 @@ public class GenericResponse<T> {
         }
 
         public static <T> ResponseEntity<GenericResponse<Object>> errorOfException(Exception error) {
-                log.warn("Exception handler===================GenericResponse ");
 
                 if (error.getClass().isInstance(DataIntegrityViolationException.class))
                         return new ResponseEntity<>(

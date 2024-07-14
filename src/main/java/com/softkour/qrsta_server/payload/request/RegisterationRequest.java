@@ -15,7 +15,6 @@ import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.service.OTPService;
-import com.twilio.rest.api.v2010.account.availablephonenumbercountry.Local;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

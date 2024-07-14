@@ -8,11 +8,16 @@ import org.springframework.stereotype.Repository;
 
 import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
 
+import jakarta.transaction.Transactional;
+
 @Repository
 public interface StudentScheduleRepo extends JpaRepository<StudentSchedule, Long> {
 
-    List<StudentSchedule> getScheduleByUser_idAndCreatedDateAfterOrderByCreatedDateDesc(Long studentId, Instant Date);
+    List<StudentSchedule> getScheduleByUser_idAndDoneFalseAndCreatedDateAfterOrderByCreatedDateDesc(Long studentId,
+            Instant Date);
 
     List<StudentSchedule> getScheduleByCourse_teacher_idAndQuestionNotNullOrderByCreatedDateDesc(Long teacherId);
 
+    @Transactional
+    public void deleteAllBySession_id(Long sessionid);
 }

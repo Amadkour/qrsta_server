@@ -9,7 +9,7 @@ import java.util.stream.DoubleStream;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudents;
@@ -26,18 +26,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
 @Setter
-@Slf4j
 public class Session extends AbstractAuditingEntity {
 
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
-        @JsonIgnoreProperties(value = { "sessions", "courses" }, allowSetters = true)
-        private Set<User> students = new HashSet<>();
+        @JsonIgnoreProperties(value = { "sessions", "courses", "offers", "needToReplace" }, allowSetters = true)
+        private Set<Student> students = new HashSet<>();
 
         @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
         @JsonIgnoreProperties(value = { "sessions", "quizzes" }, allowSetters = true)
@@ -50,6 +48,9 @@ public class Session extends AbstractAuditingEntity {
         @Column()
         private Instant startDate;
 
+        // @Column(columnDefinition = "boolean default false")
+        // private boolean active;
+
         @Column()
         private String label;
         @Column()
@@ -59,7 +60,7 @@ public class Session extends AbstractAuditingEntity {
         @JsonIgnoreProperties(value = { "sessions", "schedules" }, allowSetters = true)
         private Course course;
 
-        public void setStudents(Set<User> students) {
+        public void setStudents(Set<Student> students) {
                 if (students != null) {
                         students.forEach(i -> i.removeSession(this));
                         students.forEach(i -> i.addSession(this));
@@ -67,12 +68,12 @@ public class Session extends AbstractAuditingEntity {
                 this.students = students;
         }
 
-        public Session addStudent(User student) {
+        public Session addStudent(Student student) {
                 students.add(student);
                 return this;
         }
 
-        public Session removeStudent(User employee) {
+        public Session removeStudent(Student employee) {
                 students.remove(employee);
                 employee.getSessions().remove(this);
                 return this;
@@ -94,7 +95,7 @@ public class Session extends AbstractAuditingEntity {
                                 getCourse().getStudents().size(),
                                 grade,
                                 now.isAfter(getEndDate()),
-                                getStudents().stream().anyMatch(e -> e.getId() == studentId));
+                                getStudents().stream().anyMatch(e -> e.getUser().getId() == studentId));
         }
 
         public SessionDateAndStudentGrade toSessionDateAndStudentGradeWithAttendance(Boolean attendance) {
@@ -124,11 +125,12 @@ public class Session extends AbstractAuditingEntity {
         public SessionDetailsStudent toSessionDetailsStudent() {
 
                 Set<Session> sessions = getCourse().getSessions();
+
                 // getStudents().stream().anyMatch(m -> m.getId() ==
                 // e.getStudent().getId())
                 return new SessionDetailsStudent(
                                 getCourse().getStudents().stream()
-                                                .map((e) -> e.getStudent().toStudntInSession(
+                                                .map((e) -> e.getStudent().getUser().toStudntInSession(
                                                                 /// attendance
                                                                 sessions.stream()
                                                                                 .map(s -> s.getStudents().stream()

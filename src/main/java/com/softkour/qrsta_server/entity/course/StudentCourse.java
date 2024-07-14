@@ -2,7 +2,7 @@ package com.softkour.qrsta_server.entity.course;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
-import com.softkour.qrsta_server.entity.user.User;
+import com.softkour.qrsta_server.entity.user.Student;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,15 +17,17 @@ import lombok.Setter;
 public class StudentCourse extends AbstractAuditingEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "students", "quizes", "courses" }, allowSetters = true)
-    private User student;
+    @JsonIgnoreProperties(value = {}, allowSetters = true)
+    private Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "students", "quizes", "quizzes", "schedules", "sessions" }, allowSetters = true)
     private Course course;
 
     @Column
-    private int late = 0;
+    private int appPaymentLate = 0;
+    @Column
+    private int coursePaymentLate = 0;
     @Column
     private boolean active = false;
     @Column

@@ -2,7 +2,6 @@ package com.softkour.qrsta_server.payload.response;
 
 import java.time.Instant;
 
-import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
 
 import lombok.AllArgsConstructor;

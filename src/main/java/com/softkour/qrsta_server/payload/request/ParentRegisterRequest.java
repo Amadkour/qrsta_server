@@ -3,8 +3,6 @@ package com.softkour.qrsta_server.payload.request;
 import java.time.Instant;
 import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.service.OTPService;
@@ -24,6 +22,7 @@ public class ParentRegisterRequest {
     private String phone;
     // @Size(max = 14, min = 9)
     private String nationalId;
+
     public User toUser(OTPService otpService) {
         User user = new User();
         Supplier<String> otp = otpService.createRandomOneTimeOTP();

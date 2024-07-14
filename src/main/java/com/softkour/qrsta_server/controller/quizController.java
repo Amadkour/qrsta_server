@@ -1,10 +1,6 @@
 package com.softkour.qrsta_server.controller;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.entity.course.Session;
-import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
-import com.softkour.qrsta_server.entity.quiz.Option;
-import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.entity.quiz.Quiz;
-import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
-import com.softkour.qrsta_server.payload.request.QuizCourseSession;
 import com.softkour.qrsta_server.payload.request.QuizCreationRequest;
 import com.softkour.qrsta_server.service.OTPService;
 import com.softkour.qrsta_server.service.OptionService;
@@ -33,12 +23,10 @@ import com.softkour.qrsta_server.service.SessionService;
 import com.softkour.qrsta_server.service.course.CourseService;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("api/quiz/")
 @Validated
-@Slf4j
 public class quizController {
     @Autowired
     QuizService quizService;
@@ -58,7 +46,6 @@ public class quizController {
         Quiz quiz = quizService
                 .save(request.toQuiz(quizService, courseService, sessionService, optionService, questionService,
                         otpService));
-        log.warn(String.valueOf(quiz.getCourses().iterator().next().getCourse().getId()));
         return GenericResponse.success(quiz.toQuizModel());
 
     }
@@ -69,6 +56,7 @@ public class quizController {
         return GenericResponse.successWithMessageOnly("delete_successfully");
 
     }
+
     @GetMapping("all")
     public ResponseEntity<GenericResponse<Object>> allQuiz(
             @RequestHeader(required = false, name = "child_phone") String childPhone) {
@@ -93,6 +81,8 @@ public class quizController {
     @GetMapping("correct_quiz")
     public ResponseEntity<GenericResponse<Object>> correct(@RequestHeader("answer") List<List<String>> answers,
             @RequestHeader("quiz_id") Long quizId) {
+        System.out.println("from controller==============>");
+        System.out.println(answers);
         return GenericResponse.successWithMessageOnly(quizService.correct(answers, quizId));
     }
 }

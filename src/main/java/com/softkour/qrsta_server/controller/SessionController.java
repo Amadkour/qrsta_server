@@ -34,6 +34,7 @@ import com.softkour.qrsta_server.service.SessionObjectService;
 import com.softkour.qrsta_server.service.SessionService;
 import com.softkour.qrsta_server.service.course.CourseService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +75,7 @@ public class SessionController {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("attendance", sessions.stream()
                                 .map(s -> s.getStudents().stream()
-                                                .anyMatch(b -> b.getId() == childId))
+                                                .anyMatch(b -> b.getUser().getId() == childId))
                                 .toList());
                 map.put("date", sessions.stream().map(e -> e.getStartDate()).toList());
                 return GenericResponse.success(map);
@@ -93,7 +94,6 @@ public class SessionController {
         public ResponseEntity<GenericResponse<Object>> takeCurrentUserInAttendance(
                         @RequestHeader(name = "session_id") Long sessionId) {
                 User u = MyUtils.getCurrentUserSession(authService);
-                ;
                 return GenericResponse.success(
                                 sessionService.addStudentToSession(u, sessionId)
                                                 .toSessionDateAndStudentGradeWithAttendance(true));
@@ -122,8 +122,10 @@ public class SessionController {
         }
 
         @GetMapping("delete")
+        @Transactional
         public ResponseEntity<GenericResponse<Object>> delete(
                         @RequestHeader(name = "session_id") Long sessionId) {
+                scheduleRepo.deleteAllBySession_id(sessionId);
                 sessionService.delete(sessionId);
                 return GenericResponse.successWithMessageOnly("remove student from session successfully");
 
@@ -169,14 +171,14 @@ public class SessionController {
                 session = sessionService.save(session);
                 /// add it in student schedual
                 List<StudentCourse> students = session.getCourse().getStudents().stream().collect(Collectors.toList());
-                log.warn(students.stream().map(e -> e.getStudent().getPhoneNumber()).toList() + "");
+                log.warn(students.stream().map(e -> e.getStudent().getUser().getPhoneNumber()).toList() + "");
                 for (int i = 0; i < students.size(); i++) {
                         StudentSchedule item = new StudentSchedule();
                         item.setDone(false);
                         item.setRead(false);
                         item.setSession(session);
                         item.setCourse(course);
-                        item.setUser(students.get(i).getStudent());
+                        item.setUser(students.get(i).getStudent().getUser());
                         scheduleRepo.save(item);
                 }
                 log.warn(scheduleRepo.count() + "");

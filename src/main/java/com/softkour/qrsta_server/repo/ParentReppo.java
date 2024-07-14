@@ -9,7 +9,6 @@ import com.softkour.qrsta_server.entity.user.Parent;
 /**
  * Spring Data JPA repository for the Option entity.
  */
-@SuppressWarnings("unused")
 @Repository
 public interface ParentReppo extends JpaRepository<Parent, Long> {
 }

@@ -20,10 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Configuration
-@Slf4j
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
@@ -75,7 +72,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                         }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "api/auth/**")
+                        auth -> auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "api/auth/**")
                                 .permitAll()
 
                                 .anyRequest().authenticated());

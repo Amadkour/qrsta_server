@@ -17,7 +17,8 @@ public class StudntInSession {
     private String imageURL;
     private List<Boolean> attendance;
     private boolean isPresented;
-    private int late;
+    private int appPaymentLate;
+    private int coursePaymentLate;
     private boolean active;
     private double grade;
     private int firstSession;

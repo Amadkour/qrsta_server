@@ -1,8 +1,10 @@
 package com.softkour.qrsta_server.service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.softkour.qrsta_server.config.MyUtils;
+import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
@@ -79,6 +82,8 @@ public class AuthService {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPhone());
                 String token = jwtTokenUtil.generateToken(userDetails);
                 user.setLoginMacAddress(request.getMacAddress());
+                user.setFcmToken(request.getFcmToken());
+                user = authorRepository.save(user);
                 UserLoginResponse userLoginResponse = user.toUserLoginResponse();
                 userLoginResponse.setToken(token);
                 return userLoginResponse;
@@ -152,7 +157,8 @@ public class AuthService {
     }
 
     public List<User> getNeedToReplaceUsers(Long teacherId) {
-        return authorRepository.findAllUserByStudent_needToReplaceAndCourses_course_teacher_id(false, teacherId);
+        return authorRepository.findAllUserByStudent_needToReplaceAndAndStudent_courses_course_teacher_id(false,
+                teacherId);
     }
 
     public User save(User user) {
@@ -213,20 +219,28 @@ public class AuthService {
     }
 
     public double getUserScore(long userId, Long courseId) {
-        if (authorRepository.findById(userId).get().getQuizzes().isEmpty())
+        System.out.println(authorRepository.findById(userId).get().getStudent().getQuizzes().isEmpty());
+        if (authorRepository.findById(userId).get().getStudent().getQuizzes().isEmpty())
             return 0.0;
         else {
-            return authorRepository.getScoreByIdAndQuizzes_quiz_session_course_id(userId, courseId).getQuizzes()
+            return authorRepository.getScoreByStudent_idAndStudent_courses_course_id(userId, courseId).getStudent()
+                    .getQuizzes()
                     .stream()
                     .mapToDouble(e -> e.getGrade()).sum();
         }
 
     }
 
-    public int getUserLatePayment(long userId, Long courseId) {
-        return authorRepository.getScoreByIdAndCourses_course_id(courseId, courseId).getCourses().iterator().next()
-                .getLate();
-    }
+    // public int getUserLatePayment(long userId, Long courseId) {
+    // return
+    // authorRepository.getScoreByStudent_idAndStudent_courses_course_id(userId,
+    // courseId).getStudent()
+    // .getCourses()
+    // .iterator().next()
+    // .getLate();
+
+    // return course
+    // }
 
     public int getMissedParents() {
         return authorRepository.getStudentByStudent_parent_password(null).size();
@@ -234,7 +248,7 @@ public class AuthService {
     }
 
     public int getAllStudent(Long teacherId) {
-        return authorRepository.getStudentByCourses_course_teacher_id(teacherId).size();
+        return authorRepository.getStudentByStudent_courses_course_teacher_id(teacherId).size();
 
     }
 
@@ -261,11 +275,22 @@ public class AuthService {
     //
     // }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<Boolean> getUserAttendance(long userId, Long courseId) {
-        return authorRepository.getScoreByIdAndCourses_course_id(courseId, courseId).getCourses().iterator().next()
-                .getCourse().getSessions().stream()
-                .map(s -> s.getStudents().stream()
-                        .anyMatch(b -> b.getId() == userId))
-                .toList();
+        List<StudentCourse> courses = authorRepository
+                .getScoreByStudent_idAndStudent_courses_course_id(userId, courseId)
+                .getStudent()
+                .getCourses()
+                .stream()
+                .filter(e -> e.getId() == courseId).collect(Collectors.toList());
+        if (courses.size() > 0)
+            return courses.get(0).getCourse().getSessions()
+                    .stream()
+                    .map(s -> s.getStudents().stream()
+                            .anyMatch(b -> b.getId() == userId))
+                    .toList();
+        else
+            return new ArrayList();
+
     }
 }

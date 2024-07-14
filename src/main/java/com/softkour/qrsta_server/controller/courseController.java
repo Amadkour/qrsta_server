@@ -23,6 +23,7 @@ import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.post.Post;
+import com.softkour.qrsta_server.entity.user.Parent;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.CourseCreationRequest;
@@ -37,10 +38,7 @@ import com.softkour.qrsta_server.service.ScheduleService;
 import com.softkour.qrsta_server.service.SessionService;
 import com.softkour.qrsta_server.service.course.CourseService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @RestController
-@Slf4j
 @RequestMapping("/api/course/")
 public class courseController {
     protected final Log logger = LogFactory.getLog(getClass());
@@ -87,7 +85,7 @@ public class courseController {
         course.setSchedules(savedSchedules);
         course.setId(request.getId());
 
-        course.setTeacher(MyUtils.getCurrentUserSession(authService));
+        course.setTeacher(MyUtils.getCurrentUserSession(authService).getTeacher());
 
         return GenericResponse.success(courseService.save(course).toCourseResponse());
 
@@ -115,23 +113,42 @@ public class courseController {
 
     }
 
+    @GetMapping("pay")
+    public ResponseEntity<GenericResponse<Object>> pay(
+            @RequestHeader(name = "course_id") Long courseId, @RequestHeader(name = "monthes") int monthes) {
+        User u = MyUtils.getCurrentUserSession(authService);
+        if (u.getType() == UserType.STUDENT) {
+            StudentCourse course = studentCourseRepository.findById(courseId).get();
+            course.setAppPaymentLate(course.getAppPaymentLate() + (-1 * monthes));
+            studentCourseRepository.save(course);
+        } else if (u.getType() == UserType.OBSERVER) {
+            Parent parent = u.getParent();
+            parent.setLate(parent.getLate() + ((-1 * monthes)));
+            u.setParent(parent);
+            authService.save(u);
+        }
+        return GenericResponse.successWithMessageOnly("done");
+    }
+
     @GetMapping("course_sessions_posts")
     public ResponseEntity<GenericResponse<Object>> getCourseSessionsPosts(
             @RequestHeader(name = "course_id") Long courseId) {
-        Course c = courseService.findOne(courseId);
         User u = MyUtils.getCurrentUserSession(authService);
         List<Session> sessionList = sessionService.findSessionsOfCourse(courseId);
         List<Post> postslist = postService.posts(courseId);
         int late = studentCourseRepository.findById(courseId)
-                .orElseThrow(() -> new ClientException("course", "not found this corse")).getLate();
+                .orElseThrow(() -> new ClientException("course", "not found this corse")).getAppPaymentLate();
         if (u.getType() == UserType.STUDENT && late > 0)
-            throw new ClientException("payment", (late * -1) + "", 999);
+            throw new ClientException(
+                    "payment late monthes:" + late + ",cost of month is:" + MyUtils.courseCost
+                            + ",of course id is:" + courseId,
+                    "", 999);
 
         return GenericResponse.success(
                 new SessionAndSocialResponce(
                         sessionList.stream()
                                 .map((e) -> e.toSessionDateAndStudentGrade(
-                                        MyUtils.getCurrentUserSession(authService).getId()))
+                                        u.getId()))
                                 .toList(),
                         postslist.stream().map((e) -> e.toPostResponce(sessionService, authService)).toList())
 
@@ -156,7 +173,7 @@ public class courseController {
             return GenericResponse.success(courseList.stream().map((e) -> e.toCourseResponse()));
 
         } else {
-            List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActiveTrue(user.getId());
+            List<StudentCourse> courseList = studentCourseRepository.findByStudent_user_idAndActiveTrue(user.getId());
             return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
 
         }
@@ -165,8 +182,7 @@ public class courseController {
     @GetMapping("get_child_courses")
     public ResponseEntity<GenericResponse<Object>> getChildCourses(@RequestHeader("child_phone") String phone) {
         User student = authService.getUserByPhoneNumber(phone);
-        log.warn(student.getId() + "");
-        List<StudentCourse> courseList = studentCourseRepository.findByStudent_idAndActiveTrue(student.getId());
+        List<StudentCourse> courseList = studentCourseRepository.findByStudent_user_idAndActiveTrue(student.getId());
         return GenericResponse.success(courseList.stream().map((e) -> e.getCourse().toCourseResponse()));
     }
 

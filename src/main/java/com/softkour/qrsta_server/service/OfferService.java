@@ -70,7 +70,7 @@ public class OfferService {
         if (offer.isSoldout()) {
             throw new ClientException("offer", "This Offer is soldout: " + offerId);
         }
-        offer.addStudent(u);
+        offer.addStudent(u.getStudent());
         return offerRepo.save(offer);
     }
 

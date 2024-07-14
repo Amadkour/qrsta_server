@@ -59,12 +59,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 @ControllerAdvice
 @RestController
 @Configuration
-@Slf4j
 public class GlobalExceptionHandler {
 
     /// validation exceptions
@@ -72,7 +69,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<GenericResponse<Object>> handleException(
             MethodArgumentNotValidException e) {
-        log.warn("Exception handler===================validation ");
         return GenericResponse.errorOfMap(processvalidationErrors(e));
     }
 

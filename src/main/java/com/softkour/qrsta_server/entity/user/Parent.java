@@ -1,7 +1,12 @@
 package com.softkour.qrsta_server.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +18,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Parent extends AbstractAuditingEntity {
-    @Column
+    @Column(columnDefinition = "integer default 1")
     private int late = 0;
-
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = {}, allowSetters = true)
+    private User user;
 }

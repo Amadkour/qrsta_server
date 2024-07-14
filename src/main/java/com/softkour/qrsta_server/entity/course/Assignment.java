@@ -2,10 +2,10 @@ package com.softkour.qrsta_server.entity.course;
 
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.enumeration.AssignmentType;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.payload.response.AssignmentResponse;
 
@@ -26,8 +26,6 @@ public class Assignment extends AbstractAuditingEntity {
     private String title;
     @Column(nullable = true)
     private String description;
-    @Column(nullable = true)
-    private List<String> mediaUrls;
     @Column
     private Instant dueDate;
     @Column
@@ -35,7 +33,13 @@ public class Assignment extends AbstractAuditingEntity {
     @Column
     private int min_count;
     @Column
+    private AssignmentType type;
+    @Column
     private boolean active = false;
+    @Column
+    public boolean showForAll = false;
+    @Column
+    public boolean mustApprove = false;
     @Column
     private boolean finished = false;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,15 +54,24 @@ public class Assignment extends AbstractAuditingEntity {
     public AssignmentResponse toAssignmentResponse() {
         return new AssignmentResponse(
                 getId(),
-                getGroups().stream().map(e -> e.toGroupResponse()).toList(),
                 getTitle(),
                 getDescription(),
                 getDueDate(),
                 !isFinished(),
-                getMediaUrls());
+                getType());
     }
 
     public void addGroup(GroupAssignment group) {
         groups.add(group);
     }
+
+    public void remove(GroupAssignment group) {
+        groups.removeIf((e) -> e.getId() == group.getId());
+    }
+
+    public void update(GroupAssignment group) {
+        remove(group);
+        addGroup(group);
+    }
+
 }

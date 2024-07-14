@@ -54,8 +54,8 @@ public class ProfileController {
                 item.put("type", "course");
                 item.put("user_id", s.getId());
                 item.put("user_course", s.getCourse().getName());
-                item.put("user_image", s.getStudent().getImageUrl());
-                item.put("user_name", s.getStudent().getName());
+                item.put("user_image", s.getStudent().getUser().getImageUrl());
+                item.put("user_name", s.getStudent().getUser().getName());
                 map.add(item);
             }
         }
@@ -64,7 +64,7 @@ public class ProfileController {
             Map<String, Object> item = new HashMap<String, Object>();
             item.put("type", "device");
             item.put("user_id", user.getId());
-            item.put("user_course", user.getCourses().stream().toList().get(0).getCourse().getName());
+            item.put("user_course", user.getStudent().getCourses().stream().toList().get(0).getCourse().getName());
             item.put("user_image", user.getImageUrl());
             item.put("user_name", user.getName());
             map.add(item);
@@ -78,7 +78,9 @@ public class ProfileController {
         User u = MyUtils.getCurrentUserSession(authService);
         if (u.getStudent() == null)
             throw new ClientException("parent", "this instance not a student");
-        if (u.getCourses().stream().allMatch(e -> e.getCourse().getTeacher().getTeacher().isEnableAutoChangeDevice())) {
+        if (u.getStudent()
+                .getCourses().stream()
+                .allMatch(e -> e.getCourse().isEnableAutoChangeDevice())) {
             u.setRegisterMacAddress(u.getLoginMacAddress());
             authService.save(u);
             return GenericResponse.successWithMessageOnly("update your device successfully");
@@ -121,15 +123,15 @@ public class ProfileController {
     }
 
     @GetMapping("analysis")
-    public ResponseEntity<GenericResponse<Map>> getAnalysis() {
+    public ResponseEntity<GenericResponse<Map<String, List<Object>>>> getAnalysis() {
         User u = MyUtils.getCurrentUserSession(authService);
         log.warn(u.getId() + "");
         int allStudents = authService.getAllStudent(u.getId());
         int missingParentStudents = authService.getMissedParents();
         int misedPaymentStudents = studentCourseRepo
-                .getStudentByCourse_teacher_idAndLateGreaterThan(u.getId(), 0).size();
+                .getStudentByCourse_teacher_idAndCoursePaymentLateGreaterThan(u.getId(), 0).size();
         double actalPaymentStudents = studentCourseRepo
-                .getStudentByCourse_teacher_idAndLate(u.getId(), 0).stream()
+                .getStudentByCourse_teacher_idAndCoursePaymentLate(u.getId(), 0).stream()
                 .mapToDouble(e -> e.getCourse().getCost()).sum();
         double expectedMounthlyProfit = studentCourseRepo
                 .getStudentByCourse_teacher_id(u.getId()).stream().mapToDouble(e -> e.getCourse().getCost())

@@ -13,21 +13,13 @@ import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.SessionRepository;
 import com.softkour.qrsta_server.service.course.CourseService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Transactional
-@Slf4j
 public class SessionService {
 
     @Autowired
     CourseService courseService;
-
-    private final SessionRepository sessionRepository;
-
-    public SessionService(SessionRepository sessionRepository) {
-        this.sessionRepository = sessionRepository;
-    }
+    @Autowired
+    SessionRepository sessionRepository;
 
     public Session save(Session session) {
         return sessionRepository.save(session);
@@ -59,7 +51,6 @@ public class SessionService {
     }
 
     public void delete(Long id) {
-        log.debug("Request to delete Session : {}", id);
         sessionRepository.deleteById(id);
     }
 
@@ -67,8 +58,9 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
-        if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
-            session.addStudent(user);
+        if (user.getStudent().getCourses().stream()
+                .anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
+            session.addStudent(user.getStudent());
             return sessionRepository.save(session);
         } else {
             throw new ClientException("student",
@@ -83,8 +75,9 @@ public class SessionService {
         for (int i = 0; i < userIds.size(); i++) {
             User user = authService.getUserById(userIds.get(i));
             /// check user join this course
-            if (user.getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
-                session.addStudent(user);
+            if (user.getStudent()
+                    .getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
+                session.addStudent(user.getStudent());
                 sessionRepository.save(session);
             } else {
                 throw new ClientException("student",
@@ -100,7 +93,7 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
                         () -> new ClientException("session", "session not found id: ".concat(sessionId.toString())));
-        session.removeStudent(user);
+        session.removeStudent(user.getStudent());
         return sessionRepository.save(session);
     }
 }
