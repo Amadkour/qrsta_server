@@ -58,7 +58,7 @@ public class QuizService {
             }
         }
         notificationService.addNotification(
-                NotificationType.QUIZ, "add quiz successlly and will start in " + quiz.getStartDate(),
+                NotificationType.QUIZ, "there are a new exam successlly and will start in " + quiz.getStartDate(),
                 quiz.getId(),
                 users);
 
@@ -80,9 +80,9 @@ public class QuizService {
                     if (quiz.getCreatedDate() != null) {
                         existingQuiz.setCreatedDate(quiz.getCreatedDate());
                     }
-                    if (quiz.getStartDate() != null) {
-                        existingQuiz.setStartDate(quiz.getStartDate());
-                    }
+                    // if (quiz.getStartDate() != null) {
+                    // existingQuiz.setStartDate(quiz.getStartDate());
+                    // }
                     if (quiz.getQuestionsPerStudent() != null) {
                         existingQuiz.setQuestionsPerStudent(quiz.getQuestionsPerStudent());
                     }

@@ -30,8 +30,6 @@ import lombok.Setter;
 @Getter
 public class Quiz extends AbstractAuditingEntity {
 
-    @Column()
-    private Instant startDate;
 
     @Column()
     private String questionsPerStudent;

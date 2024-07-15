@@ -1,5 +1,6 @@
 package com.softkour.qrsta_server.payload.request;
 
+import java.time.Instant;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -13,6 +14,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class QuizCourseSession {
     private Long courseId;
+    private Instant startDate;
     private List<Long> sessionsId;
+
 
 }

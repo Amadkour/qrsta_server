@@ -27,7 +27,6 @@ import lombok.Setter;
 @Getter
 public class QuizCreationRequest {
     private Long id;
-    private Instant startDate;
     @NotNull
     private String timePerMinutes;
 
@@ -53,7 +52,6 @@ public class QuizCreationRequest {
         quiz.setId(getId());
         quiz.setQuestionsPerStudent(getQuestionsPerStudent());
         quiz.setTimePerMinutes(getTimePerMinutes());
-        quiz.setStartDate(getStartDate());
         quiz.setCourses(
                 getCourses().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
                     @Override
@@ -68,8 +66,6 @@ public class QuizCreationRequest {
                 })
                         .collect(Collectors.toSet()));
         /// questions
-        System.out.println("==============[question]==============");
-        System.out.println(getQuestions().stream().map(e -> e.getCoveredSessions()).toList());
         quiz.setQuestions(getQuestions().stream().map(q -> {
             Question question = new Question();
             /// coverd session
