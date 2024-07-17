@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class QuizResponce {
+public class QuizResponse {
 
     private Long id;
     private List<String> courses;

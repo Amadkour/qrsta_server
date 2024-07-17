@@ -29,6 +29,7 @@ public class QuizCreationRequest {
     private Long id;
     @NotNull
     private String timePerMinutes;
+    private Instant startDate;
 
     private String questionsPerStudent;
     @NotNull
@@ -58,6 +59,7 @@ public class QuizCreationRequest {
                     public CourseQuiz apply(QuizCourseSession e) {
                         CourseQuiz courseQuiz = new CourseQuiz();
                         courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
+                        courseQuiz.setStartDate(getStartDate());
                         e.getSessionsId().stream()
                                 .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
 

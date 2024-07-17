@@ -58,7 +58,7 @@ public class QuizService {
             }
         }
         notificationService.addNotification(
-                NotificationType.QUIZ, "there are a new exam successlly and will start in " + quiz.getStartDate(),
+                NotificationType.QUIZ, "there are a new exam successfully and will start in " + quiz.getCourses().stream().map(e->e.getCourse().getName()),
                 quiz.getId(),
                 users);
 
