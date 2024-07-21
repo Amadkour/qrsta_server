@@ -45,6 +45,9 @@ public class SessionService {
         return sessionRepository.findById(id)
                 .orElseThrow(() -> new ClientException("session_id", "Session not Found id: " + id));
     }
+  public List<Session> findAll(List<Long> ids) {
+        return sessionRepository.findAllById(ids);
+    }
 
     public Session getReferenceById(long id) {
         return sessionRepository.getReferenceById(id);

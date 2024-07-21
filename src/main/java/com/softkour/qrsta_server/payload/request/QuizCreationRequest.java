@@ -39,8 +39,8 @@ public class QuizCreationRequest {
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
     public Quiz toQuiz(QuizService quizService, CourseService courseService, SessionService sessionService,
-            OptionService optionService,
-            QuestionService questionService, OTPService otpService) {
+                       OptionService optionService,
+                       QuestionService questionService, OTPService otpService) {
 
         Quiz quiz;
         if (getId() == null) {
@@ -55,46 +55,38 @@ public class QuizCreationRequest {
         quiz.setTimePerMinutes(getTimePerMinutes());
         quiz.setCourses(
                 getCourses().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
-                    @Override
-                    public CourseQuiz apply(QuizCourseSession e) {
-                        CourseQuiz courseQuiz = new CourseQuiz();
-                        courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
-                        courseQuiz.setStartDate(getStartDate());
-                        e.getSessionsId().stream()
-                                .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
+                            @Override
+                            public CourseQuiz apply(QuizCourseSession e) {
+                                CourseQuiz courseQuiz = new CourseQuiz();
+                                courseQuiz.setStartDate(getStartDate());
+                                e.getSessionsId()
+                                        .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
 
-                        return courseQuiz;
-                    }
-                })
+                                return courseQuiz;
+                            }
+                        })
                         .collect(Collectors.toSet()));
         /// questions
-        quiz.setQuestions(getQuestions().stream().map(q -> {
-            Question question = new Question();
-            /// coverd session
-            question.setCoveredSessions(
-                    q.getCoveredSessions().stream().map(new Function<QuizCourseSession, CourseQuiz>() {
-                        @Override
-                        public CourseQuiz apply(QuizCourseSession e) {
-                            CourseQuiz courseQuiz = new CourseQuiz();
-                            courseQuiz.setCourse(courseService.findOne(e.getCourseId()));
-                            e.getSessionsId().stream()
-                                    .forEach(s -> courseQuiz.addSession(new SessionQuiz(sessionService.findOne(s))));
-
-                            return courseQuiz;
-                        }
-                    })
-                            .collect(Collectors.toSet()));
-            /// options
-            question.setOptions(q.getOptions().stream().map(o -> {
-                Option option = new Option();
-                option.setTitle(o.getTitle());
-                option.setIsCorrectAnswer(o.getIsCorrectAnswer());
-                return optionService.save(option);
-            }).collect(Collectors.toSet()));
-            question.setTitle(q.getTitle());
-            question.setGrade(q.getGrade());
-            return questionService.save(question);
-        }).collect(Collectors.toSet()));
+//        quiz.setQuestions(getQuestions().stream().map(q -> {
+//            Question question = new Question();
+//            /// covered session
+//            question.setCoveredSessions(q.getCoveredSessions().stream().map(e -> {
+//                e.setSessions(sessionService.findAll(e.getSessionsId()));
+//                return e.toCourseQuiz();
+//            }).collect(Collectors.toSet()));
+//            /// options
+//            question.setOptions(q.getOptions().stream().map(o -> {
+//                Option option = new Option();
+//                option.setTitle(o.getTitle());
+//                option.setIsCorrectAnswer(o.getIsCorrectAnswer());
+//                return optionService.save(option);
+//            }).collect(Collectors.toSet()));
+//            question.setTitle(q.getTitle());
+//            question.setGrade(q.getGrade());
+//            return questionService.save(question);
+//        }).collect(Collectors.toSet()));
+        quiz.setQuestions(getQuestions().stream().map(e ->
+                e.toQuestion(sessionService)).collect(Collectors.toSet()));
         return quiz;
     }
 

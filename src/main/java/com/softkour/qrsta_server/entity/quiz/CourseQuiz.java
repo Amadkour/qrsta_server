@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 
 import jakarta.persistence.CascadeType;
@@ -26,20 +25,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CourseQuiz extends AbstractAuditingEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JsonIgnoreProperties(value = { "students", "quizes", "schedules" }, allowSetters = true)
-    private Course course;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.PERSIST)
     private Set<SessionQuiz> sessions = new HashSet<>();
     @Column()
     private Instant startDate;
+
     public void addSession(SessionQuiz sessionQuiz) {
         sessions.add(sessionQuiz);
         sessionQuiz.setQuiz(this);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "students", "courses", "sessions", "students" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"students", "courses", "sessions", "students"}, allowSetters = true)
     private Quiz quiz;
 }

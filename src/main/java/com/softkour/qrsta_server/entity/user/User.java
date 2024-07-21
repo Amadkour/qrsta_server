@@ -3,6 +3,7 @@ package com.softkour.qrsta_server.entity.user;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.softkour.qrsta_server.entity.course.StudentCourse;
@@ -27,11 +28,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * A Employee.
- */
 @Entity
-// @SuppressWarnings("common-java:DuplicatedBlocks")
 @Setter
 @Getter
 @Table(name = "qrsta_user")
@@ -114,12 +111,12 @@ public class User extends AbstractAuditingEntity {
 
         public StudntInSession toStudntInSession(List<Boolean> attendance, boolean isPresent, Long courseId) {
                 StudentCourse studentCourse = this.getStudent()
-                                .getCourses().stream().filter(e -> e.getCourse().getId() == courseId).toList()
+                                .getCourses().stream().filter(e -> Objects.equals(e.getCourse().getId(), courseId)).toList()
                                 .get(0);
                 Stream<StudentQuiz> studentQuizzes = this.getStudent().getQuizzes().stream()
-                                .filter(q -> q.getQuiz().getQuiz().getCourse().getId() == studentCourse.getCourse()
-                                                .getId());
-                List<Instant> dInstants = studentCourse.getCourse().getSessions().stream().map(s -> s.getCreatedDate())
+                                .filter(q -> Objects.equals(q.getQuiz().getQuiz().getSessions().iterator().next().getSession().getCourse().getId(), studentCourse.getCourse()
+                                        .getId()));
+                List<Instant> dInstants = studentCourse.getCourse().getSessions().stream().map(AbstractAuditingEntity::getCreatedDate)
                                 .toList();
                 int firstIndex = 0;
                 for (int i = 0; i < dInstants.size(); i++) {
@@ -137,7 +134,7 @@ public class User extends AbstractAuditingEntity {
                                 studentCourse.getAppPaymentLate(),
                                 studentCourse.getCoursePaymentLate(),
                                 studentCourse.isActive(),
-                                studentQuizzes.mapToDouble(e -> e.getGrade()).sum(),
+                                studentQuizzes.mapToDouble(StudentQuiz::getGrade).sum(),
                                 firstIndex
 
                 );

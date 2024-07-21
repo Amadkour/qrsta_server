@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.softkour.qrsta_server.service.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,6 @@ import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
 import com.softkour.qrsta_server.repo.StudentCourseRepository;
-import com.softkour.qrsta_server.service.AuthService;
-import com.softkour.qrsta_server.service.PostService;
-import com.softkour.qrsta_server.service.ScheduleService;
-import com.softkour.qrsta_server.service.SessionService;
 import com.softkour.qrsta_server.service.course.CourseService;
 
 @RestController

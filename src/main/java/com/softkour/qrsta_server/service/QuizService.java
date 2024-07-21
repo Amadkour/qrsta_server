@@ -1,13 +1,8 @@
 package com.softkour.qrsta_server.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
+import com.softkour.qrsta_server.entity.quiz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +14,6 @@ import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.enumeration.NotificationType;
 import com.softkour.qrsta_server.entity.enumeration.UserType;
 import com.softkour.qrsta_server.entity.public_entity.StudentSchedule;
-import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
-import com.softkour.qrsta_server.entity.quiz.Question;
-import com.softkour.qrsta_server.entity.quiz.Quiz;
-import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.repo.QuizRepository;
@@ -53,12 +44,12 @@ public class QuizService {
         quiz = quizRepository.save(quiz);
         Set<User> users = new HashSet<>();
         for (CourseQuiz c : quiz.getCourses()) {
-            for (StudentCourse u : c.getCourse().getStudents()) {
+            for (StudentCourse u : c.getSessions().iterator().next().getSession().getCourse().getStudents()) {
                 users.add(u.getStudent().getUser());
             }
         }
         notificationService.addNotification(
-                NotificationType.QUIZ, "there are a new exam successfully and will start in " + quiz.getCourses().stream().map(e->e.getCourse().getName()),
+                NotificationType.QUIZ, "there are a new exam successfully and will start in " + quiz.getCourses().stream().map(e -> e.getSessions().iterator().next().getSession().getCourse().getName()),
                 quiz.getId(),
                 users);
 
@@ -109,9 +100,9 @@ public class QuizService {
             u = MyUtils.getCurrentUserSession(authService);
         }
         if (u.getType() == UserType.TEACHER) {
-            quizRepository.findAllByCourses_course_teacher_id(u.getId());
+            quizRepository.findAllByCourses_sessions_session_course_teacher_id(u.getId());
         } else {
-            quizRepository.findAllByCourses_course_students_student_id(u.getId());
+            quizRepository.findAllByCourses_sessions_session_course_students_student_id(u.getId());
 
         }
         return quizRepository.findAll();
@@ -127,11 +118,11 @@ public class QuizService {
         List<Question> questions = q.getQuestions().stream().toList();
         List<Question> wrongQuestions = new ArrayList<>();
         User u = MyUtils.getCurrentUserSession(authService);
-        int totalPoints = questions.stream().mapToInt(e -> e.getGrade()).sum();
+        int totalPoints = questions.stream().mapToInt(Question::getGrade).sum();
         int points = 0;
         for (int i = 0; i < questions.size(); i++) {
-            List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(e -> e.getIsCorrectAnswer())
-                    .map(e -> e.getTitle()).toList();
+            List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(Option::getIsCorrectAnswer)
+                    .map(Option::getTitle).toList();
             System.out.println(answers.get(i).size() == correctAnswer.size());
             if (answers.get(i).stream().allMatch(e -> correctAnswer.contains(e.replace("[", "").replace("]", "")))
                     && answers.get(i).size() == correctAnswer.size()) {
@@ -144,21 +135,21 @@ public class QuizService {
         /// add it in student schedual
         log.warn("total score is:" + (points / totalPoints));
         log.warn("total of wrong answers:" + wrongQuestions.size());
-        if ((points / totalPoints) < 0.5) {
-            List<CourseQuiz> courses = q.getCourses().stream().collect(Collectors.toList());
+        if (((double) points / totalPoints) < 0.5) {
+            List<CourseQuiz> courses = q.getCourses().stream().toList();
             // for (int i = 0; i < q.getCoveredSessions().size(); i++) {
             CourseQuiz c = courses.stream()
-                    .takeWhile(e -> e.getCourse().getStudents().stream().anyMatch(s -> s.getId() == u.getId()))
+                    .takeWhile(e -> e.getSessions().iterator().next().getSession().getCourse().getStudents().stream().anyMatch(s -> Objects.equals(s.getId(), u.getId())))
                     .findFirst().orElseThrow(() -> new ClientException("course", "user unjoint"));
-            List<SessionQuiz> sessions = c.getSessions().stream().collect(Collectors.toList());
-            for (int j = 0; j < sessions.size(); j++) {
+            List<SessionQuiz> sessions = c.getSessions().stream().toList();
+            for (SessionQuiz session : sessions) {
                 log.warn("add to students" + u.getPhoneNumber());
 
                 StudentSchedule item = new StudentSchedule();
                 item.setDone(false);
                 item.setRead(false);
-                item.setCourse(c.getCourse());
-                item.setSession(sessions.get(j).getSession());
+                item.setCourse(c.getSessions().iterator().next().getSession().getCourse());
+                item.setSession(session.getSession());
                 item.setUser(u);
                 item.setQuestion(wrongQuestions.get((new Random()).nextInt(wrongQuestions.size())));
                 scheduleRepo.save(item);

@@ -2,6 +2,8 @@ package com.softkour.qrsta_server.service;
 
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.repo.QuestionRepository;
+
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,15 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing
- * {@link com.softkour.qrsta_server.entity.quiz.domain.Question}.
- */
 @Service
 @Transactional
 public class QuestionService {
 
-    private final Logger log = LoggerFactory.getLogger(QuestionService.class);
 
     private final QuestionRepository questionRepository;
 
@@ -26,98 +23,29 @@ public class QuestionService {
         this.questionRepository = questionRepository;
     }
 
-    /**
-     * Save a question.
-     *
-     * @param question the entity to save.
-     * @return the persisted entity.
-     */
     public Question save(Question question) {
-        log.debug("Request to save Question : {}", question);
         return questionRepository.save(question);
     }
-
-    /**
-     * Update a question.
-     *
-     * @param question the entity to save.
-     * @return the persisted entity.
-     */
     public Question update(Question question) {
-        log.debug("Request to update Question : {}", question);
         return questionRepository.save(question);
     }
 
-    /**
-     * Partially update a question.
-     *
-     * @param question the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Optional<Question> partialUpdate(Question question) {
-        log.debug("Request to partially update Question : {}", question);
-
-        return questionRepository
-                .findById(question.getId())
-                .map(existingQuestion -> {
-                    if (question.getId() != null) {
-                        existingQuestion.setId(question.getId());
-                    }
-                    if (question.getTitle() != null) {
-                        existingQuestion.setTitle(question.getTitle());
-                    }
-                    if (question.getCreatedDate() != null) {
-                        existingQuestion.setCreatedDate(question.getCreatedDate());
-                    }
-                    if (question.getGrade() != null) {
-                        existingQuestion.setGrade(question.getGrade());
-                    }
-
-                    return existingQuestion;
-                })
-                .map(questionRepository::save);
-    }
-
-    /**
-     * Get all the questions.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
     public Page<Question> findAll(Pageable pageable) {
-        log.debug("Request to get all Questions");
         return questionRepository.findAll(pageable);
     }
 
-    /**
-     * Get all the questions with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
-     */
-    public Page<Question> findAllWithEagerRelationships(Pageable pageable) {
-        return questionRepository.findAllWithEagerRelationships(pageable);
-    }
-
-    /**
-     * Get one question by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
     public Optional<Question> findOne(Long id) {
-        log.debug("Request to get Question : {}", id);
         return questionRepository.findOneWithEagerRelationships(id);
     }
 
-    /**
-     * Delete the question by id.
-     *
-     * @param id the id of the entity.
-     */
+    @Transactional(readOnly = true)
+    public List<Question> findBySession(Long id) {
+        return questionRepository.findByCoveredSessions_sessions_session_id(id);
+    }
+
     public void delete(Long id) {
-        log.debug("Request to delete Question : {}", id);
         questionRepository.deleteById(id);
     }
 }

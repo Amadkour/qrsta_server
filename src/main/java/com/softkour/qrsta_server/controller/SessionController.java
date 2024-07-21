@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
+import com.softkour.qrsta_server.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -53,6 +56,8 @@ public class SessionController {
         AuthService authService;
         @Autowired
         SessionObjectService sessionObjectService;
+        @Autowired
+        QuestionService questionService;
 
         @GetMapping("session_details_student")
         public ResponseEntity<GenericResponse<Object>> getSessionDetailsStudent(
@@ -77,7 +82,7 @@ public class SessionController {
                                 .map(s -> s.getStudents().stream()
                                                 .anyMatch(b -> b.getUser().getId() == childId))
                                 .toList());
-                map.put("date", sessions.stream().map(e -> e.getStartDate()).toList());
+                map.put("date", sessions.stream().map(Session::getStartDate).toList());
                 return GenericResponse.success(map);
 
         }
@@ -87,6 +92,20 @@ public class SessionController {
                         @RequestHeader(name = "session_id") Long sessionId) {
                 Session session = sessionService.findOne(sessionId);
                 return GenericResponse.success(session.toSessionDetailsWithoutStudents());
+
+        }
+
+        @GetMapping("session_questions")
+        public ResponseEntity<GenericResponse<Object>> getSessionQuestions(
+                        @RequestHeader(name = "session_id") Long sessionId) {
+                return GenericResponse.success(questionService.findBySession(sessionId).stream().map(Question::toTeacher));
+
+        }
+
+        @GetMapping("add_question")
+        public ResponseEntity<GenericResponse<Object>> addQuestion(
+                        @RequestHeader(name = "questions") QuestionCreationRequest questionCreationRequest) {
+                return GenericResponse.success(questionService.save(questionCreationRequest.toQuestion(sessionService)));
 
         }
 

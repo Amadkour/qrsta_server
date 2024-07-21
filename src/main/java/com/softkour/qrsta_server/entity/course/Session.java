@@ -32,135 +32,141 @@ import lombok.Setter;
 @Setter
 public class Session extends AbstractAuditingEntity {
 
-        @ManyToMany(fetch = FetchType.LAZY)
-        @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
-        @JsonIgnoreProperties(value = { "sessions", "courses", "offers", "needToReplace" }, allowSetters = true)
-        private Set<Student> students = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user__session", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
+    @JsonIgnoreProperties(value = {"sessions", "courses", "offers", "needToReplace"}, allowSetters = true)
+    private Set<Student> students = new HashSet<>();
 
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
-        @JsonIgnoreProperties(value = { "sessions", "quizzes" }, allowSetters = true)
-        private Set<SessionQuiz> quizzes = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
+    @JsonIgnoreProperties(value = {"sessions", "quizzes"}, allowSetters = true)
+    private Set<SessionQuiz> quizzes = new HashSet<>();
 
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
-        @JsonIgnoreProperties(value = { "session" }, allowSetters = true)
-        private Set<SessionObject> objects = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
+    @JsonIgnoreProperties(value = {"session"}, allowSetters = true)
+    private Set<SessionObject> objects = new HashSet<>();
 
-        @Column()
-        private Instant startDate;
+    @Column()
+    private Instant startDate;
 
-        // @Column(columnDefinition = "boolean default false")
-        // private boolean active;
+    // @Column(columnDefinition = "boolean default false")
+    // private boolean active;
 
-        @Column()
-        private String label;
-        @Column()
-        private Instant endDate;
+    @Column()
+    private String label;
+    @Column()
+    private Instant endDate;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JsonIgnoreProperties(value = { "sessions", "schedules" }, allowSetters = true)
-        private Course course;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"sessions", "schedules"}, allowSetters = true)
+    private Course course;
 
-        public void setStudents(Set<Student> students) {
-                if (students != null) {
-                        students.forEach(i -> i.removeSession(this));
-                        students.forEach(i -> i.addSession(this));
-                }
-                this.students = students;
+    public void setStudents(Set<Student> students) {
+        if (students != null) {
+            students.forEach(i -> i.removeSession(this));
+            students.forEach(i -> i.addSession(this));
         }
+        this.students = students;
+    }
 
-        public Session addStudent(Student student) {
-                students.add(student);
-                return this;
-        }
+    public Session addStudent(Student student) {
+        students.add(student);
+        return this;
+    }
 
-        public Session removeStudent(Student employee) {
-                students.remove(employee);
-                employee.getSessions().remove(this);
-                return this;
-        }
+    public Session removeStudent(Student employee) {
+        students.remove(employee);
+        employee.getSessions().remove(this);
+        return this;
+    }
 
-        public SessionDateAndStudentGrade toSessionDateAndStudentGrade(Long studentId) {
-                double grade = getQuizzes().stream().reduce((first, second) -> second)
-                                .orElse(new SessionQuiz(null)).getStudents()
-                                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
-                Instant now = Instant.now();
-                return new SessionDateAndStudentGrade(
-                                TimeUnit.MINUTES.convert(getStartDate().toEpochMilli() - now.toEpochMilli(),
-                                                TimeUnit.MILLISECONDS),
-                                TimeUnit.MINUTES.convert(getEndDate().toEpochMilli() - getStartDate().toEpochMilli(),
-                                                TimeUnit.MILLISECONDS),
-                                getId(),
-                                getLabel(),
-                                getStudents().size(),
-                                getCourse().getStudents().size(),
-                                grade,
-                                now.isAfter(getEndDate()),
-                                getStudents().stream().anyMatch(e -> e.getUser().getId() == studentId));
-        }
+    public SessionDateAndStudentGrade toSessionDateAndStudentGrade(Long studentId) {
+        double grade = getQuizzes().stream().reduce((first, second) -> second)
+                .orElse(new SessionQuiz(null)).getStudents()
+                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
+        Instant now = Instant.now();
+        return new SessionDateAndStudentGrade(
+                TimeUnit.MINUTES.convert(getStartDate().toEpochMilli() - now.toEpochMilli(),
+                        TimeUnit.MILLISECONDS),
+                TimeUnit.MINUTES.convert(getEndDate().toEpochMilli() - getStartDate().toEpochMilli(),
+                        TimeUnit.MILLISECONDS),
+                getId(),
+                getLabel(),
+                getStudents().size(),
+                getCourse().getStudents().size(),
+                grade,
+                now.isAfter(getEndDate()),
+                getStudents().stream().anyMatch(e -> e.getUser().getId() == studentId));
+    }
 
-        public SessionDateAndStudentGrade toSessionDateAndStudentGradeWithAttendance(Boolean attendance) {
-                double grade = getQuizzes().stream().reduce((first, second) -> second)
-                                .orElse(new SessionQuiz(null)).getStudents()
-                                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
-                Instant now = Instant.now();
-                return new SessionDateAndStudentGrade(
-                                TimeUnit.MINUTES.convert(getStartDate().toEpochMilli() - now.toEpochMilli(),
-                                                TimeUnit.MILLISECONDS),
-                                TimeUnit.MINUTES.convert(getEndDate().toEpochMilli() - getStartDate().toEpochMilli(),
-                                                TimeUnit.MILLISECONDS),
-                                getId(),
-                                getLabel(),
-                                getStudents().size(),
-                                getCourse().getStudents().size(),
-                                grade,
-                                now.isAfter(getEndDate()),
+    public SessionDateAndStudentGrade toSessionDateAndStudentGradeWithAttendance(Boolean attendance) {
+        double grade = getQuizzes().stream().reduce((first, second) -> second)
+                .orElse(new SessionQuiz(null)).getStudents()
+                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
+        Instant now = Instant.now();
+        return new SessionDateAndStudentGrade(
+                TimeUnit.MINUTES.convert(getStartDate().toEpochMilli() - now.toEpochMilli(),
+                        TimeUnit.MILLISECONDS),
+                TimeUnit.MINUTES.convert(getEndDate().toEpochMilli() - getStartDate().toEpochMilli(),
+                        TimeUnit.MILLISECONDS),
+                getId(),
+                getLabel(),
+                getStudents().size(),
+                getCourse().getStudents().size(),
+                grade,
+                now.isAfter(getEndDate()),
 
-                                attendance == null ? false : attendance);
-        }
+                attendance == null ? false : attendance);
+    }
 
-        public SessionNameAndId toSessionNameAndId() {
-                return new SessionNameAndId(getId(), getLabel());
-        }
+    public SessionNameAndId toSessionNameAndId() {
+        return new SessionNameAndId(getId(), getLabel());
+    }
 
-        public SessionDetailsStudent toSessionDetailsStudent() {
+    public SessionDetailsStudent toSessionDetailsStudent() {
 
-                Set<Session> sessions = getCourse().getSessions();
+        Set<Session> sessions = getCourse().getSessions();
 
-                // getStudents().stream().anyMatch(m -> m.getId() ==
-                // e.getStudent().getId())
-                return new SessionDetailsStudent(
-                                getCourse().getStudents().stream()
-                                                .map((e) -> e.getStudent().getUser().toStudntInSession(
-                                                                /// attendance
-                                                                sessions.stream()
-                                                                                .map(s -> s.getStudents().stream()
-                                                                                                .anyMatch(b -> b.getId() == e
-                                                                                                                .getStudent()
-                                                                                                                .getId()))
-                                                                                .toList(),
-                                                                /// isPresent in this Session?
-                                                                getStudents().stream()
-                                                                                .anyMatch(m -> m.getId() == e
-                                                                                                .getStudent().getId()),
-                                                                /// course
-                                                                getCourse().getId()))
-                                                .toList());
+        // getStudents().stream().anyMatch(m -> m.getId() ==
+        // e.getStudent().getId())
+        return new SessionDetailsStudent(
+                getCourse().getStudents().stream()
+                        .map((e) -> e.getStudent().getUser().toStudntInSession(
+                                /// attendance
+                                sessions.stream()
+                                        .map(s -> s.getStudents().stream()
+                                                .anyMatch(b -> b.getId() == e
+                                                        .getStudent()
+                                                        .getId()))
+                                        .toList(),
+                                /// isPresent in this Session?
+                                getStudents().stream()
+                                        .anyMatch(m -> m.getId() == e
+                                                .getStudent().getId()),
+                                /// course
+                                getCourse().getId()))
+                        .toList());
 
-        }
+    }
 
-        public SessionDetailsWithoutStudents toSessionDetailsWithoutStudents() {
+    public SessionDetailsWithoutStudents toSessionDetailsWithoutStudents() {
 
-                return new SessionDetailsWithoutStudents(
-                                getObjects().stream()
-                                                .map((e) -> new SessionObjectResponse(e.getTitle(),
-                                                                e.getSubItems().stream()
-                                                                                .map((s) -> new SessionObjectResponse(
-                                                                                                s.getTitle(),
-                                                                                                null, s.getType(),
-                                                                                                s.getCreatedDate(),
-                                                                                                s.getId()))
-                                                                                .toList(),
-                                                                e.getType(), e.getCreatedDate(), e.getId()))
-                                                .toList());
-        }
+        return new SessionDetailsWithoutStudents(
+                getObjects().stream()
+                        .map((e) -> new SessionObjectResponse(e.getTitle(),
+                                e.getSubItems().stream()
+                                        .map((s) -> new SessionObjectResponse(
+                                                s.getTitle(),
+                                                null, s.getType(),
+                                                s.getCreatedDate(),
+                                                s.getId()))
+                                        .toList(),
+                                e.getType(), e.getCreatedDate(), e.getId()))
+                        .toList());
+    }
+
+    public SessionQuiz toSessionQuiz() {
+        SessionQuiz sessionQuiz = new SessionQuiz();
+        sessionQuiz.setSession(this);
+        return toSessionQuiz();
+    }
 }

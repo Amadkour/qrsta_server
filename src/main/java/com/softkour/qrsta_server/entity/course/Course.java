@@ -60,9 +60,9 @@ public class Course extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
-    @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
-    private Set<CourseQuiz> quizzes = new HashSet<>();
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+//    @JsonIgnoreProperties(value = { "sessions" }, allowSetters = true)
+//    private Set<CourseQuiz> quizzes = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "course", cascade = CascadeType.ALL)
     private Set<StudentCourse> students = new HashSet<>();
