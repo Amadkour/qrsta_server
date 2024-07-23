@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.softkour.qrsta_server.entity.enumeration.EssayCorrectionType;
+import com.softkour.qrsta_server.entity.enumeration.QuestionType;
 import com.softkour.qrsta_server.entity.quiz.Option;
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.service.SessionService;
@@ -22,11 +24,16 @@ public class QuestionCreationRequest {
     private int grade;
     private Set<OptionCreationRequest> options = new HashSet<>();
     private Set<QuizCourseSession> coveredSessions = new HashSet<>();
+    private QuestionType questionType;
+
+    private EssayCorrectionType correctionType;
 
     public Question toQuestion(SessionService sessionService) {
         Question question = new Question();
         question.setGrade(getGrade());
         question.setTitle(getTitle());
+        question.setType(getQuestionType());
+        question.setCorrectionType(getCorrectionType());
         question.setOptions(getOptions().stream().map(OptionCreationRequest::toOption).collect(Collectors.toSet()));
         question.setCoveredSessions(getCoveredSessions().stream().map(e -> e.toCourseQuiz(sessionService)).collect(Collectors.toSet()));
         return question;

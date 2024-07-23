@@ -38,9 +38,8 @@ public class QuizService {
     public QuizService(QuizRepository quizRepository) {
         this.quizRepository = quizRepository;
     }
-
+@Transactional
     public Quiz save(Quiz quiz) {
-        log.debug("Request to save Quiz : {}", quiz);
         quiz = quizRepository.save(quiz);
         Set<User> users = new HashSet<>();
         for (CourseQuiz c : quiz.getCourses()) {

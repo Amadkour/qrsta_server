@@ -38,9 +38,8 @@ public class QuizCreationRequest {
     private Set<QuizCourseSession> courses = new HashSet<>();
     private Set<QuestionCreationRequest> questions = new HashSet<>();
 
-    public Quiz toQuiz(QuizService quizService, CourseService courseService, SessionService sessionService,
-                       OptionService optionService,
-                       QuestionService questionService, OTPService otpService) {
+    public Quiz toQuiz(QuizService quizService, SessionService sessionService,
+                       OTPService otpService) {
 
         Quiz quiz;
         if (getId() == null) {
@@ -85,8 +84,11 @@ public class QuizCreationRequest {
 //            question.setGrade(q.getGrade());
 //            return questionService.save(question);
 //        }).collect(Collectors.toSet()));
+
         quiz.setQuestions(getQuestions().stream().map(e ->
                 e.toQuestion(sessionService)).collect(Collectors.toSet()));
+        System.out.println(quiz.getQuestions().iterator().next().getCoveredSessions().stream().map(e->e.getSessions().size()));
+
         return quiz;
     }
 

@@ -56,7 +56,7 @@ public class Session extends AbstractAuditingEntity {
     @Column()
     private Instant endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = {"sessions", "schedules"}, allowSetters = true)
     private Course course;
 
@@ -167,6 +167,6 @@ public class Session extends AbstractAuditingEntity {
     public SessionQuiz toSessionQuiz() {
         SessionQuiz sessionQuiz = new SessionQuiz();
         sessionQuiz.setSession(this);
-        return toSessionQuiz();
+        return sessionQuiz;
     }
 }

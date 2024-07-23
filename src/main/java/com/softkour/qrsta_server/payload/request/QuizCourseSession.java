@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizCourseSession {
-    private Course course;
+    private Long courseId;
     private Instant startDate;
     private List<Long> sessionsId;
 

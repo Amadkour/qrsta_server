@@ -44,7 +44,7 @@ public class quizController {
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
         Quiz quiz = quizService
-                .save(request.toQuiz(quizService, courseService, sessionService, optionService, questionService,
+                .save(request.toQuiz(quizService, sessionService,
                         otpService));
         return GenericResponse.success(quiz.toQuizModel());
 
@@ -60,12 +60,12 @@ public class quizController {
     @GetMapping("all")
     public ResponseEntity<GenericResponse<Object>> allQuiz(
             @RequestHeader(required = false, name = "child_phone") String childPhone) {
-        return GenericResponse.success(quizService.findAll(childPhone).stream().map(e -> e.toQuizModel()));
+        return GenericResponse.success(quizService.findAll(childPhone).stream().map(Quiz::toQuizModel));
     }
 
     @GetMapping("course_score")
     public ResponseEntity<GenericResponse<Object>> courseScore() {
-        return GenericResponse.success(quizService.findAll(null).stream().map(e -> e.toQuizModel()));
+        return GenericResponse.success(quizService.findAll(null).stream().map(Quiz::toQuizModel));
     }
 
     @GetMapping("quiz_profile_for_teacher")
@@ -80,7 +80,7 @@ public class quizController {
 
     @GetMapping("correct_quiz")
     public ResponseEntity<GenericResponse<Object>> correct(@RequestHeader("answer") List<List<String>> answers,
-            @RequestHeader("quiz_id") Long quizId) {
+                                                           @RequestHeader("quiz_id") Long quizId) {
         System.out.println("from controller==============>");
         System.out.println(answers);
         return GenericResponse.successWithMessageOnly(quizService.correct(answers, quizId));

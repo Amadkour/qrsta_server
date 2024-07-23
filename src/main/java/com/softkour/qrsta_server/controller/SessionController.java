@@ -220,7 +220,7 @@ public class SessionController {
                         @RequestHeader(name = "course_id") Long courseId) {
                 return GenericResponse.success(
                                 sessionService.findOldSessionsOfCourse(courseId, Instant.now()).stream()
-                                                .map((e) -> e.toSessionNameAndId())
+                                                .map(Session::toSessionNameAndId)
                                                 .toList());
 
         }

@@ -37,7 +37,12 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public List<Session> findOldSessionsOfCourse(Long courseId, Instant date) {
-        return sessionRepository.findAllByCourse_IdAndStartDateBefore(courseId, date);
+        List<Session> list = sessionRepository.findAllByCourse_IdAndStartDateBefore(courseId, date);
+        if (list.isEmpty()) {
+            list = findFutureSessionsOfCourse(courseId, date);
+        }
+        return list;
+
     }
 
     // @Transactional(readOnly = true)
@@ -45,7 +50,8 @@ public class SessionService {
         return sessionRepository.findById(id)
                 .orElseThrow(() -> new ClientException("session_id", "Session not Found id: " + id));
     }
-  public List<Session> findAll(List<Long> ids) {
+
+    public List<Session> findAll(List<Long> ids) {
         return sessionRepository.findAllById(ids);
     }
 
