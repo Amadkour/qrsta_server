@@ -31,5 +31,4 @@ public class QuizCourseSession {
         covered.setSessions(sessionService.findAll(sessionsId).stream().map(Session::toSessionQuiz).collect(Collectors.toSet()));
         return covered;
     }
-
 }

@@ -1,6 +1,8 @@
 package com.softkour.qrsta_server.payload.request;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,8 +24,8 @@ public class QuestionCreationRequest {
     private Long id;
     private String title;
     private int grade;
-    private Set<OptionCreationRequest> options = new HashSet<>();
-    private Set<QuizCourseSession> coveredSessions = new HashSet<>();
+    private List<OptionCreationRequest> options = new ArrayList<>();
+    private List<QuizCourseSession> coveredSessions = new ArrayList<>();
     private QuestionType questionType;
 
     private EssayCorrectionType correctionType;

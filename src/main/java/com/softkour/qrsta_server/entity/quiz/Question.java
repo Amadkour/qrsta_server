@@ -1,5 +1,6 @@
 package com.softkour.qrsta_server.entity.quiz;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,28 +72,15 @@ public class Question extends AbstractAuditingEntity {
     }
 
     public QuestionCreationRequest toTeacher() {
-        System.out.println(getCoveredSessions().iterator().next().getSessions().size());
-        Set<QuizCourseSession> coveredSessions = new HashSet<>();
-        if (!getCoveredSessions().isEmpty()) {
-            try {
-                coveredSessions = getCoveredSessions().stream().map(s -> new QuizCourseSession(
-                                s.getSessions().iterator().next().getSession().getCourse().getId(),
-                                s.getStartDate(),
-                                s.getSessions().stream().map(s2 -> s2.getSession().getId()).toList()))
-                        .collect(Collectors
-                                .toSet());
-            }catch (Exception e){
 
-            }
-        }
         return new QuestionCreationRequest(
                 getId(),
                 getTitle(),
                 getGrade(),
                 getOptions().stream()
                         .map(o -> new OptionCreationRequest(o.getTitle(), o.getIsCorrectAnswer()))
-                        .collect(Collectors.toSet()),
-                coveredSessions,
+                        .toList(),
+                getCoveredSessions().stream().map(CourseQuiz::toQuizCourseSession).toList(),
                 getType(),
                 getCorrectionType()
         );

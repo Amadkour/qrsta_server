@@ -97,15 +97,24 @@ public class SessionController {
 
         @GetMapping("session_questions")
         public ResponseEntity<GenericResponse<Object>> getSessionQuestions(
-                        @RequestHeader(name = "session_id") Long sessionId) {
+                        @RequestHeader(name = "id") Long sessionId) {
                 return GenericResponse.success(questionService.findBySession(sessionId).stream().map(Question::toTeacher));
 
         }
+        @GetMapping("course_questions")
+        public ResponseEntity<GenericResponse<Object>> getCourseQuestions(
+                        @RequestHeader(name = "id") Long courseId) {
+                List<Question> saved=questionService.findAll();
+//                return GenericResponse.success(saved.stream().map(Question::toTeacher));
+                return GenericResponse.success(questionService.findByCourse(courseId).stream().map(Question::toTeacher));
 
-        @GetMapping("add_question")
+        }
+
+        @PostMapping("add_question")
         public ResponseEntity<GenericResponse<Object>> addQuestion(
-                        @RequestHeader(name = "questions") QuestionCreationRequest questionCreationRequest) {
-                return GenericResponse.success(questionService.save(questionCreationRequest.toQuestion(sessionService)));
+                        @RequestBody QuestionCreationRequest question) {
+                Question saved=questionService.save(question.toQuestion(sessionService));
+                return GenericResponse.success(saved.toTeacher());
 
         }
 
@@ -185,8 +194,6 @@ public class SessionController {
                         session.setEndDate(Instant.parse(sessionCreationRequest.getToDate()).minusMillis(diff));
                 }
 
-                log.warn("start afet maintance:==>" + session.getStartDate());
-                log.warn("end afet maintance:==>" + session.getEndDate());
                 session = sessionService.save(session);
                 /// add it in student schedual
                 List<StudentCourse> students = session.getCourse().getStudents().stream().collect(Collectors.toList());

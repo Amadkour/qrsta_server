@@ -2,6 +2,8 @@ package com.softkour.qrsta_server.controller;
 
 import java.util.List;
 
+import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,8 +45,9 @@ public class quizController {
 
     @PostMapping("create")
     public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
+
         Quiz quiz = quizService
-                .save(request.toQuiz(quizService, sessionService,
+                .save(request.toQuiz(quizService, sessionService,questionService,
                         otpService));
         return GenericResponse.success(quiz.toQuizModel());
 

@@ -111,13 +111,8 @@ public class Quiz extends AbstractAuditingEntity {
                         e.getTitle(),
                         e.getGrade(),
                         e.getOptions().stream()
-                                .map(o -> new OptionCreationRequest(o.getTitle(), false)).collect(Collectors.toSet()),
-                        e.getCoveredSessions().stream().map(s -> new QuizCourseSession(
-                                        s.getSessions().iterator().next().getSession().getCourse().getId(),
-                                        s.getStartDate(),
-                                        s.getSessions().stream().map(s2 -> s2.getSession().getId()).toList()))
-                                .collect(Collectors
-                                        .toSet()),
+                                .map(o -> new OptionCreationRequest(o.getTitle(), false)).toList(),
+                        e.getCoveredSessions().stream().map(CourseQuiz::toQuizCourseSession).toList(),
                         e.getType(),e.getCorrectionType()
                         ))
                 .toList();

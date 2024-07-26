@@ -61,8 +61,7 @@ public class StudentSchedule extends AbstractAuditingEntity {
                                         getQuestion().getTitle(), getQuestion().getGrade(),
                                         getQuestion().getOptions().stream()
                                                         .map(o -> new OptionCreationRequest(o.getTitle(),
-                                                                        o.getIsCorrectAnswer()))
-                                                        .collect(Collectors.toSet()),
+                                                                        o.getIsCorrectAnswer())).toList(),
                                         null,
                                 getQuestion().getType(),
                                 getQuestion().getCorrectionType()

@@ -30,11 +30,12 @@ public class SessionQuiz extends AbstractAuditingEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "quiz", cascade = CascadeType.ALL)
     private Set<StudentQuiz> students = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JsonIgnoreProperties(value = { "students", "quizes", "schedules" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = { "students", "quizzes", "schedules" }, allowSetters = true)
     private Session session;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = { "students", "quizzes", "schedules" }, allowSetters = true)
     private CourseQuiz quiz;
 
     public SessionQuiz addStudent(StudentQuiz studentQuiz) {
