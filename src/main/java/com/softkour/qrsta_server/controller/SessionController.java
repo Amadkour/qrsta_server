@@ -104,8 +104,6 @@ public class SessionController {
         @GetMapping("course_questions")
         public ResponseEntity<GenericResponse<Object>> getCourseQuestions(
                         @RequestHeader(name = "id") Long courseId) {
-                List<Question> saved=questionService.findAll();
-//                return GenericResponse.success(saved.stream().map(Question::toTeacher));
                 return GenericResponse.success(questionService.findByCourse(courseId).stream().map(Question::toTeacher));
 
         }
@@ -113,7 +111,7 @@ public class SessionController {
         @PostMapping("add_question")
         public ResponseEntity<GenericResponse<Object>> addQuestion(
                         @RequestBody QuestionCreationRequest question) {
-                Question saved=questionService.save(question.toQuestion(sessionService));
+                Question saved=questionService.save(question.toQuestion(sessionService,courseService));
                 return GenericResponse.success(saved.toTeacher());
 
         }

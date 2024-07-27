@@ -111,12 +111,12 @@ public class TeachetController {
 
         if (courseId != null) {
             Course course = courseService.findOne(courseId);
-            course.setEnableAutojoin(mode);
+            course.setEnableAutoJoin(mode);
             courseService.save(course);
         } else {
             User u = MyUtils.getCurrentUserSession(userService);
             for (Course course : u.getTeacher().getCourses()) {
-                course.setEnableAutojoin(mode);
+                course.setEnableAutoJoin(mode);
                 courseService.save(course);
             }
         }
@@ -128,7 +128,7 @@ public class TeachetController {
         User u = MyUtils.getCurrentUserSession(userService);
         Map<String, List<Boolean>> m = new HashMap<String, List<Boolean>>();
         m.put("device_mode", u.getTeacher().getCourses().stream().map(e -> e.isEnableAutoChangeDevice()).toList());
-        m.put("join_mode", u.getTeacher().getCourses().stream().map(e -> e.isEnableAutojoin()).toList());
+        m.put("join_mode", u.getTeacher().getCourses().stream().map(e -> e.isEnableAutoJoin()).toList());
         m.put("payment_mode", u.getTeacher().getCourses().stream().map(e -> e.isUseOnlinePayment()).toList());
         m.put("absence_mode", u.getTeacher().getCourses().stream().map(e -> e.isEnableAbsence()).toList());
         return GenericResponse.success(m);

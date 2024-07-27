@@ -25,9 +25,10 @@ public class QuizCourseSession {
     private Instant startDate;
     private List<Long> sessionsId;
 
-    public CourseQuiz toCourseQuiz(SessionService sessionService) {
+    public CourseQuiz toCourseQuiz(SessionService sessionService,CourseService courseService) {
         CourseQuiz covered = new CourseQuiz();
         covered.setStartDate(getStartDate());
+        covered.setCourse(courseService.findOne(getCourseId()));
         covered.setSessions(sessionService.findAll(sessionsId).stream().map(Session::toSessionQuiz).collect(Collectors.toSet()));
         return covered;
     }

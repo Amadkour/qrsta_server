@@ -16,5 +16,5 @@ public interface QuestionRepository extends QuestionRepositoryWithBagRelationshi
     }
 
     List<Question> findByCoveredSessions_sessions_session_id(Long sessionId);
-    List<Question> findByCoveredSessions_sessions_session_course_id(Long course);
+    List<Question> findByCoveredSessions_course_id(Long course);
 }

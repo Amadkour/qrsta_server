@@ -1,9 +1,11 @@
 package com.softkour.qrsta_server.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
+import com.softkour.qrsta_server.payload.request.QuizCorrectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -81,11 +83,8 @@ public class quizController {
         return GenericResponse.success(quizService.findById(quizId).toStudentQuiz());
     }
 
-    @GetMapping("correct_quiz")
-    public ResponseEntity<GenericResponse<Object>> correct(@RequestHeader("answer") List<List<String>> answers,
-                                                           @RequestHeader("quiz_id") Long quizId) {
-        System.out.println("from controller==============>");
-        System.out.println(answers);
-        return GenericResponse.successWithMessageOnly(quizService.correct(answers, quizId));
+    @PostMapping("correct_quiz")
+    public ResponseEntity<GenericResponse<Object>> correct(@RequestBody QuizCorrectionRequest quizCorrectionRequest) {
+        return GenericResponse.successWithMessageOnly(quizService.correct(quizCorrectionRequest));
     }
 }

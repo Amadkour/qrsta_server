@@ -1,9 +1,8 @@
 package com.softkour.qrsta_server.entity.quiz;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
@@ -23,6 +22,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
+import org.antlr.v4.runtime.IntStream;
 
 @Entity
 @Setter
@@ -47,7 +47,7 @@ public class Quiz extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = {"sessions"}, allowSetters = true)
     private Set<CourseQuiz> courses = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "quizzes", cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "quizzes", cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = {"options", "quizzes"}, allowSetters = true)
     private Set<Question> questions = new HashSet<>();
 
@@ -61,17 +61,6 @@ public class Quiz extends AbstractAuditingEntity {
         this.questions = questions;
     }
 
-    public Quiz addQuestion(Question question) {
-        this.questions.add(question);
-        question.getQuizzes().add(this);
-        return this;
-    }
-
-    public Quiz removeQuestion(Question question) {
-        this.questions.remove(question);
-        question.getQuizzes().remove(this);
-        return this;
-    }
 
     public QuizResponse toQuizModel() {
         QuizResponse quizResponse = new QuizResponse();
@@ -105,17 +94,24 @@ public class Quiz extends AbstractAuditingEntity {
     }
 
     public List<QuestionCreationRequest> toStudentQuiz() {
-        return getQuestions().stream()
-                .map(e -> new QuestionCreationRequest(
-                        e.getId(),
-                        e.getTitle(),
-                        e.getGrade(),
-                        e.getOptions().stream()
-                                .map(o -> new OptionCreationRequest(o.getTitle(), false)).toList(),
-                        e.getCoveredSessions().stream().map(CourseQuiz::toQuizCourseSession).toList(),
-                        e.getType(),e.getCorrectionType()
-                        ))
-                .toList();
+        Random rand = new Random();
+        List<QuestionCreationRequest> questions=new ArrayList<>();
+        List<Question> origin=getQuestions().stream().toList();
+        System.out.println(origin.size());
+        for(int i=0;i<Integer.parseInt(getQuestionsPerStudent());i++){
+            Question q =origin.get(rand.nextInt(origin.size()));
+            QuestionCreationRequest selectedQuestion= new QuestionCreationRequest();
+            selectedQuestion.setId(q.getId());
+            selectedQuestion.setTitle(q.getTitle());
+            selectedQuestion.setGrade(q.getGrade());
+            selectedQuestion.setOptions(     q.getOptions().stream()
+                    .map(o -> new OptionCreationRequest(o.getTitle(), false)).toList());
+            selectedQuestion.setCoveredSessions(q.getCoveredSessions().stream().map(CourseQuiz::toQuizCourseSession).toList());
+            selectedQuestion.setQuestionType(q.getType());
+            selectedQuestion.setCorrectionType(q.getCorrectionType());
+            questions.add(selectedQuestion);
+        }
+        return questions;
 
     }
 

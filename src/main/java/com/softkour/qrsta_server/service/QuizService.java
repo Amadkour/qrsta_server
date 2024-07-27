@@ -2,7 +2,10 @@ package com.softkour.qrsta_server.service;
 
 import java.util.*;
 
+import com.softkour.qrsta_server.entity.enumeration.EssayCorrectionType;
+import com.softkour.qrsta_server.entity.enumeration.QuestionType;
 import com.softkour.qrsta_server.entity.quiz.*;
+import com.softkour.qrsta_server.payload.request.QuizCorrectionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +41,8 @@ public class QuizService {
     public QuizService(QuizRepository quizRepository) {
         this.quizRepository = quizRepository;
     }
-@Transactional
+
+    @Transactional
     public Quiz save(Quiz quiz) {
         quiz = quizRepository.save(quiz);
         Set<User> users = new HashSet<>();
@@ -112,28 +116,56 @@ public class QuizService {
         return quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
     }
 
-    public String correct(List<List<String>> answers, Long quizId) {
-        Quiz q = quizRepository.findById(quizId).orElseThrow(() -> new ClientException("quiz", "not found"));
-        List<Question> questions = q.getQuestions().stream().toList();
+    public String correct(QuizCorrectionRequest quizCorrectionRequest) {
+        Quiz q = quizRepository.findById(quizCorrectionRequest.getQuizId()).orElseThrow(() -> new ClientException("quiz", "not found"));
+        List<Question> questions = q.getQuestions().stream().takeWhile(e -> quizCorrectionRequest.getQuestionsId().contains(e.getId())).toList();
+        //=================================
         List<Question> wrongQuestions = new ArrayList<>();
         User u = MyUtils.getCurrentUserSession(authService);
         int totalPoints = questions.stream().mapToInt(Question::getGrade).sum();
         int points = 0;
         for (int i = 0; i < questions.size(); i++) {
-            List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(Option::getIsCorrectAnswer)
-                    .map(Option::getTitle).toList();
-            System.out.println(answers.get(i).size() == correctAnswer.size());
-            if (answers.get(i).stream().allMatch(e -> correctAnswer.contains(e.replace("[", "").replace("]", "")))
-                    && answers.get(i).size() == correctAnswer.size()) {
-                points += questions.get(i).getGrade();
-            } else {
-                wrongQuestions.add(questions.get(i));
+            List<String> correctAnswer = questions.get(i).getOptions().stream().takeWhile(Option::getIsCorrectAnswer).map(Option::getTitle).toList();
+            if (questions.get(i).getType() == QuestionType.TRUEFALSE) {
+                if (!quizCorrectionRequest.getAnswers().get(i).isEmpty() && Objects.equals(correctAnswer.get(0), quizCorrectionRequest.getAnswers().get(i).get(0))) {
+                    points += questions.get(i).getGrade();
+                } else {
+                    wrongQuestions.add(questions.get(i));
+
+                }
+            } else if (questions.get(i).getType() == QuestionType.MCQ) {
+
+                if (!quizCorrectionRequest.getAnswers().get(i).isEmpty() &&
+                        new HashSet<>(correctAnswer).containsAll(quizCorrectionRequest.getAnswers().get(i)) &&
+                        quizCorrectionRequest.getAnswers().get(i).size() == correctAnswer.size()) {
+                    points += questions.get(i).getGrade();
+                } else {
+                    wrongQuestions.add(questions.get(i));
+
+                }
+            }
+            else if (questions.get(i).getType() == QuestionType.SPACE) {
+               if(new HashSet<>(quizCorrectionRequest.getAnswers().get(i)).containsAll(correctAnswer)) {
+                    points += questions.get(i).getGrade();
+                } else {
+                    wrongQuestions.add(questions.get(i));
+                }
+            }
+
+            else {
+                EssayCorrectionType correctionType = questions.get(i).getCorrectionType();
+                if (correctionType == EssayCorrectionType.MATCHINGAI && Objects.equals(correctAnswer.get(0), quizCorrectionRequest.getAnswers().get(i).get(0))) {
+                        points += questions.get(i).getGrade();
+                } else if (correctionType == EssayCorrectionType.KEYWORDS && new HashSet<>(quizCorrectionRequest.getAnswers().get(i)).containsAll(correctAnswer)) {
+                    points += questions.get(i).getGrade();
+                } else {
+                    wrongQuestions.add(questions.get(i));
+                }
             }
         }
-        ////
-        /// add it in student schedual
-        log.warn("total score is:" + (points / totalPoints));
-        log.warn("total of wrong answers:" + wrongQuestions.size());
+
+        /// add it in student schedule
+        System.out.println("total of wrong answers:" + wrongQuestions.size());
         if (((double) points / totalPoints) < 0.5) {
             List<CourseQuiz> courses = q.getCourses().stream().toList();
             // for (int i = 0; i < q.getCoveredSessions().size(); i++) {
@@ -142,7 +174,7 @@ public class QuizService {
                     .findFirst().orElseThrow(() -> new ClientException("course", "user unjoint"));
             List<SessionQuiz> sessions = c.getSessions().stream().toList();
             for (SessionQuiz session : sessions) {
-                log.warn("add to students" + u.getPhoneNumber());
+                System.out.println("add to students" + u.getPhoneNumber());
 
                 StudentSchedule item = new StudentSchedule();
                 item.setDone(false);
@@ -155,7 +187,7 @@ public class QuizService {
             }
         }
         // }
-        return String.valueOf(points) + '/' + String.valueOf(totalPoints);
+        return String.valueOf(points) + '/' + totalPoints;
 
     }
 

@@ -11,6 +11,7 @@ import com.softkour.qrsta_server.entity.enumeration.QuestionType;
 import com.softkour.qrsta_server.entity.quiz.Option;
 import com.softkour.qrsta_server.entity.quiz.Question;
 import com.softkour.qrsta_server.service.SessionService;
+import com.softkour.qrsta_server.service.course.CourseService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,14 +31,14 @@ public class QuestionCreationRequest {
 
     private EssayCorrectionType correctionType;
 
-    public Question toQuestion(SessionService sessionService) {
+    public Question toQuestion(SessionService sessionService, CourseService courseService) {
         Question question = new Question();
         question.setGrade(getGrade());
         question.setTitle(getTitle());
         question.setType(getQuestionType());
         question.setCorrectionType(getCorrectionType());
         question.setOptions(getOptions().stream().map(OptionCreationRequest::toOption).collect(Collectors.toSet()));
-        question.setCoveredSessions(getCoveredSessions().stream().map(e -> e.toCourseQuiz(sessionService)).collect(Collectors.toSet()));
+        question.setCoveredSessions(getCoveredSessions().stream().map(e -> e.toCourseQuiz(sessionService,courseService)).collect(Collectors.toSet()));
         return question;
     }
 

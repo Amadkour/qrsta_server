@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.softkour.qrsta_server.entity.course.Course;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 
+import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.payload.request.QuizCourseSession;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -26,11 +28,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CourseQuiz extends AbstractAuditingEntity {
 
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<SessionQuiz> sessions = new HashSet<>();
 
     @Column()
     private Instant startDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"useOnlinePayment", "enableAbsence", "enableAutoJoin", "enableAutoChangeDevice"}, allowSetters = true)
+    private Course course;
 
     public void addSession(SessionQuiz sessionQuiz) {
         sessions.add(sessionQuiz);
@@ -43,9 +48,13 @@ public class CourseQuiz extends AbstractAuditingEntity {
 
     public QuizCourseSession toQuizCourseSession() {
         QuizCourseSession covered = new QuizCourseSession();
-        covered.setStartDate(getStartDate());
-        covered.setCourseId(getSessions().iterator().next().getSession().getCourse().getId());
-        covered.setSessionsId(getSessions().stream().map(e->e.getSession().getId()).toList());
+        if (getCourse() != null) {
+            covered.setCourseId(getCourse().getId());
+        }
+        if (!getSessions().isEmpty()) {
+            covered.setSessionsId(getSessions().stream().map(e -> e.getSession().getId()).toList());
+        }
         return covered;
+
     }
 }

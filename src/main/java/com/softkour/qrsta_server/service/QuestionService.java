@@ -42,7 +42,7 @@ public class QuestionService {
     }
 
     public List<Question> findByCourse(Long id) {
-        return questionRepository.findByCoveredSessions_sessions_session_course_id(id);
+        return questionRepository.findByCoveredSessions_course_id(id);
     }
 
     public void delete(Long id) {

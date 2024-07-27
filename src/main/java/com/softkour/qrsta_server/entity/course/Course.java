@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.enumeration.CourseType;
-import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.entity.user.Teacher;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
@@ -40,7 +39,7 @@ public class Course extends AbstractAuditingEntity {
     @Column(columnDefinition = "boolean default true")
     private boolean enableAbsence;
     @Column(columnDefinition = "boolean default true")
-    private boolean enableAutojoin;
+    private boolean enableAutoJoin;
     @Column(columnDefinition = "boolean default true")
     private boolean enableAutoChangeDevice;
 

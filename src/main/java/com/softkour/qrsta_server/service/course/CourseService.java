@@ -57,7 +57,7 @@ public class CourseService {
             student.setAppPaymentLate(1);
             student.setCoursePaymentLate(1);
             if (course.getType() == CourseType.PRIVATE
-                    && course.isEnableAutojoin() == false) {
+                    && course.isEnableAutoJoin() == false) {
                 student.setActive(false);
             } else {
                 student.setActive(true);
