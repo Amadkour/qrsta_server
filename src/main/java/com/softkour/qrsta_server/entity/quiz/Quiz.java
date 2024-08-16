@@ -13,13 +13,7 @@ import com.softkour.qrsta_server.payload.request.QuizCourseSession;
 import com.softkour.qrsta_server.payload.request.QuizCreationRequest;
 import com.softkour.qrsta_server.payload.response.QuizResponse;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.antlr.v4.runtime.IntStream;
@@ -43,8 +37,10 @@ public class Quiz extends AbstractAuditingEntity {
     @Column()
     private QuizType type;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"sessions"}, allowSetters = true)
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<CourseQuiz> courses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "quizzes", cascade = CascadeType.ALL)
@@ -61,6 +57,10 @@ public class Quiz extends AbstractAuditingEntity {
         this.questions = questions;
     }
 
+    public void addCourses(CourseQuiz course) {
+        this.courses.add(course);
+        course.setQuiz(this);
+    }
 
     public QuizResponse toQuizModel() {
         QuizResponse quizResponse = new QuizResponse();
@@ -68,63 +68,59 @@ public class Quiz extends AbstractAuditingEntity {
             quizResponse.setStartDate(getCourses().iterator().next().getStartDate());
         } else {
             if (getType() == QuizType.BEGIN) {
-                quizResponse.setStartDate(
-                        getCourses().iterator().next().getSessions().stream()
-                                .toList().get(0)
-                                .getSession().getStartDate());
+                quizResponse.setStartDate(getCourses().iterator().next().getSessions().stream().toList().get(0).getStartDate());
             } else if (getType() == QuizType.END) {
-                quizResponse.setStartDate(
-                        getCourses().iterator().next().getSessions().stream()
-                                .toList().get(0)
-                                .getSession().getEndDate().minusSeconds(Integer.parseInt(getTimePerMinutes()) * 60L));
+                quizResponse.setStartDate(getCourses().iterator().next().getSessions().stream().toList().get(0).getEndDate().minusSeconds(Integer.parseInt(getTimePerMinutes()) * 60L));
             }
         }
-        quizResponse.setCourses(getCourses().stream().map(e->e.getSessions().iterator().next().getSession().getCourse().getName()).toList());
+        quizResponse.setCourses(getCourses().stream().map(e -> e.getSessions().iterator().next().getCourse().getName()).toList());
         quizResponse.setPoints(getQuestions().stream().mapToInt(Question::getGrade).sum());
         quizResponse.setId(getId());
         quizResponse.setQuestionCount(getQuestionsPerStudent());
-        quizResponse.setStudentCount(
-                getCourses().stream().mapToInt(e -> e.getSessions().iterator().next().getSession().getCourse().getStudents().size()).sum());
+        quizResponse.setStudentCount(getCourses().stream().mapToInt(e -> e.getSessions().iterator().next().getCourse().getStudents().size()).sum());
         quizResponse.setType(getType());
         quizResponse.setTimePerMinutes(getTimePerMinutes());
         quizResponse.setCode(getCode());
-
+//================[students]
+        List<String> students = new ArrayList<String>();
+        System.out.println("====================[students]");
+        System.out.println(getCourses().size());
+        System.out.println(getCourses().iterator().next().getStudents().stream().map(e -> e.getStudent().getId()).toList());
+        System.out.println(getCourses().iterator().next().getStudents().stream().map(e -> e.getStudent().getUser().getName()).toList());
+        for (CourseQuiz e : getCourses()) {
+            students.addAll(e.getStudents().stream().map(s -> s.getStudent().getUser().getName()).toList());
+        }
+        quizResponse.setStudents(students);
         return quizResponse;
 
     }
 
     public List<QuestionCreationRequest> toStudentQuiz() {
         Random rand = new Random();
-        List<QuestionCreationRequest> questions=new ArrayList<>();
-        List<Question> origin=getQuestions().stream().toList();
-        System.out.println(origin.size());
-        for(int i=0;i<Integer.parseInt(getQuestionsPerStudent());i++){
-            Question q =origin.get(rand.nextInt(origin.size()));
-            QuestionCreationRequest selectedQuestion= new QuestionCreationRequest();
+        List<QuestionCreationRequest> subQuestions = new ArrayList<>();
+        List<Question> origin = getQuestions().stream().toList();
+        System.out.println(getQuestions().size());
+        for (int i = 0; i < Integer.parseInt(getQuestionsPerStudent()); i++) {
+            System.out.println(origin.size());
+            Question q = origin.get(rand.nextInt(origin.size()));
+            QuestionCreationRequest selectedQuestion = new QuestionCreationRequest();
             selectedQuestion.setId(q.getId());
             selectedQuestion.setTitle(q.getTitle());
             selectedQuestion.setGrade(q.getGrade());
-            selectedQuestion.setOptions(     q.getOptions().stream()
-                    .map(o -> new OptionCreationRequest(o.getTitle(), false)).toList());
+            selectedQuestion.setOptions(q.getOptions().stream().map(o -> new OptionCreationRequest(o.getTitle(), false)).toList());
             selectedQuestion.setCoveredSessions(q.getCoveredSessions().stream().map(CourseQuiz::toQuizCourseSession).toList());
             selectedQuestion.setQuestionType(q.getType());
             selectedQuestion.setCorrectionType(q.getCorrectionType());
-            questions.add(selectedQuestion);
+            subQuestions.add(selectedQuestion);
         }
-        return questions;
+        return subQuestions;
 
     }
 
     public QuizCreationRequest toTeacherQuiz() {
         QuizCreationRequest quiz = new QuizCreationRequest();
-        quiz.setCourses(getCourses().stream().map(e -> new QuizCourseSession(
-                        e.getSessions().iterator().next().getSession().getCourse().getId(),
-                        e.getStartDate(),
-                        e.getSessions().stream().map(s -> s.getSession().getId()).toList()))
-                .collect(Collectors.toSet()));
-        quiz.setQuestions(
-                getQuestions().stream().map(Question::toTeacher)
-                        .collect(Collectors.toSet()));
+        quiz.setCourses(getCourses().stream().map(e -> new QuizCourseSession(e.getSessions().iterator().next().getCourse().getId(), e.getStartDate(), e.getSessions().stream().map(AbstractAuditingEntity::getId).toList())).collect(Collectors.toSet()));
+        quiz.setQuestions(getQuestions().stream().map(Question::toTeacher).collect(Collectors.toSet()));
         return quiz;
     }
 }

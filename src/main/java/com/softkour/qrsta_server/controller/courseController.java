@@ -32,7 +32,7 @@ import com.softkour.qrsta_server.payload.request.ScheduleRequest;
 import com.softkour.qrsta_server.payload.response.CourseResponse;
 import com.softkour.qrsta_server.payload.response.SessionAndSocialResponce;
 import com.softkour.qrsta_server.payload.response.SessionDetailsStudent;
-import com.softkour.qrsta_server.repo.StudentCourseRepository;
+import com.softkour.qrsta_server.repo.course.StudentCourseRepository;
 import com.softkour.qrsta_server.service.course.CourseService;
 
 @RestController

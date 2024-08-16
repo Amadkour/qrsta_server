@@ -1,7 +1,6 @@
 package com.softkour.qrsta_server.entity.user;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.course.Offer;
@@ -9,6 +8,7 @@ import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.course.StudentCourse;
 import com.softkour.qrsta_server.entity.quiz.StudentQuiz;
 
+import com.softkour.qrsta_server.payload.response.AbstractUser;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,10 +29,10 @@ import lombok.Setter;
 @Getter
 public class Student extends AbstractAuditingEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "parent", "sessions", "courses" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"parent", "sessions", "courses"}, allowSetters = true)
     private User parent;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = {}, allowSetters = true)
     private User user;
 
@@ -55,7 +55,7 @@ public class Student extends AbstractAuditingEntity {
 
     /// sessions
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
-    @JsonIgnoreProperties(value = { "students", "quizzes", "course" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"students", "quizzes", "course"}, allowSetters = true)
     private Set<Session> sessions = new HashSet<>();
 
     public Set<Session> addSession(Session session) {
@@ -70,11 +70,24 @@ public class Student extends AbstractAuditingEntity {
 
     /// offers
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
-    @JsonIgnoreProperties(value = { "students", "courses" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"students", "courses"}, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
 
     /// quizzes
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "student", cascade = CascadeType.ALL)
     private Set<StudentQuiz> quizzes = new HashSet<>();
+
+
+    public AbstractUser toAbstractUserWithDegree(double grade, String answers) {
+        AbstractUser user = new AbstractUser(
+                getId(),
+                getUser().getName(),
+                getUser().getType(),
+                getUser().getImageUrl(),
+                getUser().getPhoneNumber());
+        user.setDegree(grade);
+        user.setQuizAnswer(answers);
+        return user;
+    }
 }

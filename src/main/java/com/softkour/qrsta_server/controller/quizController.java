@@ -1,11 +1,15 @@
 package com.softkour.qrsta_server.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.entity.quiz.StudentQuiz;
+import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.payload.request.QuestionCreationRequest;
 import com.softkour.qrsta_server.payload.request.QuizCorrectionRequest;
+import com.softkour.qrsta_server.repo.quiz.StudentQuizRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -49,7 +53,7 @@ public class quizController {
     public ResponseEntity<GenericResponse<Object>> addQuiz(@RequestBody @Valid QuizCreationRequest request) {
 
         Quiz quiz = quizService
-                .save(request.toQuiz(quizService, sessionService,questionService,
+                .save(request.toQuiz(quizService,courseService, sessionService,questionService,
                         otpService));
         return GenericResponse.success(quiz.toQuizModel());
 
@@ -86,5 +90,14 @@ public class quizController {
     @PostMapping("correct_quiz")
     public ResponseEntity<GenericResponse<Object>> correct(@RequestBody QuizCorrectionRequest quizCorrectionRequest) {
         return GenericResponse.successWithMessageOnly(quizService.correct(quizCorrectionRequest));
+    }
+    @GetMapping("update_student_degree")
+    public ResponseEntity<GenericResponse<Object>> updateDegree(@RequestHeader Long quizId,@RequestHeader Long studentId,@RequestHeader double newDegree ) {
+        StudentQuiz studentQuiz=quizService.updateDegree(quizId,studentId,newDegree);
+        return GenericResponse.successWithMessageOnly("update "+ Arrays.stream(studentQuiz.getStudent().getUser().getName().split(" ")).iterator().next()+"'s degree to be"+studentQuiz.getGrade());
+    }
+    @GetMapping("quiz_students")
+    public ResponseEntity<GenericResponse<Object>> quizStudents(@RequestHeader Long quizId,@RequestHeader String courseName) {
+        return GenericResponse.success(quizService.findByQuizIdAndCourseName(quizId,courseName).getCourses().stream().iterator().next().getStudents().stream().map(e->e.getStudent().toAbstractUserWithDegree(e.getGrade(),e.getAnswers())).toList());
     }
 }

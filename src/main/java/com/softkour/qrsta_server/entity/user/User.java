@@ -114,7 +114,7 @@ public class User extends AbstractAuditingEntity {
                                 .getCourses().stream().filter(e -> Objects.equals(e.getCourse().getId(), courseId)).toList()
                                 .get(0);
                 Stream<StudentQuiz> studentQuizzes = this.getStudent().getQuizzes().stream()
-                                .filter(q -> Objects.equals(q.getQuiz().getQuiz().getSessions().iterator().next().getSession().getCourse().getId(), studentCourse.getCourse()
+                                .filter(q -> Objects.equals(q.getCourse().getCourse().getId(), studentCourse.getCourse()
                                         .getId()));
                 List<Instant> dInstants = studentCourse.getCourse().getSessions().stream().map(AbstractAuditingEntity::getCreatedDate)
                                 .toList();

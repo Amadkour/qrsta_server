@@ -15,8 +15,8 @@ import com.softkour.qrsta_server.entity.enumeration.CourseType;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.AcceptRequest;
-import com.softkour.qrsta_server.repo.CourseRepository;
-import com.softkour.qrsta_server.repo.StudentCourseRepository;
+import com.softkour.qrsta_server.repo.course.CourseRepository;
+import com.softkour.qrsta_server.repo.course.StudentCourseRepository;
 
 @Service
 public class CourseService {

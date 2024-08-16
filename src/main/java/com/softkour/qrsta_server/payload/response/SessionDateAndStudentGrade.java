@@ -12,10 +12,10 @@ public class SessionDateAndStudentGrade {
     private Long perioudPerMinutes;
     private long sessionId;
     private String label;
-    private int absence_count;
-    private int expected_count;
-    private double grade;
-    private boolean finished;
-    private boolean isAttendance;
+    private Integer absence_count;
+    private Integer expected_count;
+    private Double grade;
+    private Boolean finished;
+    private Boolean isAttendance;
 
 }

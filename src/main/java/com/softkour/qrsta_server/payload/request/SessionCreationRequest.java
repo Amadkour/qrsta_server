@@ -9,10 +9,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class SessionCreationRequest {
     @NotNull
     private long courseId;
-
+    private boolean forQuiz;
     @NotNull
     @DateTimeFormat
     private String fromDate;
+    private String label;
     @NotNull
     private String toDate;
     private String currentDate;

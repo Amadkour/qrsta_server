@@ -11,7 +11,7 @@ import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.enumeration.SessionObjectType;
 import com.softkour.qrsta_server.entity.post.Post;
 import com.softkour.qrsta_server.payload.response.AbstractUser;
-import com.softkour.qrsta_server.repo.PostRepository;
+import com.softkour.qrsta_server.repo.course.PostRepository;
 
 import lombok.extern.slf4j.Slf4j;
 

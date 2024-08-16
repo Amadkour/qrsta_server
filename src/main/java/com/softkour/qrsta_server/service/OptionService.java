@@ -1,7 +1,7 @@
 package com.softkour.qrsta_server.service;
 
 import com.softkour.qrsta_server.entity.quiz.Option;
-import com.softkour.qrsta_server.repo.OptionRepository;
+import com.softkour.qrsta_server.repo.quiz.OptionRepository;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;

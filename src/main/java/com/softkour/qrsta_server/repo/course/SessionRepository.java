@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.repo;
+package com.softkour.qrsta_server.repo.course;
 
 import java.time.Instant;
 import java.util.List;

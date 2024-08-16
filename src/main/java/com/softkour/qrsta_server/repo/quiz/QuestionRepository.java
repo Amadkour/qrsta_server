@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.repo;
+package com.softkour.qrsta_server.repo.quiz;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +10,7 @@ import org.springframework.stereotype.*;
 import com.softkour.qrsta_server.entity.quiz.Question;
 
 @Repository
-public interface QuestionRepository extends QuestionRepositoryWithBagRelationships, JpaRepository<Question, Long> {
-    default Optional<Question> findOneWithEagerRelationships(Long id) {
-        return this.fetchBagRelationships(this.findById(id));
-    }
-
-    List<Question> findByCoveredSessions_sessions_session_id(Long sessionId);
+public interface QuestionRepository extends JpaRepository<Question, Long> {
+    List<Question> findByCoveredSessions_sessions_id(Long sessionId);
     List<Question> findByCoveredSessions_course_id(Long course);
 }

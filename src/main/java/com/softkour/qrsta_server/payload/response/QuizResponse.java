@@ -3,6 +3,7 @@ package com.softkour.qrsta_server.payload.response;
 import java.time.Instant;
 import java.util.List;
 
+import com.google.firebase.database.annotations.NotNull;
 import com.softkour.qrsta_server.entity.enumeration.QuizType;
 
 import lombok.Getter;
@@ -21,5 +22,6 @@ public class QuizResponse {
     private int studentCount;
     private String questionCount;
     private int points;
+    private List<String> students;
 
 }

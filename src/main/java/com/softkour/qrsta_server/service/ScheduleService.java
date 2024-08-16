@@ -76,13 +76,9 @@ public class ScheduleService {
         return scheduleRepository.findAll();
     }
 
-    public Page<Schedule> findAllWithEagerRelationships(Pageable pageable) {
-        return scheduleRepository.findAllWithEagerRelationships(pageable);
-    }
-
     @Transactional(readOnly = true)
     public Optional<Schedule> findOne(Long id) {
-        return scheduleRepository.findOneWithEagerRelationships(id);
+        return scheduleRepository.findById(id);
     }
 
     @Transactional

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softkour.qrsta_server.config.GenericResponse;
-import com.softkour.qrsta_server.repo.StudentCourseRepository;
+import com.softkour.qrsta_server.repo.course.StudentCourseRepository;
 
 @RestController
 @RequestMapping("/late/")

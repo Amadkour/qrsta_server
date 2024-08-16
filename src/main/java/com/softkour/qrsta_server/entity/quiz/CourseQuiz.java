@@ -6,16 +6,12 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.softkour.qrsta_server.entity.course.Course;
+import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 
 import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.payload.request.QuizCourseSession;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,22 +24,28 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CourseQuiz extends AbstractAuditingEntity {
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<SessionQuiz> sessions = new HashSet<>();
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "course_quiz_sessions",
+            joinColumns = @JoinColumn(name = "course_quiz_id"),
+            inverseJoinColumns = @JoinColumn(name = "sessions_id")
+    )
+    private Set<Session> sessions = new HashSet<>();
 
     @Column()
     private Instant startDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"useOnlinePayment", "enableAbsence", "enableAutoJoin", "enableAutoChangeDevice"}, allowSetters = true)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     private Course course;
 
-    public void addSession(SessionQuiz sessionQuiz) {
-        sessions.add(sessionQuiz);
-        sessionQuiz.setQuiz(this);
+    public void addSession(Session session) {
+        if (!this.sessions.contains(session)) {
+            this.sessions.add(session);
+            session.getCourseQuizzes().add(this);
+        }
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"students", "courses", "sessions", "students"}, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Quiz quiz;
 
     public QuizCourseSession toQuizCourseSession() {
@@ -52,9 +54,12 @@ public class CourseQuiz extends AbstractAuditingEntity {
             covered.setCourseId(getCourse().getId());
         }
         if (!getSessions().isEmpty()) {
-            covered.setSessionsId(getSessions().stream().map(e -> e.getSession().getId()).toList());
+            covered.setSessionsId(getSessions().stream().map(AbstractAuditingEntity::getId).toList());
         }
         return covered;
-
     }
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<StudentQuiz> students = new HashSet<>();
+
 }

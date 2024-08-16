@@ -1,4 +1,4 @@
-package com.softkour.qrsta_server.repo;
+package com.softkour.qrsta_server.repo.quiz;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

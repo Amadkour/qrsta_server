@@ -2,12 +2,14 @@ package com.softkour.qrsta_server.entity.course;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.DoubleStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.softkour.qrsta_server.entity.quiz.SessionQuiz;
+import com.softkour.qrsta_server.entity.quiz.CourseQuiz;
+import com.softkour.qrsta_server.entity.quiz.Question;
+import com.softkour.qrsta_server.entity.quiz.StudentQuiz;
 import com.softkour.qrsta_server.entity.user.AbstractAuditingEntity;
 import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.payload.response.SessionDateAndStudentGrade;
@@ -16,14 +18,7 @@ import com.softkour.qrsta_server.payload.response.SessionDetailsWithoutStudents;
 import com.softkour.qrsta_server.payload.response.SessionNameAndId;
 import com.softkour.qrsta_server.payload.response.SessionObjectResponse;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,9 +32,8 @@ public class Session extends AbstractAuditingEntity {
     @JsonIgnoreProperties(value = {"sessions", "courses", "offers", "needToReplace"}, allowSetters = true)
     private Set<Student> students = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
-    @JsonIgnoreProperties(value = {"sessions", "quizzes"}, allowSetters = true)
-    private Set<SessionQuiz> quizzes = new HashSet<>();
+    @ManyToMany(mappedBy = "sessions", cascade = CascadeType.PERSIST)
+    private Set<CourseQuiz> courseQuizzes = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
     @JsonIgnoreProperties(value = {"session"}, allowSetters = true)
@@ -48,8 +42,8 @@ public class Session extends AbstractAuditingEntity {
     @Column()
     private Instant startDate;
 
-    // @Column(columnDefinition = "boolean default false")
-    // private boolean active;
+    @Column(columnDefinition = "boolean default false")
+    private boolean finish;
 
     @Column()
     private String label;
@@ -73,16 +67,48 @@ public class Session extends AbstractAuditingEntity {
         return this;
     }
 
-    public Session removeStudent(Student employee) {
+    public void removeStudent(Student employee) {
         students.remove(employee);
         employee.getSessions().remove(this);
-        return this;
+    }
+
+    public SessionDateAndStudentGrade toQuizSession() {
+
+        Instant now = Instant.now();
+        return new SessionDateAndStudentGrade(
+                null,
+                null,
+                getId(),
+                getLabel(),
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     public SessionDateAndStudentGrade toSessionDateAndStudentGrade(Long studentId) {
-        double grade = getQuizzes().stream().reduce((first, second) -> second)
-                .orElse(new SessionQuiz(null)).getStudents()
-                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
+        double grade = 0;
+        int totalGrade = 0;
+        System.out.println("==================" + getCourseQuizzes().size() + "================");
+//        for (CourseQuiz sessionQuiz : getCourseQuizzes()) {
+//            System.out.println(sessionQuiz.getSessions().size()+"wwwwwwwwwwwwwww");
+//            System.out.println(sessionQuiz.getQuiz().getId());
+//            if (!sessionQuiz.getStudents().isEmpty() && !sessionQuiz.getQuiz().getQuestions().isEmpty()) {
+//                grade += sessionQuiz.getStudents().stream().mapToDouble(StudentQuiz::getGrade).reduce(0, Double::sum);
+//                totalGrade += sessionQuiz.getQuiz().getQuestions().stream().map(Question::getGrade).reduce(0, Integer::sum);
+//            }
+//        }
+        try {
+            CourseQuiz sessionQuiz = getCourseQuizzes().iterator().next();
+            if (!sessionQuiz.getStudents().isEmpty() && !sessionQuiz.getQuiz().getQuestions().isEmpty()) {
+                grade += sessionQuiz.getStudents().stream().mapToDouble(StudentQuiz::getGrade).reduce(0, Double::sum);
+                totalGrade += sessionQuiz.getQuiz().getQuestions().stream().map(Question::getGrade).reduce(0, Integer::sum);
+
+            }
+        } catch (Exception ignored) {
+
+        }
         Instant now = Instant.now();
         return new SessionDateAndStudentGrade(
                 TimeUnit.MINUTES.convert(getStartDate().toEpochMilli() - now.toEpochMilli(),
@@ -93,15 +119,18 @@ public class Session extends AbstractAuditingEntity {
                 getLabel(),
                 getStudents().size(),
                 getCourse().getStudents().size(),
-                grade,
-                now.isAfter(getEndDate()),
-                getStudents().stream().anyMatch(e -> e.getUser().getId() == studentId));
+                grade / totalGrade,
+                now.isAfter(getEndDate()) || isFinish(),
+                getStudents().stream().anyMatch(e -> Objects.equals(e.getUser().getId(), studentId)));
     }
 
     public SessionDateAndStudentGrade toSessionDateAndStudentGradeWithAttendance(Boolean attendance) {
-        double grade = getQuizzes().stream().reduce((first, second) -> second)
-                .orElse(new SessionQuiz(null)).getStudents()
-                .stream().flatMapToDouble(s -> DoubleStream.of(s.getGrade())).average().orElse(0);
+        double grade = 0;
+        int totalGrade = 0;
+        for (CourseQuiz sessionQuiz : getCourseQuizzes()) {
+            grade = sessionQuiz.getStudents().stream().mapToDouble(StudentQuiz::getGrade).reduce(0, Double::sum);
+            totalGrade = sessionQuiz.getQuiz().getQuestions().stream().map(Question::getGrade).reduce(0, Integer::sum);
+        }
         Instant now = Instant.now();
         return new SessionDateAndStudentGrade(
                 TimeUnit.MINUTES.convert(getStartDate().toEpochMilli() - now.toEpochMilli(),
@@ -112,10 +141,10 @@ public class Session extends AbstractAuditingEntity {
                 getLabel(),
                 getStudents().size(),
                 getCourse().getStudents().size(),
-                grade,
-                now.isAfter(getEndDate()),
+                grade / totalGrade,
+                now.isAfter(getEndDate()) || isFinish(),
 
-                attendance == null ? false : attendance);
+                attendance != null && attendance);
     }
 
     public SessionNameAndId toSessionNameAndId() {
@@ -134,14 +163,14 @@ public class Session extends AbstractAuditingEntity {
                                 /// attendance
                                 sessions.stream()
                                         .map(s -> s.getStudents().stream()
-                                                .anyMatch(b -> b.getId() == e
+                                                .anyMatch(b -> Objects.equals(b.getId(), e
                                                         .getStudent()
-                                                        .getId()))
+                                                        .getId())))
                                         .toList(),
                                 /// isPresent in this Session?
                                 getStudents().stream()
-                                        .anyMatch(m -> m.getId() == e
-                                                .getStudent().getId()),
+                                        .anyMatch(m -> Objects.equals(m.getId(), e
+                                                .getStudent().getId())),
                                 /// course
                                 getCourse().getId()))
                         .toList());
@@ -162,11 +191,5 @@ public class Session extends AbstractAuditingEntity {
                                         .toList(),
                                 e.getType(), e.getCreatedDate(), e.getId()))
                         .toList());
-    }
-
-    public SessionQuiz toSessionQuiz() {
-        SessionQuiz sessionQuiz = new SessionQuiz();
-        sessionQuiz.setSession(this);
-        return sessionQuiz;
     }
 }

@@ -22,7 +22,7 @@ import com.softkour.qrsta_server.entity.user.Student;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
 import com.softkour.qrsta_server.payload.request.RequstForm;
-import com.softkour.qrsta_server.repo.StudentCourseRepository;
+import com.softkour.qrsta_server.repo.course.StudentCourseRepository;
 import com.softkour.qrsta_server.service.AuthService;
 import com.softkour.qrsta_server.service.course.CourseService;
 

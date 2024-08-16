@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.softkour.qrsta_server.entity.course.Session;
 import com.softkour.qrsta_server.entity.user.User;
 import com.softkour.qrsta_server.exception.ClientException;
-import com.softkour.qrsta_server.repo.SessionRepository;
+import com.softkour.qrsta_server.repo.course.SessionRepository;
 import com.softkour.qrsta_server.service.course.CourseService;
 
 @Service
@@ -63,6 +63,13 @@ public class SessionService {
         sessionRepository.deleteById(id);
     }
 
+    public void finish(Long id) {
+        Session s=sessionRepository.findById(id) .orElseThrow(
+                () -> new ClientException("session", "session not found id: ".concat(id.toString())));
+        s.setFinish(true);
+        sessionRepository.save(s);
+    }
+
     public Session addStudentToSession(User user, Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(
@@ -86,7 +93,11 @@ public class SessionService {
             /// check user join this course
             if (user.getStudent()
                     .getCourses().stream().anyMatch(c -> c.getCourse().getId() == session.getCourse().getId())) {
-                session.addStudent(user.getStudent());
+                if(session.getStudents().stream().anyMatch(e->e.getId()==user.getStudent().getId())){
+                    session.removeStudent(user.getStudent());
+                }else {
+                    session.addStudent(user.getStudent());
+                }
                 sessionRepository.save(session);
             } else {
                 throw new ClientException("student",

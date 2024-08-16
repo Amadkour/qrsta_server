@@ -10,26 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import com.softkour.qrsta_server.entity.course.Schedule;
 
-/**
- * Spring Data JPA repository for the Schedule entity.
- *
- * When extending this class, extend ScheduleRepositoryWithBagRelationships too.
- * For more information refer to
- * https://github.com/jhipster/generator-jhipster/issues/17990.
- */
 @Repository
-public interface ScheduleRepository extends ScheduleRepositoryWithBagRelationships, JpaRepository<Schedule, Long> {
-    default Optional<Schedule> findOneWithEagerRelationships(Long id) {
-        return this.fetchBagRelationships(this.findById(id));
-    }
+public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-    default List<Schedule> findAllWithEagerRelationships() {
-        return this.fetchBagRelationships(this.findAll());
-    }
-
-    default Page<Schedule> findAllWithEagerRelationships(Pageable pageable) {
-        return this.fetchBagRelationships(this.findAll(pageable));
-    }
 
     List<Schedule> findAllByCourses_teacher_Id(Long userId);
 
